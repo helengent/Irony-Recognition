@@ -1,0 +1,539 @@
+---
+title: "Pilot"
+author: "Helen Gent"
+date: "3/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(stringr)
+require(mgcv)
+require(devtools)
+require(itsadug)
+require(tidyverse)
+require(lme4)
+require(lmerTest)
+require(MuMIn)
+require(sjPlot)
+require(reticulate)
+```
+
+```{r}
+#df_global = read.csv("f0comparisonFile/big.csv")
+
+
+#df_global = select(df_global, Name, Speaker, Irony, parseltonguef0, reaperf0)
+
+```
+
+
+Global Measures
+```{r}
+
+#bData_global = filter(df_global, Speaker == "B")
+#gData_global = filter(df_global, Speaker == "G")
+#pData_global = filter(df_global, Speaker == "P")
+#rData_global = filter(df_global, Speaker == "R")
+#yData_global = filter(df_global, Speaker == "Y")
+
+#iAll_global = filter(df_global, Irony == "i")
+#nAll_global = filter(df_global, Irony == "n")
+
+#ib_global = filter(bData_global, Irony == "i")
+#nb_global = filter(bData_global, Irony == "n")
+
+#ig_global = filter(gData_global, Irony == "i")
+#ng_global = filter(gData_global, Irony == "n")
+
+#ip_global = filter(pData_global, Irony == "i")
+#np_global = filter(pData_global, Irony == "n")
+
+#ir_global = filter(rData_global, Irony == "i")
+#nr_global = filter(rData_global, Irony == "n")
+
+#iy_global = filter(yData_global, Irony == "i")
+#ny_global = filter(yData_global, Irony == "n")
+```
+
+```{r}
+duplicationAll = read.csv("f0comparisonFile/duplicationAll.csv")
+duplicationAll = select(duplicationAll, Name, Speaker, Irony, parseltonguef0, reaperf0)
+
+duplicationB = read.csv("f0comparisonFile/duplicationB.csv")
+duplicationB = select(duplicationB, Name, Speaker, Irony, parseltonguef0, reaperf0)
+
+duplicationG = read.csv("f0comparisonFile/duplicationG.csv")
+duplicationG = select(duplicationG, Name, Speaker, Irony, parseltonguef0, reaperf0)
+
+duplicationP = read.csv("f0comparisonFile/duplicationP.csv")
+duplicationP = select(duplicationP, Name, Speaker, Irony, parseltonguef0, reaperf0)
+
+duplicationR = read.csv("f0comparisonFile/duplicationR.csv")
+duplicationR = select(duplicationR, Name, Speaker, Irony, parseltonguef0, reaperf0)
+
+duplicationY = read.csv("f0comparisonFile/duplicationY.csv")
+duplicationY = select(duplicationY, Name, Speaker, Irony, parseltonguef0, reaperf0)
+```
+
+
+```{r}
+all75 = read.csv("f0comparisonFile/A.csv")
+all75 = select(all75, name, speaker, lab, time)
+B75 = read.csv("f0comparisonFile/B.csv")
+B75 = select(B75, name, speaker, lab, time)
+G75 = read.csv("f0comparisonFile/G.csv")
+G75 = select(G75, name, speaker, lab, time)
+P75 = read.csv("f0comparisonFile/P.csv")
+P75 = select(P75, name, speaker, lab, time)
+R75 = read.csv("f0comparisonFile/R.csv")
+R75 = select(R75, name, speaker, lab, time)
+Y75 = read.csv("f0comparisonFile/Y.csv")
+Y75 = select(Y75, name, speaker, lab, time)
+```
+
+```{r}
+Allfiles = unique(all75$name)
+Bfiles = unique(B75$name)
+Gfiles = unique(G75$name)
+Pfiles = unique(P75$name)
+Rfiles = unique(R75$name)
+Yfiles = unique(Y75$name)
+```
+
+
+```{r}
+#create reaperAll
+N = length(Allfiles)
+allData = array(1:(N*75), dim=c(N,75))
+i = 1
+  for (value in Allfiles)
+  {
+
+    temp = subset(duplicationAll, Name == value)
+    f0Line = approx(temp$reaperf0,n=75)$y
+    
+    allData[i,] = f0Line
+    i = i + 1
+    
+  }
+
+allData = array_reshape(allData, dim=c((N*75),1))
+reaperAll = data.frame(name = all75$name, speaker = all75$speaker, lab = all75$lab, time = all75$time)
+reaperAll$f0 = allData
+
+#create reaperB
+N = length(Bfiles)
+BData = array(1:(N*75), dim=c(N,75))
+i = 1
+  for (value in Bfiles)
+  {
+
+    temp = subset(duplicationB, Name == value)
+    f0Line = approx(temp$reaperf0,n=75)$y
+    
+    BData[i,] = f0Line
+    i = i + 1
+    
+  }
+
+BData = array_reshape(BData, dim=c((N*75),1))
+reaperB = data.frame(name = B75$name, speaker = B75$speaker, lab = B75$lab, time = B75$time)
+reaperB$f0 = BData
+
+#create reaperG
+N = length(Gfiles)
+GData = array(1:(N*75), dim=c(N,75))
+i = 1
+  for (value in Gfiles)
+  {
+
+    temp = subset(duplicationG, Name == value)
+    f0Line = approx(temp$reaperf0,n=75)$y
+    
+    GData[i,] = f0Line
+    i = i + 1
+    
+  }
+
+GData = array_reshape(GData, dim=c((N*75),1))
+reaperG = data.frame(name = G75$name, speaker = G75$speaker, lab = G75$lab, time = G75$time)
+reaperG$f0 = GData
+
+#create reaperP
+N = length(Pfiles)
+PData = array(1:(N*75), dim=c(N,75))
+i = 1
+  for (value in Pfiles)
+  {
+
+    temp = subset(duplicationP, Name == value)
+    f0Line = approx(temp$reaperf0,n=75)$y
+    
+    PData[i,] = f0Line
+    i = i + 1
+    
+  }
+
+PData = array_reshape(PData, dim=c((N*75),1))
+reaperP = data.frame(name = P75$name, speaker = P75$speaker, lab = P75$lab, time = P75$time)
+reaperP$f0 = PData
+
+#create reaperR
+N = length(Rfiles)
+RData = array(1:(N*75), dim=c(N,75))
+i = 1
+  for (value in Rfiles)
+  {
+
+    temp = subset(duplicationR, Name == value)
+    f0Line = approx(temp$reaperf0,n=75)$y
+    
+    RData[i,] = f0Line
+    i = i + 1
+    
+  }
+
+RData = array_reshape(RData, dim=c((N*75),1))
+reaperR = data.frame(name = R75$name, speaker = R75$speaker, lab = R75$lab, time = R75$time)
+reaperR$f0 = RData
+
+#create reaperY
+N = length(Yfiles)
+YData = array(1:(N*75), dim=c(N,75))
+i = 1
+  for (value in Yfiles)
+  {
+
+    temp = subset(duplicationY, Name == value)
+    f0Line = approx(temp$reaperf0,n=75)$y
+    
+    YData[i,] = f0Line
+    i = i + 1
+    
+  }
+
+YData = array_reshape(YData, dim=c((N*75),1))
+reaperY = data.frame(name = Y75$name, speaker = Y75$speaker, lab = Y75$lab, time = Y75$time)
+reaperY$f0 = YData
+```
+
+```{r}
+#create parselAll
+N = length(Allfiles)
+allData = array(1:(N*75), dim=c(N,75))
+i = 1
+  for (value in Allfiles)
+  {
+
+    temp = subset(duplicationAll, Name == value)
+    f0Line = approx(temp$parseltonguef0,n=75)$y
+    
+    allData[i,] = f0Line
+    i = i + 1
+    
+  }
+
+allData = array_reshape(allData, dim=c((N*75),1))
+parselAll = data.frame(name = all75$name, speaker = all75$speaker, lab = all75$lab, time = all75$time)
+parselAll$f0 = allData
+
+#create parselB
+N = length(Bfiles)
+BData = array(1:(N*75), dim=c(N,75))
+i = 1
+  for (value in Bfiles)
+  {
+
+    temp = subset(duplicationB, Name == value)
+    f0Line = approx(temp$parseltonguef0,n=75)$y
+    
+    BData[i,] = f0Line
+    i = i + 1
+    
+  }
+
+BData = array_reshape(BData, dim=c((N*75),1))
+parselB = data.frame(name = B75$name, speaker = B75$speaker, lab = B75$lab, time = B75$time)
+parselB$f0 = BData
+
+#create parselG
+N = length(Gfiles)
+GData = array(1:(N*75), dim=c(N,75))
+i = 1
+  for (value in Gfiles)
+  {
+
+    temp = subset(duplicationG, Name == value)
+    f0Line = approx(temp$parseltonguef0,n=75)$y
+    
+    GData[i,] = f0Line
+    i = i + 1
+    
+  }
+
+GData = array_reshape(GData, dim=c((N*75),1))
+parselG = data.frame(name = G75$name, speaker = G75$speaker, lab = G75$lab, time = G75$time)
+parselG$f0 = GData
+
+#create parselP
+N = length(Pfiles)
+PData = array(1:(N*75), dim=c(N,75))
+i = 1
+  for (value in Pfiles)
+  {
+
+    temp = subset(duplicationP, Name == value)
+    f0Line = approx(temp$parseltonguef0,n=75)$y
+    
+    PData[i,] = f0Line
+    i = i + 1
+    
+  }
+
+PData = array_reshape(PData, dim=c((N*75),1))
+parselP = data.frame(name = P75$name, speaker = P75$speaker, lab = P75$lab, time = P75$time)
+parselP$f0 = PData
+
+#create parselR
+N = length(Rfiles)
+RData = array(1:(N*75), dim=c(N,75))
+i = 1
+  for (value in Rfiles)
+  {
+
+    temp = subset(duplicationR, Name == value)
+    f0Line = approx(temp$parseltonguef0,n=75)$y
+    
+    RData[i,] = f0Line
+    i = i + 1
+    
+  }
+
+RData = array_reshape(RData, dim=c((N*75),1))
+parselR = data.frame(name = R75$name, speaker = R75$speaker, lab = R75$lab, time = R75$time)
+parselR$f0 = RData
+
+#create parselY
+N = length(Yfiles)
+YData = array(1:(N*75), dim=c(N,75))
+i = 1
+  for (value in Yfiles)
+  {
+
+    temp = subset(duplicationY, Name == value)
+    f0Line = approx(temp$parseltonguef0,n=75)$y
+    
+    YData[i,] = f0Line
+    i = i + 1
+    
+  }
+
+YData = array_reshape(YData, dim=c((N*75),1))
+parselY = data.frame(name = Y75$name, speaker = Y75$speaker, lab = Y75$lab, time = Y75$time)
+parselY$f0 = YData
+```
+
+```{r}
+#All Speakers GAM using reaper
+#The model
+m1all=bam(f0 ~ lab + te(time, by=lab) + s(speaker, bs="re") + s(time, speaker, bs="fs", m=1), data=reaperAll)
+
+#Summary table
+summary(m1all)
+
+#Plots
+par(mfrow=c(2,2))
+plot(m1all, select=1, main = "All Speakers: Ironic", shade=TRUE, shade.col = "seagreen2")
+plot(m1all, select=2, main = "All Speakers: Non-Ironic", shade=TRUE, shade.col = "wheat")
+plot(m1all, select=1, ylab = "te(time):lab", xlab = "time", main = "All Speakers: Both Curves");
+par(new=TRUE); plot(m1all, select=2, ylab = "", xlab = "", main = "", col="indianred4")
+plot_diff(m1all, view = 'time', shade=TRUE, comp=list(lab = c("i", "n")))
+```
+
+```{r}
+#Speaker B GAM using reaper
+#The model
+m1B=bam(f0 ~ lab + te(time, by=lab) , data=reaperB)
+
+#Summary table
+summary(m1B)
+
+#Plots
+par(mfrow=c(2,2))
+plot(m1B, select=1, main = "Speaker B: Ironic", shade=TRUE, shade.col = "seagreen2")
+plot(m1B, select=2, main = "Speaker B: Non-Ironic", shade=TRUE, shade.col = "wheat")
+plot(m1B, select=1, ylab = "te(time):lab", xlab = "time", main = "Speaker B: Both Curves");
+par(new=TRUE); plot(m1B, select=2, ylab = "", xlab = "", main = "", col="indianred4")
+plot_diff(m1B, view = 'time', shade=TRUE, comp=list(lab = c("i", "n")))
+```
+
+```{r}
+#Speaker G GAM using reaper
+#The model
+m1G=bam(f0 ~ lab + te(time, by=lab) , data=reaperG)
+
+#Summary table
+summary(m1G)
+
+#Plots
+par(mfrow=c(2,2))
+plot(m1G, select=1, main = "Speaker G: Ironic", shade=TRUE, shade.col = "seagreen2")
+plot(m1G, select=2, main = "Speaker G: Non-Ironic", shade=TRUE, shade.col = "wheat")
+plot(m1G, select=1, ylab = "te(time):lab", xlab = "time", main = "Speaker G: Both Curves");
+par(new=TRUE); plot(m1G, select=2, ylab = "", xlab = "", main = "", col="indianred4")
+plot_diff(m1B, view = 'time', shade=TRUE, comp=list(lab = c("i", "n")))
+```
+
+```{r}
+#Speaker P GAM using reaper
+#The model
+m1P=bam(f0 ~ lab + te(time, by=lab) , data=reaperP)
+
+#Summary table
+summary(m1P)
+
+#Plots
+par(mfrow=c(2,2))
+plot(m1P, select=1, main = "Speaker P: Ironic", shade=TRUE, shade.col = "seagreen2")
+plot(m1P, select=2, main = "Speaker P: Non-Ironic", shade=TRUE, shade.col = "wheat")
+plot(m1P, select=1, ylab = "te(time):lab", xlab = "time", main = "Speaker P: Both Curves");
+par(new=TRUE); plot(m1P, select=2, ylab = "", xlab = "", main = "", col="indianred4")
+plot_diff(m1P, view = 'time', shade=TRUE, comp=list(lab = c("i", "n")))
+```
+
+```{r}
+#Speaker R GAM using reaper
+#The model
+m1R=bam(f0 ~ lab + te(time, by=lab) , data=reaperR)
+
+#Summary table
+summary(m1R)
+
+#Plots
+par(mfrow=c(2,2))
+plot(m1R, select=1, main = "Speaker R: Ironic", shade=TRUE, shade.col = "seagreen2")
+plot(m1R, select=2, main = "Speaker R: Non-Ironic", shade=TRUE, shade.col = "wheat")
+plot(m1R, select=1, ylab = "te(time):lab", xlab = "time", main = "Speaker R: Both Curves");
+par(new=TRUE); plot(m1R, select=2, ylab = "", xlab = "", main = "", col="indianred4")
+plot_diff(m1R, view = 'time', shade=TRUE, comp=list(lab = c("i", "n")))
+```
+
+```{r}
+#Speaker Y GAM using reaper
+#The model
+m1Y=bam(f0 ~ lab + te(time, by=lab) , data=reaperY)
+
+#Summary table
+summary(m1Y)
+
+#Plots
+par(mfrow=c(2,2))
+plot(m1Y, select=1, main = "Speaker Y: Ironic", shade=TRUE, shade.col = "seagreen2")
+plot(m1Y, select=2, main = "Speaker Y: Non-Ironic", shade=TRUE, shade.col = "wheat")
+plot(m1Y, select=1, ylab = "te(time):lab", xlab = "time", main = "Speaker Y: Both Curves");
+par(new=TRUE); plot(m1Y, select=2, ylab = "", xlab = "", main = "", col="indianred4")
+plot_diff(m1Y, view = 'time', shade=TRUE, comp=list(lab = c("i", "n")))
+```
+
+```{r}
+#All Speakers GAM using parseltongue
+#The model
+m1all=bam(f0 ~ lab + te(time, by=lab) + s(speaker, bs="re") + s(time, speaker, bs="fs", m=1), data=parselAll)
+
+#Summary table
+summary(m1all)
+
+#Plots
+par(mfrow=c(2,2))
+plot(m1all, select=1, main = "All Speakers: Ironic", shade=TRUE, shade.col = "seagreen2")
+plot(m1all, select=2, main = "All Speakers: Non-Ironic", shade=TRUE, shade.col = "wheat")
+plot(m1all, select=1, ylab = "te(time):lab", xlab = "time", main = "All Speakers: Both Curves");
+par(new=TRUE); plot(m1all, select=2, ylab = "", xlab = "", main = "", col="indianred4")
+plot_diff(m1all, view = 'time', shade=TRUE, comp=list(lab = c("i", "n")))
+```
+
+```{r}
+#Speaker B GAM using parseltongue
+#The model
+m1B=bam(f0 ~ lab + te(time, by=lab) , data=parselB)
+
+#Summary table
+summary(m1B)
+
+#Plots
+par(mfrow=c(2,2))
+plot(m1B, select=1, main = "Speaker B: Ironic", shade=TRUE, shade.col = "seagreen2")
+plot(m1B, select=2, main = "Speaker B: Non-Ironic", shade=TRUE, shade.col = "wheat")
+plot(m1B, select=1, ylab = "te(time):lab", xlab = "time", main = "Speaker B: Both Curves");
+par(new=TRUE); plot(m1B, select=2, ylab = "", xlab = "", main = "", col="indianred4")
+plot_diff(m1B, view = 'time', shade=TRUE, comp=list(lab = c("i", "n")))
+```
+
+```{r}
+#Speaker G GAM using parseltongue
+#The model
+m1G=bam(f0 ~ lab + te(time, by=lab) , data=parselG)
+
+#Summary table
+summary(m1G)
+
+#Plots
+par(mfrow=c(2,2))
+plot(m1G, select=1, main = "Speaker G: Ironic", shade=TRUE, shade.col = "seagreen2")
+plot(m1G, select=2, main = "Speaker G: Non-Ironic", shade=TRUE, shade.col = "wheat")
+plot(m1G, select=1, ylab = "te(time):lab", xlab = "time", main = "Speaker G: Both Curves");
+par(new=TRUE); plot(m1G, select=2, ylab = "", xlab = "", main = "", col="indianred4")
+plot_diff(m1B, view = 'time', shade=TRUE, comp=list(lab = c("i", "n")))
+```
+
+```{r}
+#Speaker P GAM using parseltongue
+#The model
+m1P=bam(f0 ~ lab + te(time, by=lab) , data=parselP)
+
+#Summary table
+summary(m1P)
+
+#Plots
+par(mfrow=c(2,2))
+plot(m1P, select=1, main = "Speaker P: Ironic", shade=TRUE, shade.col = "seagreen2")
+plot(m1P, select=2, main = "Speaker P: Non-Ironic", shade=TRUE, shade.col = "wheat")
+plot(m1P, select=1, ylab = "te(time):lab", xlab = "time", main = "Speaker P: Both Curves");
+par(new=TRUE); plot(m1P, select=2, ylab = "", xlab = "", main = "", col="indianred4")
+plot_diff(m1P, view = 'time', shade=TRUE, comp=list(lab = c("i", "n")))
+```
+
+```{r}
+#Speaker R GAM using parseltongue
+#The model
+m1R=bam(f0 ~ lab + te(time, by=lab) , data=parselR)
+
+#Summary table
+summary(m1R)
+
+#Plots
+par(mfrow=c(2,2))
+plot(m1R, select=1, main = "Speaker R: Ironic", shade=TRUE, shade.col = "seagreen2")
+plot(m1R, select=2, main = "Speaker R: Non-Ironic", shade=TRUE, shade.col = "wheat")
+plot(m1R, select=1, ylab = "te(time):lab", xlab = "time", main = "Speaker R: Both Curves");
+par(new=TRUE); plot(m1R, select=2, ylab = "", xlab = "", main = "", col="indianred4")
+plot_diff(m1R, view = 'time', shade=TRUE, comp=list(lab = c("i", "n")))
+```
+
+```{r}
+#Speaker Y GAM using parseltongue
+#The model
+m1Y=bam(f0 ~ lab + te(time, by=lab) , data=parselY)
+
+#Summary table
+summary(m1Y)
+
+#Plots
+par(mfrow=c(2,2))
+plot(m1Y, select=1, main = "Speaker Y: Ironic", shade=TRUE, shade.col = "seagreen2")
+plot(m1Y, select=2, main = "Speaker Y: Non-Ironic", shade=TRUE, shade.col = "wheat")
+plot(m1Y, select=1, ylab = "te(time):lab", xlab = "time", main = "Speaker Y: Both Curves");
+par(new=TRUE); plot(m1Y, select=2, ylab = "", xlab = "", main = "", col="indianred4")
+plot_diff(m1Y, view = 'time', shade=TRUE, comp=list(lab = c("i", "n")))
+```
