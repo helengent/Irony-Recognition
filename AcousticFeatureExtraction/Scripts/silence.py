@@ -2,9 +2,9 @@
 
 import os, shutil, glob, sys
 from scipy.signal import firwin, lfilter
-from WAVReader import WAVReader as WR
-from WAVWriter import WAVWriter as WW
-from DSP_Tools import findEndpoint, normaliseRMS, rms
+from lib.WAVReader import WAVReader as WR
+from lib.WAVWriter import WAVWriter as WW
+from lib.DSP_Tools import findEndpoint, normaliseRMS, rms
 import matplotlib.pyplot as plt
 import numpy as np
 

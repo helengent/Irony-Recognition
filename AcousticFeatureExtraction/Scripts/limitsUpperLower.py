@@ -1,5 +1,6 @@
 #/usr/bin/env python3
 
+import os
 from sd import sd
 import parselmouth
 from glob import glob
@@ -16,7 +17,7 @@ def lowerLimit(vec):
     lower = mean - sdev * 2.5
     return lower
 
-'''def assembleVec(files):
+def assembleVec(files):
     vec = []
     for thing in files:
         f = open(thing, "r")
@@ -28,19 +29,19 @@ def lowerLimit(vec):
                 vec.append(float(item))
             else:
                 vec.append(0.0)
-    return vec'''
+    return vec
 
 #New method to work with parseltongue and WAV files instead of REAPER text outputs
-def assembleVec(files):
-    vec = []
-    for thing in files:
-        snd = parselmouth.Sound(thing)
-        f0 = snd.to_pitch(time_step=0.005)
-        fValues = f0.selected_array['frequency']
-        for value in fValues:
-            if value > 0:
-                vec.append(value)
-    return vec
+# def assembleVec(files):
+#     vec = []
+#     for thing in files:
+#         snd = parselmouth.Sound(thing)
+#         f0 = snd.to_pitch(time_step=0.005)
+#         fValues = f0.selected_array['frequency']
+#         for value in fValues:
+#             if value > 0:
+#                 vec.append(value)
+#     return vec
 
 def giveLowerLimit(vec):
     lowerLim = lowerLimit(vec)
@@ -67,21 +68,21 @@ def giveSD(vec):
     return SD
 
 if __name__=="__main__":
-    f0Files = glob('../SmolWaves/*/*/*.wav')
+    f0Files = glob('../ReaperF0Results/*/*/*.f0.p')
     speakerList = ["B", "G", "P", "R", "Y"]
     for speaker in speakerList:
         filesList = []
         indv = {}
         indv["speaker"] = speaker
         for item in f0Files:
-            if item[13] == speaker:
+            if os.path.basename(item).split("_")[1][0].upper() == speaker:
                 filesList.append(item)
         vec = assembleVec(filesList)
         indv["upper"] = giveUpperLimit(vec)
         indv["lower"] = giveLowerLimit(vec)
         indv["mean"] = giveMean(vec)
         indv["sd"] = giveSD(vec)
-        with open('../{}.txt'.format(speaker), 'w') as f:
+        with open('../SpeakerF0Stats/{}.txt'.format(speaker), 'w') as f:
             for key in indv.keys():
                 f.write("{}\t{}\n".format(key, str(indv[key])))
         f.close()

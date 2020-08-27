@@ -10,7 +10,7 @@
 import wave
 import struct
 import numpy as np
-import DSP_Tools as dsp
+import lib.DSP_Tools as dsp
 
 class WAVReader():
     def __init__(self, wavfile):

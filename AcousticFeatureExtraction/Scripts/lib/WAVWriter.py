@@ -9,7 +9,7 @@
 import wave
 import struct
 import numpy as np
-import DSP_Tools as dsp
+import lib.DSP_Tools as dsp
 
 class WAVWriter():
     def __init__(self, wavfile, data, fs=44100, bits=16):

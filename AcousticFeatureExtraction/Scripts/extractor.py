@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
 
-from speaker import Speaker
-from sd import sd
-from f0_parseltongue import smooth
-from limitsUpperLower import giveMean, giveSD
-from reaper_f0extractor import f0VecTime
-from glob import glob
-import numpy as np
+import os
 import sys
-import pandas as pd
+from sd import sd
+import numpy as np
 import parselmouth
-from python_speech_features import mfcc, logfbank
-from scipy.io import wavfile as wave
+import pandas as pd
+from glob import glob
+from speaker import Speaker
 import matplotlib.pyplot as plt
-from WAVReader import WAVReader as WR
-from DSP_Tools import findEndpoint, normaliseRMS
+from f0_parseltongue import smooth
+from scipy.io import wavfile as wave
 from silence import highPass, validateTs
+from reaper_f0extractor import f0VecTime
+from lib.WAVReader import WAVReader as WR
+from limitsUpperLower import giveMean, giveSD
+from python_speech_features import mfcc, logfbank
+from lib.DSP_Tools import findEndpoint, normaliseRMS
 
 def plotIt(listoThings, x):
     fig, axs = plt.subplots(len(listoThings), constrained_layout=True)
@@ -113,59 +114,60 @@ class Extractor:
 
 
 if __name__ == "__main__":
-    #initiate speakers list:
-    B = Speaker("B", "../B.txt", gender="m")
-    G = Speaker("G", "../G.txt", gender="f")
-    P = Speaker("P", "../P.txt", gender="f")
-    R = Speaker("R", "../R.txt", gender="nb")
-    Y = Speaker("Y", "../Y.txt", gender="m")
-    speakers = [B, G, P, R, Y]
+    # #initiate speakers list:
+    # B = Speaker("B", "../SpeakerF0Stats/B.txt", gender="m")
+    # G = Speaker("G", "../SpeakerF0Stats/G.txt", gender="f")
+    # P = Speaker("P", "../SpeakerF0Stats/P.txt", gender="f")
+    # R = Speaker("R", "../SpeakerF0Stats/R.txt", gender="nb")
+    # Y = Speaker("Y", "../SpeakerF0Stats/Y.txt", gender="m")
+    # speakers = [B, G, P, R, Y]
 
-    #wavs = glob('../mono_waves/*/*/*.wav')
-    wavs = glob('../TestWaves/*/*/*.wav')
-    wavs.sort()
-    #f0Files = glob('../LooseDataF0/*/*/*.f0.p')
-    f0Files = glob('../Test_DataF0/*/*/*.f0.p')
-    f0Files.sort()
+    # #wavs = glob('../../AudioData/SmolWaves/*/*/*.wav')
+    # wavs = glob('../../AudioData/TestWaves/*/*/*.wav')
+    # wavs.sort()
+    # #f0Files = glob('../ReaperF0Results/*/*/*.f0.p')
+    # f0Files = [glob("../ReaperF0Results/*/*/{}.f0.p".format(os.path.basename(wav).split(".")[0])) for wav in wavs]
+    # f0Files.sort()
 
-    masterList = []
-    #f0sequential = []
+    # masterList = []
+    # #f0sequential = []
 
-    upperDur = 8.715
+    # upperDur = 8.715
 
-    for i in range(len(wavs)):
+    # for i in range(len(wavs)):
 
-        print("Working on file {} of {}".format(i, len(wavs)))
+    #     print("Working on file {} of {}".format(i, len(wavs)))
 
-        f = open(f0Files[i], "r")
-        f0text = f.read()
-        f.close()
-        f0text = f0text.split()
+    #     f = open(f0Files[i][0], "r")
+    #     f0text = f.read()
+    #     f.close()
+    #     f0text = f0text.split()
 
-        wavfile = wavs[i]
+    #     wavfile = os.path.basename(wavs[i]).split(".")[0]
 
-        #set speaker variable
-        speaker = "NULL"
-        for s in speakers:
-            if wavfile[13] == s.getSpeaker():
-                speaker = s
+    #     #set speaker variable
+    #     speaker = "NULL"
+    #     for s in speakers:
+    #         if wavfile[8].upper() == s.getSpeaker():
+    #             speaker = s
 
-        #set irony variable
-        irony = wavfile[15]
+    #     #set irony variable
+    #     if wavfile[-1] == "I":
+    #         irony = "i"
+    #     else:
+    #         irony = "n"
 
-        #Normalize rms?
+    #     #Normalize rms?
 
-        extractor = Extractor(wavfile, f0text, speaker, irony)
-        mfccs = extractor.getMFCCs()
-        print(extractor.name)
-        print(mfccs)
-        #f0 = extractor.getF0Contour()
-        silence = extractor.findSilences()
-        dur = extractor.dur
-        nb_sample = extractor.wav.getSampleNO()
-        spacing = np.linspace(0+dur/nb_sample, dur, nb_sample)
-        win_spacing = np.linspace(0+dur/len(silence), dur, len(silence))
-        toPlot = [extractor.ampData, silence]
-        x = [spacing, win_spacing]
-        plotIt(toPlot, x)
+    #     extractor = Extractor(wavs[i], f0text, speaker, irony)
+    #     mfccs = extractor.getMFCCs()
+    #     #f0 = extractor.getF0Contour()
+    #     silence = extractor.findSilences()
+    #     dur = extractor.dur
+        # nb_sample = extractor.wav.getSampleNO()
+        # spacing = np.linspace(0+dur/nb_sample, dur, nb_sample)
+        # win_spacing = np.linspace(0+dur/len(silence), dur, len(silence))
+        # toPlot = [extractor.ampData, silence]
+        # x = [spacing, win_spacing]
+        # plotIt(toPlot, x)
 
