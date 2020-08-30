@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
+import sys
 import pickle
 import pandas as pd
+from glob import glob
 
 #Create consolidated dataframe that incorporates speaker information and irony label
 def main():
@@ -36,9 +38,9 @@ def main():
 
         #Set irony label
         if f[-5] == "I":
-            irony = "0"
+            irony = 0
         else:
-            irony = "1"
+            irony = 1
 
         speakerList.append(speaker)
         labelList.append(irony)
@@ -48,10 +50,13 @@ def main():
         bigDF = bigDF.append(row, ignore_index=True)
         print(bigDF.shape)
 
-    bigDF['label'] = labelList
     bigDF['speaker'] = speakerList
     bigDF['gender'] = genderList
-    bigDF.pop('name')
+    bigDF['label'] = labelList
+    try:
+        bigDF.pop('name')
+    except:
+        pass
 
     print(bigDF.shape)
     

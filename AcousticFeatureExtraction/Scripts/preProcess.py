@@ -130,7 +130,7 @@ if __name__ == "__main__":
 
         newData, fs, bits = preProcess(wav, avgRMS)
 
-        #TODO write newData out as new wavFile in fresh directory
+        #Write newData out as new wavFile in fresh directory
         name = "../../AudioData/Gated/" + os.path.basename(wav)
         writer = WW(name, newData, fs=fs, bits=bits)
         writer.write()
