@@ -14,6 +14,7 @@ from matplotlib import pyplot as plt
 from sklearn.model_selection import KFold
 import torchvision.transforms as transforms
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
 
 #Taken from https://www.deeplearningwizard.com/deep_learning/practical_pytorch/pytorch_feedforward_neuralnetwork/
 '''
@@ -38,16 +39,7 @@ class FeedforwardNeuralNetModel(nn.Module):
         out = self.fc2(out)
         return out
 
-def pilotNN(train, test):
-
-    '''
-    STEP 2: MAKING DATASET ITERABLE
-    '''
-    train_labels = train[:, -1]
-    test_labels = test[:, -1]
-
-    train_dataset = train[:, :-1]
-    test_dataset = test[:, :-1]
+def pilotNN(train_dataset, train_labels, test_dataset, test_labels):
 
     batch_size = len(train_dataset)
     n_iters = 3000
@@ -106,7 +98,7 @@ def pilotNN(train, test):
 
             iter += 1
 
-            if iter % 500 == 0:
+            if iter % 5 == 0:
                 # Calculate Accuracy         
                 correct = 0
                 total = 0
@@ -132,15 +124,17 @@ def pilotNN(train, test):
     print(1)
 
 def main(df):
+    labs = np.array(df.pop("label"))
     newdf = np.array(df)
 
-    #TODO shuffle and break into training and test using kFold
-    kf = KFold(n_splits=5, shuffle=True)
-    for train_index, test_index in kf.split(newdf):
-        print("TRAIN:", train_index, "TEST:", test_index)
-        train, test = newdf[train_index], newdf[test_index]
+    X_K, X_dev, y_K, y_dev = train_test_split(newdf, labs, test_size=0.1, random_state=6)
 
-        pilotNN(train, test)
+    kf = KFold(n_splits=5, shuffle=True)
+    for train_index, test_index in kf.split(X_K):
+        # print("TRAIN:", train_index, "TEST:", test_index)
+        X_train, y_train, X_test, y_test = X_K[train_index], y_K[train_index], X_K[test_index], y_K[test_index]
+
+        pilotNN(X_train, y_train, X_test, y_test)
 
     print(1)
 
