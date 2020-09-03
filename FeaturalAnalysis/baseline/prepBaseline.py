@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os
 import sys
 import pickle
 import pandas as pd
@@ -13,7 +14,8 @@ def main():
     for f in glob("baselineResults/*"):
 
         #Set speaker
-        speaker = f[16]
+        #speaker = f[16]
+        speaker = os.path.basename(f).split("_")[1][0]
 
         #Set speaker gender (numerified)
         if speaker == "b":
@@ -37,7 +39,8 @@ def main():
             sys.exit()
 
         #Set irony label
-        if f[-5] == "I":
+        if f[-1] == "I":
+            print("This one's ironic!")
             irony = 0
         else:
             irony = 1
