@@ -117,12 +117,13 @@ def findAvgRMS(wavs):
     return sum(rmsList)/len(rmsList)
 
 if __name__ == "__main__":
-    wavList = glob('../../AudioData/SmolWaves/*/*/*.wav')
+    # wavList = glob('../../AudioData/SmolWaves/*/*/*.wav')
     # wavList = glob('../../AudioData/TestWaves/*/*/*.wav')
+    wavList = glob('../../AudioData/PrunedWaves/*/*/*.wav')
     avgRMS = findAvgRMS(wavList)
 
-    createDir("../../AudioData/Gated")
-    createDir("../../SilenceTrimmingPlots")
+    createDir("../../AudioData/GatedPruned")
+    createDir("../../SilenceTrimmingPlotsPruned")
 
     for i, wav in enumerate(wavList):
 
@@ -131,7 +132,7 @@ if __name__ == "__main__":
         newData, fs, bits = preProcess(wav, avgRMS)
 
         #Write newData out as new wavFile in fresh directory
-        name = "../../AudioData/Gated/" + os.path.basename(wav)
+        name = "../../AudioData/GatedPruned/" + os.path.basename(wav)
         writer = WW(name, newData, fs=fs, bits=bits)
         writer.write()
     

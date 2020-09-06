@@ -15,6 +15,7 @@ from sklearn.model_selection import KFold
 import torchvision.transforms as transforms
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import balanced_accuracy_score, precision_score, recall_score, f1_score
 
 #Taken from https://www.deeplearningwizard.com/deep_learning/practical_pytorch/pytorch_feedforward_neuralnetwork/
 '''
@@ -100,27 +101,38 @@ def pilotNN(train_dataset, train_labels, test_dataset, test_labels):
 
             if iter % 5 == 0:
                 # Calculate Accuracy         
-                correct = 0
-                total = 0
+                # correct = 0
+                # total = 0
                 # Iterate through test dataset
-                for features, labels in test_loader:
+                # for features, labels in test_loader:
 
-                    # Forward pass only to get logits/output
-                    outputs = net(features)
+                #     # Forward pass only to get logits/output
+                #     outputs = net(features)
 
-                    # Get predictions from the maximum value
-                    _, predicted = torch.max(outputs.data, 1)
+                #     # Get predictions from the maximum value
+                #     _, predicted = torch.max(outputs.data, 1)
 
-                    # Total number of labels
-                    total += labels.size(0)
+                #     # Total number of labels
+                #     total += labels.size(0)
 
-                    # Total correct predictions
-                    correct += (predicted == labels).sum()
+                #     # Total correct predictions
+                #     correct += (predicted == labels).sum()
 
-                accuracy = 100 * correct / total
+                # accuracy = 100 * correct / total
 
-                # Print Loss
-                print('Iteration: {}. Loss: {}. Accuracy: {}'.format(iter, loss.item(), accuracy))
+                # # Print Loss
+                # print('Iteration: {}. Loss: {}. Accuracy: {}'.format(iter, loss.item(), accuracy))
+                
+                outputs = net(test_loader[0][0])
+                # Get predictions from the maximum value
+                _, predicted = torch.max(outputs.data, 1)
+
+                recall = recall_score(test_loader[0][1], predicted)
+                precision = precision_score(test_loader[0][1], predicted)
+                f1 = f1_score(test_loader[0][1], predicted)
+                balanced_accuracy = balanced_accuracy_score(test_loader[0][1], predicted)
+                print('Iteration: {}. Loss: {}. Accuracy: {}. Precision: {}. Recall: {}. F1: {}'.format(iter, loss.item(), balanced_accuracy, precision, recall, f1))
+
     print(1)
 
 def main(df):
