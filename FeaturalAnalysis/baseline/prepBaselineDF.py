@@ -40,7 +40,6 @@ def main():
 
         #Set irony label
         if f[-1] == "I":
-            print("This one's ironic!")
             irony = 0
         else:
             irony = 1
