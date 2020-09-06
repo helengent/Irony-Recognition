@@ -102,7 +102,7 @@ def preProcess(wav, tarRMS):
     new_dur = len(gated_sig)/fs
     gated_spacing = np.linspace(0+new_dur/len(gated_sig), new_dur, len(gated_sig))
     x = [spacing, win_spacing, gated_spacing]
-    name = "../../SilenceTrimmingPlots/" + os.path.basename(wav).split(".")[0] + ".pdf"
+    name = "../../SilenceTrimmingPlotsPruned/" + os.path.basename(wav).split(".")[0] + ".pdf"
     plotIt(toPlot, x, labels, xlabs, ylabs, name)
 
     return signal, fs, readr.getBitsPerSample()
