@@ -61,7 +61,7 @@ def pilotNN(train_dataset, train_labels, test_dataset, test_labels):
     '''
     input_dim = np.shape(train_dataset)[1]
     hidden_dim = 100
-    output_dim = 10
+    output_dim = 2
     net = FeedforwardNeuralNetModel(input_dim=input_dim, hidden_dim=hidden_dim, output_dim=output_dim)
 
     '''
@@ -99,7 +99,8 @@ def pilotNN(train_dataset, train_labels, test_dataset, test_labels):
 
             iter += 1
 
-            if iter % 5 == 0:
+            if iter % 500 == 0:
+                print(1)
                 # Calculate Accuracy         
                 # correct = 0
                 # total = 0
@@ -125,7 +126,8 @@ def pilotNN(train_dataset, train_labels, test_dataset, test_labels):
                 
                 outputs = net(test_loader[0][0])
                 # Get predictions from the maximum value
-                _, predicted = torch.max(outputs.data, 1)
+                #TODO Look reeeeeally critically at this line
+                something, predicted = torch.max(outputs.data, 1)
 
                 recall = recall_score(test_loader[0][1], predicted)
                 precision = precision_score(test_loader[0][1], predicted)
