@@ -2,7 +2,7 @@
 
 import os
 from sd import sd
-import parselmouth
+#import parselmouth
 from glob import glob
 
 def upperLimit(vec):
