@@ -11,7 +11,7 @@ def main():
     bigDF = pd.DataFrame()
     speakerList, labelList, genderList = list(), list(), list()
 
-    for f in glob("baselineResults/*"):
+    for f in glob("baselineResultsPruned/*"):
 
         #Set speaker
         #speaker = f[16]
@@ -39,7 +39,7 @@ def main():
             sys.exit()
 
         #Set irony label
-        if f[-1] == "I":
+        if f[-5] == "I":
             irony = 0
         else:
             irony = 1
@@ -62,7 +62,7 @@ def main():
 
     print(bigDF.shape)
     
-    with open("baseline_consolidated.pkl", "wb") as p:
+    with open("baseline_consolidated_pruned.pkl", "wb") as p:
         pickle.dump(bigDF, p, protocol=4)
 
 if __name__=="__main__":

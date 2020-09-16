@@ -112,8 +112,10 @@ class Extractor:
     #Relative spectral transform
 
 
-
 if __name__ == "__main__":
+
+    pass
+
     # #initiate speakers list:
     # B = Speaker("B", "../SpeakerF0Stats/B.txt", gender="m")
     # G = Speaker("G", "../SpeakerF0Stats/G.txt", gender="f")
