@@ -1,4 +1,4 @@
-function ns_ams = extract_AMS(x, fs, nChnl, nb_frames)
+function ns_ams = extract_AMS(filename)
 % filename: file name of waveform for extracting feature
 % cl_file: file name of clean signal
 % nChnl: # of channels (filterbank)
@@ -15,8 +15,14 @@ function ns_ams = extract_AMS(x, fs, nChnl, nb_frames)
 % This program is used to extract the AMS from a file as well as the SNRs
 % in subbands with high efficiency (frame by frame).
 
+% x, fs, nChnl, nb_frames
+
 
 %% read waveform
+% noisy speech
+[x fs] = audioread(filename);
+nChnl = 1;
+nb_frames = length(x);
 
 %%
 % Level Adjustment

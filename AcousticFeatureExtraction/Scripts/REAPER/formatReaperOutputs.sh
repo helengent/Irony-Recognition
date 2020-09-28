@@ -4,5 +4,6 @@
 
 for i in *.f0
 do
+    echo $i
     awk -F" " '{ if($2==1) {print $3;} else {print "NaN";}}' $i >> $i.p
 done

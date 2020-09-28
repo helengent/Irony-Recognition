@@ -8,6 +8,7 @@ function env = env_extraction(SIG, parameters)
 %
 
 R = parameters.R;
+R = round(R)
 choice = parameters.env_choice;
 lp_A = parameters.lp_A;
 lp_B = parameters.lp_B;

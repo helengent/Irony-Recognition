@@ -18,9 +18,9 @@ function [ns_ams, true_SNR] = extract_AMS_TrainingData_FFT_FB(filename, cl_file,
 
 %% read waveform
 % noisy speech
-[x Srate] = wavread(filename);
+[x Srate] = AUDIOREAD(filename);
 % true noise
-[cl Srate] = wavread(cl_file);
+[cl Srate] = AUDIOREAD(cl_file);
 % clean speech
 tn = x - cl;
 %% 

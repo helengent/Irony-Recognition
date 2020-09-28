@@ -55,12 +55,12 @@ def giveUpperLimit(vec):
     return upperLim
 
 def giveMean(vec):
-    newVec = []
-    for item in vec:
-        if item != 0:
-            newVec.append(item)
-    mean = sum(newVec)/len(newVec)
-    return mean
+    newVec = [item for item in vec if item != 0]
+    if newVec == []:
+        print("Woah. wft?")
+    else:
+        mean = sum(newVec)/len(newVec)
+        return mean
 
 def giveSD(vec):
     mean = giveMean(vec)
@@ -68,7 +68,7 @@ def giveSD(vec):
     return SD
 
 if __name__=="__main__":
-    f0Files = glob('../ReaperF0Results/*/*/*.f0.p')
+    f0Files = glob('../ReaperF0Results/*.f0.p')
     speakerList = ["B", "G", "P", "R", "Y"]
     for speaker in speakerList:
         filesList = []
