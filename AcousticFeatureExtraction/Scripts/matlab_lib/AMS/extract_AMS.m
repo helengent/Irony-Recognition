@@ -75,7 +75,7 @@ repwin_ams = repmat(win_ams,1,nChnl);
 for kk=1:KK
    start_idx = 1 + (AMS_frame_step*(kk-1));
    end_idx = AMS_frame_len + (AMS_frame_step*(kk-1));
-   
+
    if end_idx<=length(ns_env)
       ns_env_frm = ns_env(:, start_idx:end_idx);
    else
