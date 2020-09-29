@@ -21,8 +21,8 @@ function ns_ams = extract_AMS(filename)
 %% read waveform
 % noisy speech
 [x fs] = audioread(filename);
-nChnl = 1;
-nb_frames = length(x);
+nChnl = 15;
+nb_frames = length(x) / (0.005 * fs);
 
 %%
 % Level Adjustment
