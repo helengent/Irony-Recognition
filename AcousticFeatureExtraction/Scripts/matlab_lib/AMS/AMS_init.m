@@ -26,7 +26,7 @@ win = win(:);
 % R = 12; %downsampling rate
 % R = 3; is_modified.R = 3;
 
-R = Srate/4000;
+R = floor(Srate/4000);
 is_modified.R = R; % modified by Yang Lu, April 27, 2010
 
 [lp_B, lp_A] = butter(6, 400/Srate*R);

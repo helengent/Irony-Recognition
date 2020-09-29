@@ -22,7 +22,7 @@ function ns_ams = extract_AMS(filename)
 % noisy speech
 [x fs] = audioread(filename);
 nChnl = 15;
-nb_frames = length(x) / (0.005 * fs);
+nb_frames = ceil(length(x) / (0.005 * fs));
 
 %%
 % Level Adjustment
