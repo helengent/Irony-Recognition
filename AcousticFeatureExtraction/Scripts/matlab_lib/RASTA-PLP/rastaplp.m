@@ -1,4 +1,4 @@
-function [cepstra, spectra, pspectrum, lpcas, F, M] = rastaplp(samples, sr, dorasta, modelorder)
+function [cepstra, spectra, pspectrum, lpcas, F, M] = rastaplp(filename)
 %[cepstra, spectra, lpcas] = rastaplp(samples, sr, dorasta, modelorder)
 %
 % cheap version of log rasta with fixed parameters
@@ -16,15 +16,19 @@ function [cepstra, spectra, pspectrum, lpcas, F, M] = rastaplp(samples, sr, dora
 %
 % 2003-04-12 dpwe@ee.columbia.edu after shire@icsi.berkeley.edu's version
 
-if nargin < 2
-  sr = 8000;
-end
-if nargin < 3
-  dorasta = 1;
-end
-if nargin < 4
-  modelorder = 8;
-end
+%if nargin < 2
+%  sr = 8000;
+%end
+%if nargin < 3
+%  dorasta = 1;
+%end
+%if nargin < 4
+%  modelorder = 8;
+%end
+
+[samples, sr] = audioread(filename);
+dorasta = 0
+modelorder = 8
 
 % add miniscule amount of noise
 %samples = samples + randn(size(samples))*0.0001;
