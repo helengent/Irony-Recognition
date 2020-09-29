@@ -4,6 +4,7 @@ import os
 import shutil
 import numpy as np
 from glob import glob
+from scipy.signal import decimate
 from matplotlib import pyplot as plt
 from scipy.signal import firwin, lfilter
 from lib.WAVReader import WAVReader as WR
@@ -46,6 +47,15 @@ def validateTs(T, nb_cw=2):
             i+=1
     return(newT)
 
+def downSample(signal, fs, tar_fs=16000):
+
+    q = int(np.floor(fs/tar_fs))
+
+    newSig = decimate(signal, q, axis=0)
+    new_fs = int(fs/q)
+
+    return newSig, new_fs
+
 def trimSilence(signal, fs, win_size):
 
     signal = np.reshape(signal, (len(signal), 1))
@@ -69,21 +79,12 @@ def trimSilence(signal, fs, win_size):
 
     return gated_sig, silences
 
-def makeItMono(stereoInput):
-    newAudio = np.zeros((len(stereoInput), 1))
-    for i in range(len(stereoInput)):
-        newAudio[i] = ((stereoInput[i][0]/2)+(stereoInput[i][1]/2))
-    return newAudio
-
 def preProcess(wav, tarRMS):
     readr = WR(wav)
     signal = readr.getData()
     fs = readr.getSamplingRate()
     dur = readr.getDuration()
     nb_sample = readr.getSampleNO()
-
-    #make stereo input mono
-    signal = makeItMono(signal)
 
     #normalize rms
     signal, k = normaliseRMS(signal, tarRMS)
@@ -102,10 +103,10 @@ def preProcess(wav, tarRMS):
     new_dur = len(gated_sig)/fs
     gated_spacing = np.linspace(0+new_dur/len(gated_sig), new_dur, len(gated_sig))
     x = [spacing, win_spacing, gated_spacing]
-    name = "../../SilenceTrimmingPlotsPruned/" + os.path.basename(wav).split(".")[0] + ".pdf"
+    name = "../../SilenceTrimmingPlots/" + os.path.basename(wav).split(".")[0] + ".pdf"
     plotIt(toPlot, x, labels, xlabs, ylabs, name)
 
-    return signal, fs, readr.getBitsPerSample()
+    return gated_sig, fs, readr.getBitsPerSample()
 
 def findAvgRMS(wavs):
     rmsList = list()
@@ -117,13 +118,13 @@ def findAvgRMS(wavs):
     return sum(rmsList)/len(rmsList)
 
 if __name__ == "__main__":
-    # wavList = glob('../../AudioData/SmolWaves/*/*/*.wav')
+    wavList = glob('../../AudioData/monoDown/*.wav')
     # wavList = glob('../../AudioData/TestWaves/*/*/*.wav')
-    wavList = glob('../../AudioData/PrunedWaves/*/*/*.wav')
+    # wavList = glob('../../AudioData/PrunedWaves/*/*/*.wav')
     avgRMS = findAvgRMS(wavList)
 
-    createDir("../../AudioData/GatedPruned")
-    createDir("../../SilenceTrimmingPlotsPruned")
+    createDir("../../AudioData/GatedAll")
+    createDir("../../SilenceTrimmingPlots")
 
     for i, wav in enumerate(wavList):
 
@@ -132,7 +133,7 @@ if __name__ == "__main__":
         newData, fs, bits = preProcess(wav, avgRMS)
 
         #Write newData out as new wavFile in fresh directory
-        name = "../../AudioData/GatedPruned/" + os.path.basename(wav)
+        name = "../../AudioData/GatedAll/" + os.path.basename(wav)
         writer = WW(name, newData, fs=fs, bits=bits)
         writer.write()
     

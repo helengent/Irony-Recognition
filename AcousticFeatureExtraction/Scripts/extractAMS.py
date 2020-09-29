@@ -337,12 +337,12 @@ def extractAMS(x, fs, nChnl, nb_frames):
     win_ams = np.hanning(AMS_frame_len)
     repwin_ams = np.tile(win_ams, (1, nChnl))
 
-    for kk in range(1, KK+1):
-        start_idx = AMS_frame_step*(kk-1)
-        end_idx = 1 + (AMS_frame_len + (AMS_frame_step*(kk-1)))
+    for kk in range(KK+1):
+        start_idx = AMS_frame_step*kk
+        end_idx = AMS_frame_len + (AMS_frame_step*kk)
     
         if end_idx<=np.shape(ns_env)[1]:
-            ns_env_frm = ns_env[:, int(start_idx):int(end_idx)]
+            ns_env_frm = ns_env[:, int(start_idx):1+int(end_idx)]
         else:
             zero_padding =  np.zeros((np.shape(ns_env)[0], int(end_idx) - np.shape(ns_env)[1]))
             ns_env_frm = ns_env[:,int(start_idx):len(ns_env)]
@@ -360,7 +360,8 @@ def extractAMS(x, fs, nChnl, nb_frames):
 
 
 if __name__ == "__main__":
-    wavs = glob('../../AudioData/GatedAll/*.wav')
+    #wavs = glob('../../AudioData/GatedAll/*.wav')
+    wavs = glob("./matlab_lib/AMS/*.wav")
 
     for i, wav in enumerate(wavs):
 
@@ -368,8 +369,8 @@ if __name__ == "__main__":
         readr = WR(wav)
         x = readr.getData()
         fs = readr.getSamplingRate()
-        nChnl = readr.getChannelNO()
-        nb_frames = readr.getSampleNO()
+        nChnl = 15
+        nb_frames = int(np.ceil(len(x)/(0.005 * fs)))
 
         x, ratio = LTLAdjust(x, fs)
 

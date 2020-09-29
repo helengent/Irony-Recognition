@@ -19,21 +19,53 @@ def pruneAndSave():
     global_df = global_df[global_df.duration < durUpperLim]
 
     f0Pruned = list()
+    mfccsPruned = list()
     newSequentialDict = {"filename": [], "label": []}
-    for i, contour in enumerate(F0CONTOURS):
+    for i, (contour, mfcc) in enumerate(zip(F0CONTOURS, MFCCS)):
         if SEQUENTIALDICT["filename"][i] in global_df.filename.tolist():
             f0Pruned.append(contour)
+            mfccsPruned.append(mfcc)
             newSequentialDict["filename"].append(SEQUENTIALDICT["filename"][i])
             newSequentialDict["label"].append(SEQUENTIALDICT["label"][i])
 
-    longest = np.max([len(contour) for contour in f0Pruned])
-    for contour in f0Pruned:
+    longList = [np.max([len(contour) for contour in f0Pruned]), np.max([len(mfcc) for mfcc in mfccsPruned])]
+    longest = np.max(longList)
+
+    for contour, mfcc in zip(f0Pruned, mfccsPruned):
         while len(contour) < longest:
             contour.append(-1)
+        while len(mfcc) < longest:
+            padding = np.full((1,13), -1)
+            mfcc = np.append(mfcc, padding, axis=0)
 
     for i in range(longest):
-        colName = "frame_" + str(i) + "_f0"
-        newSequentialDict[colName] = [contour[i] for contour in f0Pruned]
+        f0colName = "frame_" + str(i) + "_f0"
+        newSequentialDict[f0colName] = [contour[i] for contour in f0Pruned]
+        ms = [mfcc[i] for mfcc in mfccsPruned]
+        for j in range(13):
+            colName = "frame_" + str(i) + "_mfcc_" + str(j)
+            newSequentialDict[colName] = [m[j] for m in ms]
+
+    # longest = np.max([len(contour) for contour in f0Pruned])
+    # for contour in f0Pruned:
+    #     while len(contour) < longest:
+    #         contour.append(-1)
+
+    # for i in range(longest):
+    #     colName = "frame_" + str(i) + "_f0"
+    #     newSequentialDict[colName] = [contour[i] for contour in f0Pruned]
+
+    # Definitely need to break mfccs up into format like frame_i_mfcc_j
+    # longest = np.max([len(mfcc) for mfcc in mfccsPruned])
+    # for mfcc in mfccsPruned:
+    #     while len(mfcc) < longest:
+    #         mfcc.append([-1]*13)
+
+    # for i in range(longest):
+    #     ms = [mfcc[i] for mfcc in mfccsPruned]
+    #     for j in range(13):
+    #         colName = "frame_" + str(i) + "_mfcc_" + str(j)
+    #         newSequentialDict[colName] = [m[j] for m in ms]
 
     sequential_df = pd.DataFrame(newSequentialDict)
 
@@ -113,9 +145,6 @@ def main():
     global GLOBALDICT
     GLOBALDICT = {"filename": [], "label": [], "speaker": [], "gender": [], "duration": [], "hnr": [], "f0globalMean": [], 
                   "f0globalSD": [], "avgPauseLength": [], "sound2silenceRatio": [], "totalPauses": []}
-    for i in range(13):
-        colName = "mfcc" + str(i)
-        GLOBALDICT[colName] = []
 
     global SEQUENTIALDICT
     SEQUENTIALDICT = {"filename": [], "label": []}
