@@ -31,17 +31,19 @@ def pruneAndSave():
     longList = [np.max([len(contour) for contour in f0Pruned]), np.max([len(mfcc) for mfcc in mfccsPruned])]
     longest = np.max(longList)
 
+    newMFCCsPruned = list()
     for contour, mfcc in zip(f0Pruned, mfccsPruned):
         while len(contour) < longest:
             contour.append(-1)
         while len(mfcc) < longest:
             padding = np.full((1,13), -1)
             mfcc = np.append(mfcc, padding, axis=0)
+        newMFCCsPruned.append(mfcc)
 
     for i in range(longest):
         f0colName = "frame_" + str(i) + "_f0"
         newSequentialDict[f0colName] = [contour[i] for contour in f0Pruned]
-        ms = [mfcc[i] for mfcc in mfccsPruned]
+        ms = [mfcc[i] for mfcc in newMFCCsPruned]
         for j in range(13):
             colName = "frame_" + str(i) + "_mfcc_" + str(j)
             newSequentialDict[colName] = [m[j] for m in ms]
@@ -73,7 +75,7 @@ def pruneAndSave():
     sequential_df.to_csv("../../FeaturalAnalysis/handExtracted/sequential_measures.csv")
 
 def extractVectors(wav, speakers):
-    f = open("../ReaperF0Results/{}.f0.p".format(os.path.basename(wav).split(".")[0]), "r")
+    f = open("../ReaperF0Results/{}.wav.f0.p".format(os.path.basename(wav).split(".")[0]), "r")
     f0text = f.read()
     f.close()
     f0text = f0text.split()
@@ -130,6 +132,8 @@ def extractVectors(wav, speakers):
         #Append mfccs to MFCCS
         MFCCS.append(mfccs)
 
+    return len(f0), len(mfccs)
+
 def makeSpeakerList():
     #initiate speakers list:
     B = Speaker("B", "../SpeakerF0Stats/B.txt", gender="m")
@@ -162,12 +166,17 @@ def main():
     wavs = glob('../../AudioData/GatedAll/*.wav')
     wavs.sort()
 
+    f0Lens, mfccLens = list(), list()
+
     for i, wav in enumerate(wavs):
 
         print("Working on file {} of {}".format(i, len(wavs)))
-        extractVectors(wav, speakers)
-    
-    pruneAndSave()
+        f0Len, mfccLen = extractVectors(wav, speakers)
+        f0Lens.append(f0Len)
+        mfccLens.append(mfccLen)
+
+    print(1)
+    # pruneAndSave()
 
 if __name__ == "__main__":
     main()

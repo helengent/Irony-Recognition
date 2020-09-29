@@ -134,7 +134,7 @@ class Extractor:
     #First 13 MFCCs
     def getMFCCs(self):
         (rate, sig) = wave.read(self.name)
-        mfccs = mfcc(sig, samplerate=rate, winlen=0.005, winstep=0.01)
+        mfccs = mfcc(sig, samplerate=rate, winlen=0.005, winstep=0.005)
         #mfccs is an array of size (YO-IDK, 13) aka: first 13 mfccs for each...
         return mfccs
 
