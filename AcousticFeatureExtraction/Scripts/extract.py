@@ -91,12 +91,12 @@ def make3Ddf(seqDict, listTup):
         pickle.dump(timeDict, f)
     with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/innerColNames.pkl", "wb") as f:
         pickle.dump(innerColNames, f)
-    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/A.pkl", "wb") as f:
-        pickle.dump(A, f)
-    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/B.pkl", "wb") as f:
-        pickle.dump(B, f)
-    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/C.pkl", "wb") as f:
-        pickle.dump(C, f)
+    #with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/A.pkl", "wb") as f:
+     #   pickle.dump(A, f)
+    #with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/B.pkl", "wb") as f:
+     #   pickle.dump(B, f)
+    #with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/C.pkl", "wb") as f:
+     #   pickle.dump(C, f)
     with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/3Dsequential.pkl", "wb") as f:
         pickle.dump(threeDdf, f)
 
