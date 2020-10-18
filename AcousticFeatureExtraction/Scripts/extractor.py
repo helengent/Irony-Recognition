@@ -8,6 +8,7 @@ import parselmouth
 import pandas as pd
 from glob import glob
 from speaker import Speaker
+from numpy import genfromtxt
 import matplotlib.pyplot as plt
 from f0_parseltongue import smooth
 from scipy.io import wavfile as wave
@@ -134,12 +135,22 @@ class Extractor:
     #First 13 MFCCs
     def getMFCCs(self):
         (rate, sig) = wave.read(self.name)
-        mfccs = mfcc(sig, samplerate=rate, winlen=0.005, winstep=0.005)
+        mfccs = mfcc(sig, samplerate=rate, winlen=0.01, winstep=0.01)
         #mfccs is an array of size (YO-IDK, 13) aka: first 13 mfccs for each...
         return mfccs
 
     #Perceptual Linear Prediction
+    def getPLP(self):
+        n = os.path.basename(self.name).split("SPPep12_")[1].split(".")[0]
+        rastaFile = "../../FeaturalAnalysis/handExtracted/Data/rastaplp/{}.csv".format(n)
+        rasta = genfromtxt(rastaFile, delimiter=',')
+        return rasta
 
     #Amplitude modulation spectrum
+    def getAMS(self):
+        n = os.path.basename(self.name).split("SPPep12_")[1].split(".")[0]
+        amsFile = "../../FeaturalAnalysis/handExtracted/Data/ams/{}.csv".format(n)
+        ams = genfromtxt(amsFile, delimiter=',')
+        return ams
 
     #Relative spectral transform

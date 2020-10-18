@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import os
+import time
+import pickle
 from sd import sd
 import numpy as np
 import pandas as pd
@@ -8,37 +10,160 @@ from glob import glob
 from speaker import Speaker
 from extractor import Extractor
 
+def make3Ddf(seqDict, listTup):
+
+    print("Compiling 3D time-series data")
+
+    #takes a tuple of lists, unpacks, and converts into a 3D dataframe
+
+    f0List, mfccs, amsList, plpList = listTup
+
+    fileNameList = seqDict["filename"]
+    labList = seqDict["label"]
+    speakerList = [filename[0] for filename in fileNameList]
+
+    timeDict = dict()
+    innerColNames = ["filename", "label", "speaker", "f0"]
+
+    #Append all variable names to innerColNames
+    for i in range(13):
+        string = "mfcc" + str(i)
+        innerColNames.append(string)
+    for i in range(225):
+        string = "ams" + str(i)
+        innerColNames.append(string)
+    for i in range(9):
+        string = "plp" + str(i)
+        innerColNames.append(string)
+
+    print("Assembling 3D array")
+
+    #Each element in timeDict will have a list of all variables for that element
+    #IN THE ORDER THEY APPEAR IN innerColNames!!!
+    for i in range(len(f0List[0])):
+        timeString = "t" + str(i)
+
+        timeDict[timeString] = [fileNameList, labList, speakerList]
+
+        #All f0 measures at timestep i for all samples
+        allTf0 = [f0[i] for f0 in f0List]
+        timeDict[timeString].append(allTf0)
+
+        #All mfcc coefficients
+        for j in range(13):
+            #All mfcc[j] coefficients at timestep i for all samples
+            allTmfcc = [mfcc[i][j] for mfcc in mfccs]
+            timeDict[timeString].append(allTmfcc)
+
+        #All ams measures
+        for j in range(225):
+            #All ams[j] measures at timestep i for all samples
+            allTams = [ams[j][i] for ams in amsList]
+            timeDict[timeString].append(allTams)
+        
+        #All plp measures
+        for j in range(9):
+            #All plp[j] measures at timestep i for all samples
+            allTplp = [plp[j][i] for plp in plpList]
+            timeDict[timeString].append(allTplp)
+
+    timeList = list(timeDict.keys())
+
+    toArray = list()
+    for k in timeDict.keys():
+        for item in timeDict[k]:
+            toArray.append(item)
+
+    t = timeList * len(innerColNames)
+    t.sort()
+    
+    C = np.array(toArray)
+
+    A = np.array(t)
+    B = np.array(innerColNames*len(timeList))
+
+    print("Saving 3D data")
+
+    threeDdf = pd.DataFrame(C.T, columns=pd.MultiIndex.from_tuples(zip(A, B)))
+    threeDdf.to_csv("../../FeaturalAnalysis/handExtracted/Data/CSVs/3Dsequential.csv", index=False)
+
+    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/timeDict.pkl", "wb") as f:
+        pickle.dump(timeDict, f)
+    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/innerColNames.pkl", "wb") as f:
+        pickle.dump(innerColNames, f)
+    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/A.pkl", "wb") as f:
+        pickle.dump(A, f)
+    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/B.pkl", "wb") as f:
+        pickle.dump(B, f)
+    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/C.pkl", "wb") as f:
+        pickle.dump(C, f)
+    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/3Dsequential.pkl", "wb") as f:
+        pickle.dump(threeDdf, f)
+
+    print("3D processes complete")
+
+
 def pruneAndSave():
     meanDur = sum(GLOBALDICT["duration"])/len(GLOBALDICT["duration"])
     sdDur = sd(GLOBALDICT["duration"], meanDur)
 
     durUpperLim = meanDur + (2.5 * sdDur)
-    durLowerLim = meanDur - (2.5 * sdDur)
+    durLowerLim = 0.855 #hard-coded to ensure enough sequential samples.
 
     global_df = pd.DataFrame(GLOBALDICT)
     global_df = global_df[global_df.duration < durUpperLim]
+    global_df = global_df[global_df.duration >= durLowerLim]
 
     f0Pruned = list()
     mfccsPruned = list()
+    amsPruned = list()
+    plpPruned = list()
+
+    print("Pruning sequential data to match pruned global data")
+
     newSequentialDict = {"filename": [], "label": []}
-    for i, (contour, mfcc) in enumerate(zip(F0CONTOURS, MFCCS)):
+    for i, (contour, mfcc, ams, plp) in enumerate(zip(F0CONTOURS, MFCCS, AMSLIST, RASTAPLPLIST)):
         if SEQUENTIALDICT["filename"][i] in global_df.filename.tolist():
             f0Pruned.append(contour)
             mfccsPruned.append(mfcc)
+            amsPruned.append(ams)
+            plpPruned.append(plp)
             newSequentialDict["filename"].append(SEQUENTIALDICT["filename"][i])
             newSequentialDict["label"].append(SEQUENTIALDICT["label"][i])
 
-    longList = [np.max([len(contour) for contour in f0Pruned]), np.max([len(mfcc) for mfcc in mfccsPruned])]
+    print("Padding sequential data to uniform length")
+
+    longList = [np.max([len(contour) for contour in f0Pruned]), np.max([len(mfcc) for mfcc in mfccsPruned]), 
+                np.max([np.shape(ams)[1] for ams in amsPruned]), np.max([np.shape(plp)[1] for plp in plpPruned])]
     longest = np.max(longList)
 
-    newMFCCsPruned = list()
-    for contour, mfcc in zip(f0Pruned, mfccsPruned):
+    #All f0 contours are 1xtime
+    #All MFCC grids are timex13
+    #All ams measures are 225xtime
+    #All plp measures are 9xtime
+    newMFCCsPruned, newAMSpruned, newPLPpruned = list(), list(), list()
+    for contour, mfcc, ams, plp in zip(f0Pruned, mfccsPruned, amsPruned, plpPruned):
         while len(contour) < longest:
-            contour.append(-1)
+            contour.append(np.nan)
+            
         while len(mfcc) < longest:
-            padding = np.full((1,13), -1)
+            padding = np.full((1,13), np.nan)
             mfcc = np.append(mfcc, padding, axis=0)
         newMFCCsPruned.append(mfcc)
+        
+        while np.shape(ams)[1] < longest:
+            padding = np.full((225, 1), np.nan)
+            ams = np.append(ams, padding, axis=1)
+        newAMSpruned.append(ams)
+        
+        while np.shape(plp)[1] < longest:
+            padding = np.full((9, 1), np.nan)
+            plp = np.append(plp, padding, axis=1)
+        newPLPpruned.append(plp)
+
+    # This function makes it take FOREVER.
+    # Only uncomment if you need the 3D dataframe
+    make3Ddf(newSequentialDict, (f0Pruned, newMFCCsPruned, newAMSpruned, newPLPpruned))
 
     for i in range(longest):
         f0colName = "frame_" + str(i) + "_f0"
@@ -48,34 +173,21 @@ def pruneAndSave():
             colName = "frame_" + str(i) + "_mfcc_" + str(j)
             newSequentialDict[colName] = [m[j] for m in ms]
 
-    # longest = np.max([len(contour) for contour in f0Pruned])
-    # for contour in f0Pruned:
-    #     while len(contour) < longest:
-    #         contour.append(-1)
-
-    # for i in range(longest):
-    #     colName = "frame_" + str(i) + "_f0"
-    #     newSequentialDict[colName] = [contour[i] for contour in f0Pruned]
-
-    # Definitely need to break mfccs up into format like frame_i_mfcc_j
-    # longest = np.max([len(mfcc) for mfcc in mfccsPruned])
-    # for mfcc in mfccsPruned:
-    #     while len(mfcc) < longest:
-    #         mfcc.append([-1]*13)
-
-    # for i in range(longest):
-    #     ms = [mfcc[i] for mfcc in mfccsPruned]
-    #     for j in range(13):
-    #         colName = "frame_" + str(i) + "_mfcc_" + str(j)
-    #         newSequentialDict[colName] = [m[j] for m in ms]
-
     sequential_df = pd.DataFrame(newSequentialDict)
 
-    global_df.to_csv("../../FeaturalAnalysis/handExtracted/global_measures.csv")
-    sequential_df.to_csv("../../FeaturalAnalysis/handExtracted/sequential_measures.csv")
+    print("Saving global and 2D sequential dataframes")
+
+    global_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/CSVs/global_measures.csv", index=False)
+    sequential_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/CSVs/10ms_sequential_measures.csv", index=False)
+
+    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/global.pkl", "wb") as f:
+        pickle.dump(global_df, f)
+    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/10ms_sequential.pkl", "wb") as f:
+        pickle.dump(sequential_df, f)
+
 
 def extractVectors(wav, speakers):
-    f = open("../ReaperF0Results/{}.wav.f0.p".format(os.path.basename(wav).split(".")[0]), "r")
+    f = open("../10ms_ReaperF0Results/{}.wav.f0.p".format(os.path.basename(wav).split(".")[0]), "r")
     f0text = f.read()
     f.close()
     f0text = f0text.split()
@@ -106,8 +218,10 @@ def extractVectors(wav, speakers):
         meanF0 = extractor.getMeanf0()
         F0sd = extractor.getSDF0()
         apl, s2s, tp = extractor.getTimingStats()
+        ams = extractor.getAMS()
+        plp = extractor.getPLP()
 
-        fileID = wavfile.split("_")[1]
+        fileID = wavfile.split("SPPep12_")[1]
 
         #Append to GLOBALDICT
         GLOBALDICT['filename'].append(fileID)
@@ -132,7 +246,12 @@ def extractVectors(wav, speakers):
         #Append mfccs to MFCCS
         MFCCS.append(mfccs)
 
-    return len(f0), len(mfccs)
+        #Append ams to AMSLIST
+        AMSLIST.append(ams)
+
+        #Append plp to RASTAPLPLIST
+        RASTAPLPLIST.append(plp) 
+
 
 def makeSpeakerList():
     #initiate speakers list:
@@ -143,7 +262,8 @@ def makeSpeakerList():
     Y = Speaker("Y", "../SpeakerF0Stats/Y.txt", gender="m")
     speakers = [B, G, P, R, Y]
     return speakers
-    
+  
+
 def main():
 
     global GLOBALDICT
@@ -159,24 +279,26 @@ def main():
     global MFCCS
     MFCCS = list()
 
+    global AMSLIST
+    AMSLIST = list()
+
+    global RASTAPLPLIST
+    RASTAPLPLIST = list()
+
     speakers = makeSpeakerList()
 
-    # wavs = glob('../../AudioData/SmolWaves/*/*/*.wav')
-    # wavs = glob('../../AudioData/TestWaves/*/*/*.wav')
     wavs = glob('../../AudioData/GatedAll/*.wav')
     wavs.sort()
-
-    f0Lens, mfccLens = list(), list()
 
     for i, wav in enumerate(wavs):
 
         print("Working on file {} of {}".format(i, len(wavs)))
-        f0Len, mfccLen = extractVectors(wav, speakers)
-        f0Lens.append(f0Len)
-        mfccLens.append(mfccLen)
+        extractVectors(wav, speakers)
 
-    print(1)
-    # pruneAndSave()
+    pruneAndSave()
 
 if __name__ == "__main__":
+    t0 = time.time()
     main()
+    t1 = time.time()
+    print("All processes completed in {} minutes".format((t1-t0)/60))
