@@ -107,8 +107,11 @@ def pruneAndSave():
     meanDur = sum(GLOBALDICT["duration"])/len(GLOBALDICT["duration"])
     sdDur = sd(GLOBALDICT["duration"], meanDur)
 
-    durUpperLim = meanDur + (2.5 * sdDur)
-    durLowerLim = 0.855 #hard-coded to ensure enough sequential samples.
+    # durUpperLim = meanDur + (2.5 * sdDur)
+    # durLowerLim = 0.855 #hard-coded to ensure enough sequential samples.
+
+    durUpperLim = 1000
+    durLowerLim = 0 #These samples are already pruned for duration.
 
     global_df = pd.DataFrame(GLOBALDICT)
     global_df = global_df[global_df.duration < durUpperLim]
@@ -215,7 +218,7 @@ def pruneAndSave():
 
 
 def extractVectors(wav, speakers):
-    f = open("../10ms_ReaperF0Results/{}.wav.f0.p".format(os.path.basename(wav).split(".")[0]), "r")
+    f = open("../Pruned_10ms_ReaperF0Results/{}.wav.f0.p".format(os.path.basename(wav).split(".")[0]), "r")
     f0text = f.read()
     f.close()
     f0text = f0text.split()
