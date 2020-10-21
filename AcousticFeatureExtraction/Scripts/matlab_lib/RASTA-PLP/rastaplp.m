@@ -36,7 +36,7 @@ modelorder = 8
 % first compute power spectrum
 %pspectrum = powspec(samples, sr);
 % to match STEP settings
-pspectrum = powspec(samples, sr, 0.01, 0.01);
+pspectrum = powspec(samples, sr, 0.025, 0.025);
 
 % next group to critical bands
 aspectrum = audspec(pspectrum, sr);

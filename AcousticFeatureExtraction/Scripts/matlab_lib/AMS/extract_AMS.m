@@ -22,7 +22,7 @@ function ns_ams = extract_AMS(filename)
 % noisy speech
 [x fs] = audioread(filename);
 nChnl = 15;
-nb_frames = ceil(length(x) / (0.01 * fs)); %Note from Helen (9/29/20) minimum window size is 10 ms)
+nb_frames = ceil(length(x) / (0.025 * fs)); %Note from Helen (9/29/20) minimum window size is 10 ms)
 
 %%
 % Level Adjustment
