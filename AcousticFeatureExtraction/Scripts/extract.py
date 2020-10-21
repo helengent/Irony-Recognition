@@ -67,38 +67,38 @@ def make3Ddf(seqDict, listTup):
             allTplp = [plp[j][i] for plp in plpList]
             timeDict[timeString].append(allTplp)
 
-    timeList = list(timeDict.keys())
+    # timeList = list(timeDict.keys())
 
-    toArray = list()
-    for k in timeDict.keys():
-        for item in timeDict[k]:
-            toArray.append(item)
+    # toArray = list()
+    # for k in timeDict.keys():
+    #     for item in timeDict[k]:
+    #         toArray.append(item)
 
-    t = timeList * len(innerColNames)
-    t.sort()
+    # t = timeList * len(innerColNames)
+    # t.sort()
     
-    C = np.array(toArray)
+    # C = np.array(toArray)
 
-    A = np.array(t)
-    B = np.array(innerColNames*len(timeList))
+    # A = np.array(t)
+    # B = np.array(innerColNames*len(timeList))
 
-    print("Saving 3D data")
+    # print("Saving 3D data")
 
-    threeDdf = pd.DataFrame(C.T, columns=pd.MultiIndex.from_tuples(zip(A, B)))
-    threeDdf.to_csv("../../FeaturalAnalysis/handExtracted/Data/CSVs/3Dsequential.csv", index=False)
+    # threeDdf = pd.DataFrame(C.T, columns=pd.MultiIndex.from_tuples(zip(A, B)))
+    # threeDdf.to_csv("../../FeaturalAnalysis/handExtracted/Data/CSVs/3Dsequential.csv", index=False)
 
-    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/timeDict.pkl", "wb") as f:
+    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/Pruned_timeDict.pkl", "wb") as f:
         pickle.dump(timeDict, f)
-    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/innerColNames.pkl", "wb") as f:
+    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/Pruned_innerColNames.pkl", "wb") as f:
         pickle.dump(innerColNames, f)
-    #with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/A.pkl", "wb") as f:
-     #   pickle.dump(A, f)
-    #with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/B.pkl", "wb") as f:
-     #   pickle.dump(B, f)
-    #with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/C.pkl", "wb") as f:
-     #   pickle.dump(C, f)
-    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/3Dsequential.pkl", "wb") as f:
-        pickle.dump(threeDdf, f)
+    # with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/A.pkl", "wb") as f:
+    #     pickle.dump(A, f)
+    # with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/B.pkl", "wb") as f:
+    #     pickle.dump(B, f)
+    # with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/C.pkl", "wb") as f:
+    #     pickle.dump(C, f)
+    # with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/3Dsequential.pkl", "wb") as f:
+    #     pickle.dump(threeDdf, f)
 
     print("3D processes complete")
 
@@ -121,15 +121,24 @@ def pruneAndSave():
 
     print("Pruning sequential data to match pruned global data")
 
-    newSequentialDict = {"filename": [], "label": []}
+    newSequentialDict = {"filename": [], "speaker": [], "label": []}
+    f0SequentialDict = {"filename": [], "speaker": [], "label": []}
+    mfccSequentialDict = {"filename": [], "speaker": [], "label": []}
+    amsSequentialDict = {"filename": [], "speaker": [], "label": []}
+    plpSequentialDict = {"filename": [], "speaker": [], "label": []}
+
+    seqDictList = [newSequentialDict, f0SequentialDict, mfccSequentialDict, amsSequentialDict, plpSequentialDict]
+
     for i, (contour, mfcc, ams, plp) in enumerate(zip(F0CONTOURS, MFCCS, AMSLIST, RASTAPLPLIST)):
         if SEQUENTIALDICT["filename"][i] in global_df.filename.tolist():
             f0Pruned.append(contour)
             mfccsPruned.append(mfcc)
             amsPruned.append(ams)
             plpPruned.append(plp)
-            newSequentialDict["filename"].append(SEQUENTIALDICT["filename"][i])
-            newSequentialDict["label"].append(SEQUENTIALDICT["label"][i])
+            for dictionary in seqDictList:
+                dictionary["filename"].append(SEQUENTIALDICT["filename"][i])
+                dictionary["speaker"].append(SEQUENTIALDICT["filename"][i][0])
+                dictionary["label"].append(SEQUENTIALDICT["label"][i])
 
     print("Padding sequential data to uniform length")
 
@@ -168,22 +177,41 @@ def pruneAndSave():
     for i in range(longest):
         f0colName = "frame_" + str(i) + "_f0"
         newSequentialDict[f0colName] = [contour[i] for contour in f0Pruned]
+        f0SequentialDict[f0colName] = [contour[i] for contour in f0Pruned]
         ms = [mfcc[i] for mfcc in newMFCCsPruned]
         for j in range(13):
             colName = "frame_" + str(i) + "_mfcc_" + str(j)
             newSequentialDict[colName] = [m[j] for m in ms]
-
-    sequential_df = pd.DataFrame(newSequentialDict)
+            mfccSequentialDict[colName] = [m[j] for m in ms]
+        for j in range(225):
+            colName = "frame_" + str(i) + "_ams_" + str(j)
+            allTams = [ams[j][i] for ams in newAMSpruned]
+            newSequentialDict[colName] = allTams
+            amsSequentialDict[colName] = allTams
+        for j in range(9):
+            colName = "frame_" + str(i) + "_plp_" + str(j)
+            allTplp = [plp[j][i] for plp in newPLPpruned]
+            newSequentialDict[colName] = allTplp
+            plpSequentialDict[colName] = allTplp
 
     print("Saving global and 2D sequential dataframes")
 
-    global_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/CSVs/global_measures.csv", index=False)
-    sequential_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/CSVs/10ms_sequential_measures.csv", index=False)
-
-    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/global.pkl", "wb") as f:
+    global_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/CSVs/Pruned_global_measures.csv", index=False)
+    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/Pruned_global.pkl", "wb") as f:
         pickle.dump(global_df, f)
-    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/10ms_sequential.pkl", "wb") as f:
-        pickle.dump(sequential_df, f)
+
+    fileNames = ["all", "f0", "mfcc", "ams", "plp"]
+
+    for d, f in zip(seqDictList, fileNames):
+
+        print(f)
+
+        sequential_df = pd.DataFrame(d)
+
+        sequential_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/CSVs/Pruned_10ms_{}_Seqmeasures.csv".format(f), index=False)
+
+        with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/Pruned_10ms_{}_Seqmeasures.pkl".format(f), "wb") as f:
+            pickle.dump(sequential_df, f)
 
 
 def extractVectors(wav, speakers):
@@ -287,7 +315,7 @@ def main():
 
     speakers = makeSpeakerList()
 
-    wavs = glob('../../AudioData/GatedAll/*.wav')
+    wavs = glob('../../AudioData/GatedPruned/*.wav')
     wavs.sort()
 
     for i, wav in enumerate(wavs):

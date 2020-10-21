@@ -103,7 +103,7 @@ def preProcess(wav, tarRMS):
     new_dur = len(gated_sig)/fs
     gated_spacing = np.linspace(0+new_dur/len(gated_sig), new_dur, len(gated_sig))
     x = [spacing, win_spacing, gated_spacing]
-    name = "../../SilenceTrimmingPlots/" + os.path.basename(wav).split(".")[0] + ".pdf"
+    name = "../../SilenceTrimmingPlotsPruned/" + os.path.basename(wav).split(".")[0] + ".pdf"
     plotIt(toPlot, x, labels, xlabs, ylabs, name)
 
     return gated_sig, fs, readr.getBitsPerSample()
@@ -118,13 +118,12 @@ def findAvgRMS(wavs):
     return sum(rmsList)/len(rmsList)
 
 if __name__ == "__main__":
-    wavList = glob('../../AudioData/monoDown/*.wav')
-    # wavList = glob('../../AudioData/TestWaves/*/*/*.wav')
-    # wavList = glob('../../AudioData/PrunedWaves/*/*/*.wav')
+    # wavList = glob('../../AudioData/All/*.wav')
+    wavList = glob('../../AudioData/PrunedWaves/*.wav')
     avgRMS = findAvgRMS(wavList)
 
-    createDir("../../AudioData/GatedAll")
-    createDir("../../SilenceTrimmingPlots")
+    createDir("../../AudioData/GatedPruned")
+    createDir("../../SilenceTrimmingPlotsPruned")
 
     for i, wav in enumerate(wavList):
 
@@ -133,7 +132,7 @@ if __name__ == "__main__":
         newData, fs, bits = preProcess(wav, avgRMS)
 
         #Write newData out as new wavFile in fresh directory
-        name = "../../AudioData/GatedAll/" + os.path.basename(wav)
+        name = "../../AudioData/GatedPruned/" + os.path.basename(wav)
         writer = WW(name, newData, fs=fs, bits=bits)
         writer.write()
     
