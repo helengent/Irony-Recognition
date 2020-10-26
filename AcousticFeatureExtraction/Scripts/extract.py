@@ -67,38 +67,8 @@ def make3Ddf(seqDict, listTup):
             allTplp = [plp[j][i] for plp in plpList]
             timeDict[timeString].append(allTplp)
 
-    # timeList = list(timeDict.keys())
-
-    # toArray = list()
-    # for k in timeDict.keys():
-    #     for item in timeDict[k]:
-    #         toArray.append(item)
-
-    # t = timeList * len(innerColNames)
-    # t.sort()
-    
-    # C = np.array(toArray)
-
-    # A = np.array(t)
-    # B = np.array(innerColNames*len(timeList))
-
-    # print("Saving 3D data")
-
-    # threeDdf = pd.DataFrame(C.T, columns=pd.MultiIndex.from_tuples(zip(A, B)))
-    # threeDdf.to_csv("../../FeaturalAnalysis/handExtracted/Data/CSVs/3Dsequential.csv", index=False)
-
-    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/Pruned_timeDict.pkl", "wb") as f:
+    with open("../../FeaturalAnalysis/handExtracted/Data/Pruned/Pruned_25ms_timeDict.pkl", "wb") as f:
         pickle.dump(timeDict, f)
-    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/Pruned_innerColNames.pkl", "wb") as f:
-        pickle.dump(innerColNames, f)
-    # with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/A.pkl", "wb") as f:
-    #     pickle.dump(A, f)
-    # with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/B.pkl", "wb") as f:
-    #     pickle.dump(B, f)
-    # with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/C.pkl", "wb") as f:
-    #     pickle.dump(C, f)
-    # with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/various3D/3Dsequential.pkl", "wb") as f:
-    #     pickle.dump(threeDdf, f)
 
     print("3D processes complete")
 
@@ -199,8 +169,11 @@ def pruneAndSave():
 
     print("Saving global and 2D sequential dataframes")
 
-    global_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/CSVs/Pruned_global_measures.csv", index=False)
-    with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/Pruned_global.pkl", "wb") as f:
+    # global_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/CSVs/Pruned_global_measures.csv", index=False)
+    # with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/Pruned_global.pkl", "wb") as f:
+    #     pickle.dump(global_df, f)
+    global_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/Pruned/Pruned_global_measures.csv", index=False)
+    with open("../../FeaturalAnalysis/handExtracted/Data/Pruned/Pruned_global.pkl", "wb") as f:
         pickle.dump(global_df, f)
 
     fileNames = ["all", "f0", "mfcc", "ams", "plp"]
@@ -211,9 +184,11 @@ def pruneAndSave():
 
         sequential_df = pd.DataFrame(d)
 
-        sequential_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/CSVs/Pruned_10ms_{}_Seqmeasures.csv".format(f), index=False)
+        # sequential_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/CSVs/Pruned_10ms_{}_Seqmeasures.csv".format(f), index=False)
+        sequential_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/Pruned/Pruned_25ms_{}_Seqmeasures.csv".format(f), index=False)
 
-        with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/Pruned_10ms_{}_Seqmeasures.pkl".format(f), "wb") as f:
+        # with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/Pruned_10ms_{}_Seqmeasures.pkl".format(f), "wb") as f:
+        with open("../../FeaturalAnalysis/handExtracted/Data/Pruned/Pruned_25ms_{}_Seqmeasures.pkl".format(f), "wb") as f:
             pickle.dump(sequential_df, f)
 
 
@@ -327,6 +302,7 @@ def main():
         extractVectors(wav, speakers)
 
     pruneAndSave()
+
 
 if __name__ == "__main__":
     t0 = time.time()

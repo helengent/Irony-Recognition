@@ -33,18 +33,10 @@ class Extractor:
         self.irony = irony
         self.sound = parselmouth.Sound(wav)
         self.wav = WR(self.name)
-        # self.ampData =  self.makeItMono(self.wav.getData())
         self.ampData = self.wav.getData()
         self.fs = self.wav.getSamplingRate()
         self.dur = self.wav.getDuration()
-        #self.nb_samples = self.wav.getSampleNO()
         self.f0Data = self.getF0Contour()
-
-    # def makeItMono(self, stereoInput):
-    #     newAudio = []
-    #     for i in range(len(stereoInput)):
-    #         newAudio.append((stereoInput[i][0]/2)+(stereoInput[i][1]/2))
-    #     return newAudio
    
     #Speaker features
     def getSpeaker(self):
@@ -63,7 +55,7 @@ class Extractor:
         # return pitch.selected_array['frequency']
     
         #This is the code to get the reaper f0 contour
-        f0Contour = f0VecTime(self.text, lowerLimit, upperLimit)
+        f0Contour = f0VecTime(self.text, lowerLimit, upperLimit, ms=25)
         return f0Contour 
 
     def getMeanf0(self):
@@ -133,23 +125,25 @@ class Extractor:
         return shimmer
 
     #First 13 MFCCs
-    def getMFCCs(self):
+    def getMFCCs(self, ms=0.01):
         (rate, sig) = wave.read(self.name)
-        mfccs = mfcc(sig, samplerate=rate, winlen=0.01, winstep=0.01)
+        mfccs = mfcc(sig, samplerate=rate, winlen=ms, winstep=ms)
         #mfccs is an array of size (YO-IDK, 13) aka: first 13 mfccs for each...
         return mfccs
 
     #Perceptual Linear Prediction
     def getPLP(self):
         n = os.path.basename(self.name).split("SPPep12_")[1].split(".")[0]
-        rastaFile = "../../FeaturalAnalysis/handExtracted/Data/rastaplp/{}.csv".format(n)
+        # rastaFile = "../../FeaturalAnalysis/handExtracted/Data/rastaplp/{}.csv".format(n)
+        rastaFile = "../../FeaturalAnalysis/handExtracted/Data/Pruned/plp/{}.csv".format(n)
         rasta = genfromtxt(rastaFile, delimiter=',')
         return rasta
 
     #Amplitude modulation spectrum
     def getAMS(self):
         n = os.path.basename(self.name).split("SPPep12_")[1].split(".")[0]
-        amsFile = "../../FeaturalAnalysis/handExtracted/Data/ams/{}.csv".format(n)
+        # amsFile = "../../FeaturalAnalysis/handExtracted/Data/ams/{}.csv".format(n)
+        amsFile = "../../FeaturalAnalysis/handExtracted/Data/Pruned/ams/{}.csv".format(n)
         ams = genfromtxt(amsFile, delimiter=',')
         return ams
 
