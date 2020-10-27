@@ -1,0 +1,57 @@
+---
+title: "gamms"
+author: "Helen Gent"
+date: "10/7/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(plyr)
+require(mgcv)
+require(stringr)
+require(itsadug)
+require(ggplot2)
+require(tidyverse)
+require(ggcorrplot)
+```
+
+```{r}
+setwd("~/Desktop/Irony-Recognition/FeaturalAnalysis/handExtracted/Data/TheBigDumb")
+ilist=scan("ilist", "")
+nlist=scan("nlist", "")
+```
+
+```{r}
+setwd("~/Desktop/Irony-Recognition/FeaturalAnalysis/handExtracted/Data/TheBigDumb/f0")
+
+N=length(ilist)
+S=rep(str_extract(ilist, "[a-z]"), each = 85)
+idataAll=array(1:(N*85), dim=c(N,85))
+ndataAll=array(1:(N*85), dim=c(N,85))
+for (i in 1:N) {
+  ndataAll[i,]=approx(scan(nlist[i]),n=85)$y
+  idataAll[i,]=approx(scan(ilist[i]),n=85)$y
+}
+inlabAll=rep(c("i", "n"), each=(N*85))
+intimeAll=rep(c(1:85), (N*2))
+
+indataAll=c(t(idataAll)[1:85,],t(ndataAll)[1:85,])
+f0All=list(S, inlabAll, intimeAll, indataAll)
+f0All=as.data.frame(f0All)
+colnames(f0All) =list("speaker", "label", "time", "f0")
+```
+
+```{r}
+mf0all=bam(f0~label+ te(time, by=label)+ s(speaker, bs="re")+ s(time, speaker, bs="fs", m=1), data=f0All)
+summary(mf0all)
+
+#Plots
+par(mfrow=c(2,2))
+plot(mf0all, select=1, main = "All Speakers: Ironic", shade=TRUE, shade.col = "seagreen2")
+plot(mf0all, select=2, main = "All Speakers: Non-Ironic", shade=TRUE, shade.col = "wheat")
+plot(mf0all, select=1, ylab = "te(time):lab", xlab = "time", main = "All Speakers: Both Curves");
+par(new=TRUE); plot(mf0all, select=2, ylab = "", xlab = "", main = "", col="indianred4")
+#plot_diff(mf0all, view ='time', shade=TRUE, comp=list(lab =c("i", "n")))
+```
+

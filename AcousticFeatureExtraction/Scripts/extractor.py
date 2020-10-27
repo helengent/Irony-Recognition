@@ -19,12 +19,6 @@ from limitsUpperLower import giveMean, giveSD
 from python_speech_features import mfcc, logfbank
 from lib.DSP_Tools import findEndpoint, normaliseRMS
 
-def plotIt(listoThings, x):
-    fig, axs = plt.subplots(len(listoThings), constrained_layout=True)
-    for i in range(len(listoThings)):
-        axs[i].plot(x[i], listoThings[i])
-    plt.show()
-
 class Extractor:
     def __init__(self, wav, text, speaker, irony):
         self.name = wav
@@ -134,16 +128,14 @@ class Extractor:
     #Perceptual Linear Prediction
     def getPLP(self):
         n = os.path.basename(self.name).split("SPPep12_")[1].split(".")[0]
-        # rastaFile = "../../FeaturalAnalysis/handExtracted/Data/rastaplp/{}.csv".format(n)
-        rastaFile = "../../FeaturalAnalysis/handExtracted/Data/Pruned/plp/{}.csv".format(n)
+        rastaFile = "../../FeaturalAnalysis/handExtracted/Data/rastaplp/{}.csv".format(n)
         rasta = genfromtxt(rastaFile, delimiter=',')
         return rasta
 
     #Amplitude modulation spectrum
     def getAMS(self):
         n = os.path.basename(self.name).split("SPPep12_")[1].split(".")[0]
-        # amsFile = "../../FeaturalAnalysis/handExtracted/Data/ams/{}.csv".format(n)
-        amsFile = "../../FeaturalAnalysis/handExtracted/Data/Pruned/ams/{}.csv".format(n)
+        amsFile = "../../FeaturalAnalysis/handExtracted/Data/ams/{}.csv".format(n)
         ams = genfromtxt(amsFile, delimiter=',')
         return ams
 

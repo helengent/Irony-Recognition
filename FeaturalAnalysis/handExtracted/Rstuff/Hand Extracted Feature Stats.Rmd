@@ -1,0 +1,128 @@
+---
+title: "Hand Extracted Feature Stats"
+author: "Helen Gent"
+date: "9/23/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(plyr)
+require(ggplot2)
+require(tidyverse)
+require(ggcorrplot)
+```
+
+```{r}
+global = read.csv("~/Desktop/Irony-Recognition/FeaturalAnalysis/handExtracted/Data/global_measures.csv")
+longSequential = read.csv("~/Desktop/Irony-Recognition/FeaturalAnalysis/handExtracted/Data/10ms_long_sequential.csv")
+```
+
+```{r}
+durPlot = ggplot(data = global,aes(speaker, duration, color=label))+geom_boxplot()+labs(title = " ", x = "Speaker", y = "Duration", color = "Label")
+
+durPlot
+
+hnrPlot = ggplot(data = global,aes(speaker, hnr, color=label))+geom_boxplot()+labs(title = " ", x = "Speaker", y = "hnr", color = "Label")
+
+hnrPlot
+
+meanF0Plot = ggplot(data = global,aes(speaker, f0globalMean, color=label))+geom_boxplot()+labs(title = " ", x = "Speaker", y = "Mean F0", color = "Label")
+
+meanF0Plot
+
+sdF0Plot = ggplot(data = global,aes(speaker, f0globalSD, color=label))+geom_boxplot()+labs(title = " ", x = "Speaker", y = "F0 sd", color = "Label")
+
+sdF0Plot
+
+avgPausePlot = ggplot(data = global,aes(speaker, avgPauseLength, color=label))+geom_boxplot()+labs(title = " ", x = "Speaker", y = "Average Pause Length", color = "Label")
+
+avgPausePlot
+
+s2sPlot = ggplot(data = global,aes(speaker, sound2silenceRatio, color=label))+geom_boxplot()+labs(title = " ", x = "Speaker", y = "Sound to Silence Ratio", color = "Label")
+
+s2sPlot
+
+totalPausePlot = ggplot(data = global,aes(speaker, totalPauses, color=label))+geom_boxplot()+labs(title = " ", x = "Speaker", y = "Total number of Pauses", color = "Label")
+
+totalPausePlot
+```
+
+```{r}
+summary(global)
+```
+
+```{r}
+iData = filter(global, label=="i")
+nData = filter(global, label=="n")
+
+iMeanDur = mean(iData$duration)
+iDurSD = sd(iData$duration)
+
+iDurLower = iMeanDur - (iDurSD * 2.5)
+iDurUpper = iMeanDur + (iDurSD * 2.5)
+
+nData = filter(nData, duration < iDurUpper)
+nData = filter(nData, duration > min(iData$duration))
+
+summary(iData)
+```
+#The lowest nubmer of ironic samples for a given speaker is 17, so that's the number we're going to use to balance
+```{r}
+iData = ddply(iData, "speaker", function(z) z[sample(nrow(z), 17),])
+nData = ddply(nData, "speaker", function(z) z[sample(nrow(z), 17),])
+
+newGlobal = full_join(iData, nData)
+```
+
+```{r}
+sequentialBalanced = filter(longSequential, longSequential$filename %in% newGlobal$filename)
+sequentialBalanced = filter(sequentialBalanced, sequentialBalanced$f0 != 'NaN')
+```
+
+```{r}
+
+f0Interpolated = select(sequentialBalanced, filename, speaker, label)
+
+names = unique(sequentialBalanced$filename)
+for (name in names){
+  interp = approx(sequentialBalanced$f0[sequentialBalanced$filename==name] ,n=85)
+}
+
+```
+
+```{r}
+newGlobal$label = as.numeric(factor(newGlobal$label, levels = c("i", "n"), labels = c(1, 0)))
+newGlobal$speaker = as.numeric(factor(newGlobal$speaker, levels = c("B", "G", "P", "R", "Y"), labels = c(0, 1, 2, 3, 4)))
+newGlobal$gender = as.numeric(factor(newGlobal$gender, levels = c("m", "f", "nb"), labels = c(0, 1, 2)))
+```
+
+```{r}
+global$label = as.numeric(factor(global$label, levels = c("i", "n"), labels = c(1, 0)))
+global$speaker = as.numeric(factor(global$speaker, levels = c("B", "G", "P", "R", "Y"), labels = c(0, 1, 2, 3, 4)))
+global$gender = as.numeric(factor(global$gender, levels = c("m", "f", "nb"), labels = c(0, 1, 2)))
+```
+
+```{r}
+corrGlobal = cor(newGlobal[,2:11])
+ggcorrplot(corrGlobal,colors = c("red", "white", "blue"))
+```
+
+```{r}
+summary(aov(newGlobal$label ~ newGlobal$duration))
+summary(aov(newGlobal$label ~ newGlobal$hnr))
+summary(aov(newGlobal$label ~ newGlobal$f0globalMean))
+summary(aov(newGlobal$label ~ newGlobal$f0globalSD))
+summary(aov(newGlobal$label ~ newGlobal$avgPauseLength))
+summary(aov(newGlobal$label ~ newGlobal$sound2silenceRatio))
+summary(aov(newGlobal$label ~ newGlobal$totalPauses))
+```
+
+
+Okay, we're going to do a PCA using wholeBalanced...? I think...?
+```{r}
+
+
+
+```
+
