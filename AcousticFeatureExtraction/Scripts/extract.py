@@ -72,7 +72,9 @@ def make3Ddf(seqDict, listTup):
 
     print("3D processes complete")
 
-
+##What. A. Nightmare.
+##Walk Away Helen.
+##Walk Away.
 def pruneAndSave():
     meanDur = sum(GLOBALDICT["duration"])/len(GLOBALDICT["duration"])
     sdDur = sd(GLOBALDICT["duration"], meanDur)
@@ -258,6 +260,17 @@ def extractVectors(wav, speakers):
         #Append plp to RASTAPLPLIST
         RASTAPLPLIST.append(plp) 
 
+        f0 = pd.DataFrame(np.array(f0))
+        f0.to_csv("../../FeaturalAnalysis/handExtracted/Data/f0/{}.csv".format(fileID), index=False)
+
+        mfccs = pd.DataFrame(mfccs)
+        mfccs.to_csv("../../FeaturalAnalysis/handExtracted/Data/mfccs/{}.csv".format(fileID), index=False)
+
+        smolDict = {'duration': [dur], 'hnr': [hnr], 'f0globalMean': [meanF0], 'f0globalSD': [F0sd], 
+                    'avgPauseLength': [apl], 'sound2silenceRatio': [s2s], 'totalPauses': [tp]}
+        smolDict = pd.DataFrame(smolDict)
+        smolDict.to_csv("../../FeaturalAnalysis/handExtracted/Data/globalVector/{}.csv".format(fileID), index=False)
+
 
 def makeSpeakerList():
     #initiate speakers list:
@@ -301,7 +314,7 @@ def main():
         print("Working on file {} of {}".format(i, len(wavs)))
         extractVectors(wav, speakers)
 
-    pruneAndSave()
+    # pruneAndSave()
 
 
 if __name__ == "__main__":

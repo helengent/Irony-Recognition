@@ -41,7 +41,6 @@ def getLabels(exp, data):
     for _, row in df.iterrows():
         y.append(row.label)
         files.append(row.filename)
-        print(row.filename)
 
     return y, files
 

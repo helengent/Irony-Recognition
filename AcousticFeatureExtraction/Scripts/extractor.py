@@ -49,7 +49,7 @@ class Extractor:
         # return pitch.selected_array['frequency']
     
         #This is the code to get the reaper f0 contour
-        f0Contour = f0VecTime(self.text, lowerLimit, upperLimit, ms=25)
+        f0Contour = f0VecTime(self.text, lowerLimit, upperLimit)
         return f0Contour 
 
     def getMeanf0(self):
@@ -122,7 +122,6 @@ class Extractor:
     def getMFCCs(self, ms=0.01):
         (rate, sig) = wave.read(self.name)
         mfccs = mfcc(sig, samplerate=rate, winlen=ms, winstep=ms)
-        #mfccs is an array of size (YO-IDK, 13) aka: first 13 mfccs for each...
         return mfccs
 
     #Perceptual Linear Prediction
