@@ -15,11 +15,13 @@ def highPass(fs, low, filterOrder):
     bs = firwin((filterOrder+1), (low/(fs/2)), pass_zero=False)
     return bs
 
+
 def createDir(name):
     dirs = os.listdir()
     if name in dirs:
         shutil.rmtree(name)
     os.mkdir(name)
+
 
 def plotIt(listoThings, x, listoLabels, xlabs, ylabs, name):
     fig, axs = plt.subplots(len(listoThings), constrained_layout=True)
@@ -29,6 +31,7 @@ def plotIt(listoThings, x, listoLabels, xlabs, ylabs, name):
         axs[i].set(xlabel = xlabs[i], ylabel = ylabs[i])
     plt.savefig(name)
     plt.clf()
+
 
 def validateTs(T, nb_cw=2):
     newT = T[:]
@@ -47,14 +50,6 @@ def validateTs(T, nb_cw=2):
             i+=1
     return(newT)
 
-def downSample(signal, fs, tar_fs=16000):
-
-    q = int(np.floor(fs/tar_fs))
-
-    newSig = decimate(signal, q, axis=0)
-    new_fs = int(fs/q)
-
-    return newSig, new_fs
 
 def trimSilence(signal, fs, win_size):
 
@@ -79,7 +74,8 @@ def trimSilence(signal, fs, win_size):
 
     return gated_sig, silences
 
-def preProcess(wav, tarRMS):
+
+def preProcess(wav, tarRMS, wavPath):
     readr = WR(wav)
     signal = readr.getData()
     fs = readr.getSamplingRate()
@@ -94,19 +90,20 @@ def preProcess(wav, tarRMS):
     gated_sig, silences = trimSilence(signal, fs, 0.005)
 
     # Plotting to check filter efficacy
-    toPlot = [signal, silences, gated_sig]
-    labels = ["Original Signal", "Detected Silences", "Trimmed Signal"]
-    xlabs = ["Time", "Time", "Time"]
-    ylabs = ["Amplitude", "Silence", "Amplitude"]
-    spacing = np.linspace(0+dur/nb_sample, dur, nb_sample)
-    win_spacing = np.linspace(0+dur/len(silences), dur, len(silences))
-    new_dur = len(gated_sig)/fs
-    gated_spacing = np.linspace(0+new_dur/len(gated_sig), new_dur, len(gated_sig))
-    x = [spacing, win_spacing, gated_spacing]
-    name = "../../SilenceTrimmingPlotsPruned/" + os.path.basename(wav).split(".")[0] + ".pdf"
-    plotIt(toPlot, x, labels, xlabs, ylabs, name)
+    # toPlot = [signal, silences, gated_sig]
+    # labels = ["Original Signal", "Detected Silences", "Trimmed Signal"]
+    # xlabs = ["Time", "Time", "Time"]
+    # ylabs = ["Amplitude", "Silence", "Amplitude"]
+    # spacing = np.linspace(0+dur/nb_sample, dur, nb_sample)
+    # win_spacing = np.linspace(0+dur/len(silences), dur, len(silences))
+    # new_dur = len(gated_sig)/fs
+    # gated_spacing = np.linspace(0+new_dur/len(gated_sig), new_dur, len(gated_sig))
+    # x = [spacing, win_spacing, gated_spacing]
+    # name = "../../SilenceTrimmingPlots{}/".format(wavPath) + os.path.basename(wav).split(".")[0] + ".pdf"
+    # plotIt(toPlot, x, labels, xlabs, ylabs, name)
 
     return gated_sig, fs, readr.getBitsPerSample()
+
 
 def findAvgRMS(wavs):
     rmsList = list()
@@ -117,22 +114,26 @@ def findAvgRMS(wavs):
 
     return sum(rmsList)/len(rmsList)
 
-if __name__ == "__main__":
-    # wavList = glob('../../AudioData/All/*.wav')
-    wavList = glob('../../AudioData/PrunedWaves/*.wav')
+
+def main(wavPath):
+ 
+    wavList = glob('../../AudioData/temp{}/*.wav'.format(wavPath))
     avgRMS = findAvgRMS(wavList)
 
-    createDir("../../AudioData/GatedPruned")
-    createDir("../../SilenceTrimmingPlotsPruned")
+    createDir("../../AudioData/Gated{}".format(wavPath))
+    #createDir("../../SilenceTrimmingPlots/{}".format(wavPath))
 
     for i, wav in enumerate(wavList):
 
         print("Working on {}.\tThis is file {}\t{}".format(os.path.basename(wav), i, len(wavList)))
 
-        newData, fs, bits = preProcess(wav, avgRMS)
+        newData, fs, bits = preProcess(wav, avgRMS, wavPath)
 
         #Write newData out as new wavFile in fresh directory
-        name = "../../AudioData/GatedPruned/" + os.path.basename(wav)
+        name = "../../AudioData/Gated{}/".format(wavPath) + os.path.basename(wav)
         writer = WW(name, newData, fs=fs, bits=bits)
         writer.write()
+
+if __name__ == "__main__":
+    main("Pruned")
     

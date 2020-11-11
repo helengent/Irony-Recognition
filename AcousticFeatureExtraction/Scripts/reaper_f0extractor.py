@@ -67,7 +67,6 @@ def f0VecTime(text, lowerLim, upperLim, ms=5):
                                 if lowerLim <= text[i+n] <= upperLim:
                                     f0vec.append(text[i+n])
                                     n = ms + 1
-                                    print("Hey! A value actually got added!")
                                     added = True
                                 else:
                                     n+=1

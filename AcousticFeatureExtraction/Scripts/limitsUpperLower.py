@@ -5,17 +5,20 @@ from sd import sd
 #import parselmouth
 from glob import glob
 
+
 def upperLimit(vec):
     mean = sum(vec)/len(vec)
     sdev = sd(vec, mean)
     upper = mean + sdev * 2.5
     return upper
 
+
 def lowerLimit(vec):
     mean = sum(vec)/len(vec)
     sdev = sd(vec, mean)
     lower = mean - sdev * 2.5
     return lower
+
 
 def assembleVec(files):
     vec = []
@@ -50,9 +53,11 @@ def giveLowerLimit(vec):
     else:
         return 30
 
+
 def giveUpperLimit(vec):
     upperLim = upperLimit(vec)
     return upperLim
+
 
 def giveMean(vec):
     newVec = [item for item in vec if item != 0]
@@ -63,6 +68,7 @@ def giveMean(vec):
         mean = sum(newVec)/len(newVec)
         return mean
 
+
 def giveSD(vec):
     mean = giveMean(vec)
     if mean == None:
@@ -71,9 +77,9 @@ def giveSD(vec):
         SD = sd(vec, mean)
         return SD
 
-if __name__=="__main__":
-    f0Files = glob('../Pruned_10ms_ReaperF0Results/*.f0.p')
-    speakerList = ["B", "G", "P", "R", "Y"]
+
+def main(wavPath, winSize, speakerList):
+    f0Files = glob('../ReaperTxtFiles/{}_{}ms_ReaperF0Results/*.f0.p'.format(wavPath, winSize))
     for speaker in speakerList:
         filesList = []
         indv = {}
@@ -90,3 +96,8 @@ if __name__=="__main__":
             for key in indv.keys():
                 f.write("{}\t{}\n".format(key, str(indv[key])))
         f.close()
+
+if __name__=="__main__":
+
+    speakerList = ["B", "G", "P", "R", "Y"]
+    main("Pruned", "10", speakerList)

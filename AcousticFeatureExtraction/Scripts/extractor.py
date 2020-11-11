@@ -20,11 +20,12 @@ from python_speech_features import mfcc, logfbank
 from lib.DSP_Tools import findEndpoint, normaliseRMS
 
 class Extractor:
-    def __init__(self, wav, text, speaker, irony):
+    def __init__(self, wav, text, speaker, irony, winSize=5):
         self.name = wav
         self.text = text
         self.speaker = speaker
         self.irony = irony
+        self.winSize = winSize
         self.sound = parselmouth.Sound(wav)
         self.wav = WR(self.name)
         self.ampData = self.wav.getData()
@@ -45,11 +46,11 @@ class Extractor:
         lowerLimit = self.speaker.getLowerLimit()
 
         #This is the code to get the Parselmouth f0 contour
-        # pitch = self.sound.to_pitch(time_step=0.005, pitch_floor=lowerLimit, pitch_ceiling=upperLimit)
+        # pitch = self.sound.to_pitch(time_step=(self.winSize/1000), pitch_floor=lowerLimit, pitch_ceiling=upperLimit)
         # return pitch.selected_array['frequency']
     
         #This is the code to get the reaper f0 contour
-        f0Contour = f0VecTime(self.text, lowerLimit, upperLimit)
+        f0Contour = f0VecTime(self.text, lowerLimit, upperLimit, ms=self.winSize)
         return f0Contour 
 
     def getMeanf0(self):
@@ -59,6 +60,7 @@ class Extractor:
         return giveSD(self.f0Data)
 
     #Timing features
+    #window size is hard-coded to 5ms for this one
     def findSilences(self):
         lowerCutoff = 40
         order = 1000
@@ -110,6 +112,7 @@ class Extractor:
         return hnr
 
     #Jitter and Shimmer
+    #TODO
     def getJitter(self):
         jitter = 0
         return jitter
@@ -119,7 +122,8 @@ class Extractor:
         return shimmer
 
     #First 13 MFCCs
-    def getMFCCs(self, ms=0.01):
+    def getMFCCs(self):
+        ms = self.winSize/1000
         (rate, sig) = wave.read(self.name)
         mfccs = mfcc(sig, samplerate=rate, winlen=ms, winstep=ms)
         return mfccs
@@ -139,3 +143,4 @@ class Extractor:
         return ams
 
     #Relative spectral transform
+    #TODO

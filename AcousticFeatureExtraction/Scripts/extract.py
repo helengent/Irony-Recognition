@@ -10,110 +10,52 @@ from glob import glob
 from speaker import Speaker
 from extractor import Extractor
 
-def make3Ddf(seqDict, listTup):
 
-    print("Compiling 3D time-series data")
+def pruneAndSave(wavPath, winSize, prune=True):
 
-    #takes a tuple of lists, unpacks, and converts into a 3D dataframe
+    if prune == True:
+        meanDur = sum(GLOBALDICT["duration"])/len(GLOBALDICT["duration"])
+        sdDur = sd(GLOBALDICT["duration"], meanDur)
 
-    f0List, mfccs, amsList, plpList = listTup
+        durUpperLim = meanDur + (2.5 * sdDur)
+        durLowerLim = 0.755 #hard-coded to ensure enough sequential samples.
 
-    fileNameList = seqDict["filename"]
-    labList = seqDict["label"]
-    speakerList = [filename[0] for filename in fileNameList]
+        global_df = pd.DataFrame(GLOBALDICT)
+        global_df = global_df[global_df.duration < durUpperLim]
+        global_df = global_df[global_df.duration >= durLowerLim]
 
-    timeDict = dict()
-    innerColNames = ["filename", "label", "speaker", "f0"]
+        f0Pruned = list()
+        mfccsPruned = list()
+        amsPruned = list()
+        plpPruned = list()
 
-    #Append all variable names to innerColNames
-    for i in range(13):
-        string = "mfcc" + str(i)
-        innerColNames.append(string)
-    for i in range(225):
-        string = "ams" + str(i)
-        innerColNames.append(string)
-    for i in range(9):
-        string = "plp" + str(i)
-        innerColNames.append(string)
+        print("Pruning sequential data to match pruned global data")
 
-    print("Assembling 3D array")
+        newSequentialDict = {"filename": [], "speaker": [], "label": []}
+        f0SequentialDict = {"filename": [], "speaker": [], "label": []}
+        mfccSequentialDict = {"filename": [], "speaker": [], "label": []}
+        amsSequentialDict = {"filename": [], "speaker": [], "label": []}
+        plpSequentialDict = {"filename": [], "speaker": [], "label": []}
 
-    #Each element in timeDict will have a list of all variables for that element
-    #IN THE ORDER THEY APPEAR IN innerColNames!!!
-    for i in range(len(f0List[0])):
-        timeString = "t" + str(i)
+        seqDictList = [newSequentialDict, f0SequentialDict, mfccSequentialDict, amsSequentialDict, plpSequentialDict]
 
-        timeDict[timeString] = [fileNameList, labList, speakerList]
+        for i, (contour, mfcc, ams, plp) in enumerate(zip(F0CONTOURS, MFCCS, AMSLIST, RASTAPLPLIST)):
+            if SEQUENTIALDICT["filename"][i] in global_df.filename.tolist():
+                f0Pruned.append(contour)
+                mfccsPruned.append(mfcc)
+                amsPruned.append(ams)
+                plpPruned.append(plp)
+                for dictionary in seqDictList:
+                    dictionary["filename"].append(SEQUENTIALDICT["filename"][i])
+                    dictionary["speaker"].append(SEQUENTIALDICT["filename"][i][0])
+                    dictionary["label"].append(SEQUENTIALDICT["label"][i])
 
-        #All f0 measures at timestep i for all samples
-        allTf0 = [f0[i] for f0 in f0List]
-        timeDict[timeString].append(allTf0)
-
-        #All mfcc coefficients
-        for j in range(13):
-            #All mfcc[j] coefficients at timestep i for all samples
-            allTmfcc = [mfcc[i][j] for mfcc in mfccs]
-            timeDict[timeString].append(allTmfcc)
-
-        #All ams measures
-        for j in range(225):
-            #All ams[j] measures at timestep i for all samples
-            allTams = [ams[j][i] for ams in amsList]
-            timeDict[timeString].append(allTams)
-        
-        #All plp measures
-        for j in range(9):
-            #All plp[j] measures at timestep i for all samples
-            allTplp = [plp[j][i] for plp in plpList]
-            timeDict[timeString].append(allTplp)
-
-    with open("../../FeaturalAnalysis/handExtracted/Data/Pruned/Pruned_25ms_timeDict.pkl", "wb") as f:
-        pickle.dump(timeDict, f)
-
-    print("3D processes complete")
-
-##What. A. Nightmare.
-##Walk Away Helen.
-##Walk Away.
-def pruneAndSave():
-    meanDur = sum(GLOBALDICT["duration"])/len(GLOBALDICT["duration"])
-    sdDur = sd(GLOBALDICT["duration"], meanDur)
-
-    # durUpperLim = meanDur + (2.5 * sdDur)
-    # durLowerLim = 0.855 #hard-coded to ensure enough sequential samples.
-
-    durUpperLim = 1000
-    durLowerLim = 0 #These samples are already pruned for duration.
-
-    global_df = pd.DataFrame(GLOBALDICT)
-    global_df = global_df[global_df.duration < durUpperLim]
-    global_df = global_df[global_df.duration >= durLowerLim]
-
-    f0Pruned = list()
-    mfccsPruned = list()
-    amsPruned = list()
-    plpPruned = list()
-
-    print("Pruning sequential data to match pruned global data")
-
-    newSequentialDict = {"filename": [], "speaker": [], "label": []}
-    f0SequentialDict = {"filename": [], "speaker": [], "label": []}
-    mfccSequentialDict = {"filename": [], "speaker": [], "label": []}
-    amsSequentialDict = {"filename": [], "speaker": [], "label": []}
-    plpSequentialDict = {"filename": [], "speaker": [], "label": []}
-
-    seqDictList = [newSequentialDict, f0SequentialDict, mfccSequentialDict, amsSequentialDict, plpSequentialDict]
-
-    for i, (contour, mfcc, ams, plp) in enumerate(zip(F0CONTOURS, MFCCS, AMSLIST, RASTAPLPLIST)):
-        if SEQUENTIALDICT["filename"][i] in global_df.filename.tolist():
-            f0Pruned.append(contour)
-            mfccsPruned.append(mfcc)
-            amsPruned.append(ams)
-            plpPruned.append(plp)
-            for dictionary in seqDictList:
-                dictionary["filename"].append(SEQUENTIALDICT["filename"][i])
-                dictionary["speaker"].append(SEQUENTIALDICT["filename"][i][0])
-                dictionary["label"].append(SEQUENTIALDICT["label"][i])
+    else:
+        global_df = pd.DataFrame(GLOBALDICT)
+        f0Pruned = F0CONTOURS[:]
+        mfccsPruned = MFCCS[:]
+        amsPruned = AMSLIST[:]
+        plpPruned = RASTAPLPLIST[:]
 
     print("Padding sequential data to uniform length")
 
@@ -145,10 +87,7 @@ def pruneAndSave():
             plp = np.append(plp, padding, axis=1)
         newPLPpruned.append(plp)
 
-    # This function makes it take FOREVER.
-    # Only uncomment if you need the 3D dataframe
-    make3Ddf(newSequentialDict, (f0Pruned, newMFCCsPruned, newAMSpruned, newPLPpruned))
-
+    #TODO change column names once input format for RNN is clearer
     for i in range(longest):
         f0colName = "frame_" + str(i) + "_f0"
         newSequentialDict[f0colName] = [contour[i] for contour in f0Pruned]
@@ -169,33 +108,85 @@ def pruneAndSave():
             newSequentialDict[colName] = allTplp
             plpSequentialDict[colName] = allTplp
 
-    print("Saving global and 2D sequential dataframes")
+    print("Saving global and sequential dataframes")
 
-    # global_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/CSVs/Pruned_global_measures.csv", index=False)
-    # with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/Pruned_global.pkl", "wb") as f:
-    #     pickle.dump(global_df, f)
-    global_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/Pruned/Pruned_global_measures.csv", index=False)
-    with open("../../FeaturalAnalysis/handExtracted/Data/Pruned/Pruned_global.pkl", "wb") as f:
-        pickle.dump(global_df, f)
+    global_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_{}ms/global_measures.csv".format(wavPath, winSize), index=False)
 
     fileNames = ["all", "f0", "mfcc", "ams", "plp"]
 
     for d, f in zip(seqDictList, fileNames):
-
         print(f)
-
         sequential_df = pd.DataFrame(d)
-
-        # sequential_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/CSVs/Pruned_10ms_{}_Seqmeasures.csv".format(f), index=False)
-        sequential_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/Pruned/Pruned_25ms_{}_Seqmeasures.csv".format(f), index=False)
-
-        # with open("../../FeaturalAnalysis/handExtracted/Data/Pickles/Pruned_10ms_{}_Seqmeasures.pkl".format(f), "wb") as f:
-        with open("../../FeaturalAnalysis/handExtracted/Data/Pruned/Pruned_25ms_{}_Seqmeasures.pkl".format(f), "wb") as f:
-            pickle.dump(sequential_df, f)
+        sequential_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_{}ms/{}_Seqmeasures.csv".format(wavPath, winSize, f), index=False)
 
 
-def extractVectors(wav, speakers):
-    f = open("../Pruned_10ms_ReaperF0Results/{}.wav.f0.p".format(os.path.basename(wav).split(".")[0]), "r")
+#This creates long data - needed for GAM analysis
+def makeLongDFs(wavPath, winSize):
+
+    for i, measure in enumerate([F0CONTOURS, MFCCS, AMSLIST, RASTAPLPLIST]):
+        longDict = {'filename': [], 'speaker': [], 'label': [], 'time': []}
+
+        if i == 0:
+            #deal with f0
+            #F0CONTOURS is a list of lists
+            longDict['f0'] = []
+            for j, c in enumerate(measure):
+                for h, dataPoint in enumerate(c):
+                    longDict['filename'].append(GLOBALDICT['filename'][j])
+                    longDict['speaker'].append(GLOBALDICT['speaker'][j].lower())
+                    longDict['label'].append(GLOBALDICT['label'][j])
+                    longDict['time'].append((h+1)/len(c))
+                    longDict['f0'].append(dataPoint)
+        elif i == 1:
+            #deal with mfccs
+            #MFCCS is an array of size (num_frames, 13)
+            longDict['mfccNum'] = []
+            longDict['mfcc'] = []
+            for j, c in enumerate(measure):
+                for h in range(np.shape(c)[0]):
+                    for m in range(13):
+                        longDict['filename'].append(GLOBALDICT['filename'][j])
+                        longDict['speaker'].append(GLOBALDICT['speaker'][j].lower())
+                        longDict['label'].append(GLOBALDICT['label'][j])
+                        longDict['time'].append((h+1)/np.shape(c)[0])
+                        longDict['mfccNum'].append(m+1)
+                        longDict['mfcc'].append(c[h][m])
+        elif i == 2:
+            #deal with ams
+            #AMSLIST is an array of size (225, num_frames)
+            longDict['amsNum'] = []
+            longDict['ams'] = []
+            for j, c in enumerate(measure):
+                for h in range(np.shape(c)[1]):
+                    for m in range(225):
+                        longDict['filename'].append(GLOBALDICT['filename'][j])
+                        longDict['speaker'].append(GLOBALDICT['speaker'][j].lower())
+                        longDict['label'].append(GLOBALDICT['label'][j])
+                        longDict['time'].append((h+1)/np.shape(c)[1])
+                        longDict['amsNum'].append(m+1)
+                        longDict['ams'].append(c[m][h])
+        elif i == 3:
+            #deal with plp
+            #RASTAPLPLIST is an array of size (9, num_frames)
+            longDict['plpNum'] = []
+            longDict['plp'] = []
+            for j, c in enumerate(measure):
+                for h in range(np.shape(c)[1]):
+                    for m in range(9):
+                        longDict['filename'].append(GLOBALDICT['filename'][j])
+                        longDict['speaker'].append(GLOBALDICT['speaker'][j].lower())
+                        longDict['label'].append(GLOBALDICT['label'][j])
+                        longDict['time'].append((h+1)/np.shape(c)[1])
+                        longDict['plpNum'].append(m+1)
+                        longDict['plp'].append(c[m][h])
+        
+        longdf = pd.DataFrame(longDict)
+        fileNames = ["f0", "mfcc", "ams", "plp"]
+        longdf.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_{}ms/{}_long.csv".format(wavPath, winSize, fileNames[i]), index=False)
+
+
+def extractVectors(wav, speakers, wavPath, winSize):
+    f = open("../ReaperTxtFiles/{}_{}ms_ReaperF0Results/{}.wav.f0.p".format(wavPath, winSize, os.path.basename(wav).split(".")[0]), "r")
     f0text = f.read()
     f.close()
     f0text = f0text.split()
@@ -214,7 +205,7 @@ def extractVectors(wav, speakers):
     else:
         irony = "n"
 
-    extractor = Extractor(wav, f0text, speaker, irony)
+    extractor = Extractor(wav, f0text, speaker, irony, winSize=int(winSize))
     f0 = extractor.getF0Contour()
     if len(list(set(f0))) == 1:
         print("Bad file: {}".format(wavfile))
@@ -260,18 +251,21 @@ def extractVectors(wav, speakers):
         #Append plp to RASTAPLPLIST
         RASTAPLPLIST.append(plp) 
 
-        f0 = pd.DataFrame(np.array(f0))
-        f0.to_csv("../../FeaturalAnalysis/handExtracted/Data/f0/{}.csv".format(fileID), index=False)
+        ##This code saves out individual csv files for each sequential measure and for the global measure vector for each .wav file
+        # f0 = pd.DataFrame(np.array(f0))
+        # f0.to_csv("../../FeaturalAnalysis/handExtracted/Data/f0/{}.csv".format(fileID), index=False)
 
-        mfccs = pd.DataFrame(mfccs)
-        mfccs.to_csv("../../FeaturalAnalysis/handExtracted/Data/mfccs/{}.csv".format(fileID), index=False)
+        # mfccs = pd.DataFrame(mfccs)
+        # mfccs.to_csv("../../FeaturalAnalysis/handExtracted/Data/mfccs/{}.csv".format(fileID), index=False)
 
-        smolDict = {'duration': [dur], 'hnr': [hnr], 'f0globalMean': [meanF0], 'f0globalSD': [F0sd], 
-                    'avgPauseLength': [apl], 'sound2silenceRatio': [s2s], 'totalPauses': [tp]}
-        smolDict = pd.DataFrame(smolDict)
-        smolDict.to_csv("../../FeaturalAnalysis/handExtracted/Data/globalVector/{}.csv".format(fileID), index=False)
+        # smolDict = {'duration': [dur], 'hnr': [hnr], 'f0globalMean': [meanF0], 'f0globalSD': [F0sd], 
+        #             'avgPauseLength': [apl], 'sound2silenceRatio': [s2s], 'totalPauses': [tp]}
+        # smolDict = pd.DataFrame(smolDict)
+        # smolDict.to_csv("../../FeaturalAnalysis/handExtracted/Data/globalVector/{}.csv".format(fileID), index=False)
 
 
+#This requires hand-modification for different speakers
+#Fix in the future
 def makeSpeakerList():
     #initiate speakers list:
     B = Speaker("B", "../SpeakerF0Stats/B.txt", gender="m")
@@ -283,7 +277,7 @@ def makeSpeakerList():
     return speakers
   
 
-def main():
+def main(wavPath, winSize="10", prune=True):
 
     global GLOBALDICT
     GLOBALDICT = {"filename": [], "label": [], "speaker": [], "gender": [], "duration": [], "hnr": [], "f0globalMean": [], 
@@ -306,19 +300,22 @@ def main():
 
     speakers = makeSpeakerList()
 
-    wavs = glob('../../AudioData/GatedPruned/*.wav')
+    wavs = glob('../../AudioData/Gated{}/*.wav'.format(wavPath))
     wavs.sort()
 
     for i, wav in enumerate(wavs):
 
         print("Working on file {} of {}".format(i, len(wavs)))
-        extractVectors(wav, speakers)
+        extractVectors(wav, speakers, wavPath, winSize)
 
-    # pruneAndSave()
-
+    #makeLongDFs(wavPath, winSize)
+    #pruneAndSave(wavPath, winSize, prune=prune)
+    
+    global_df = pd.DataFrame(GLOBALDICT)
+    global_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_global_measures.csv".format(wavPath), index=False)
 
 if __name__ == "__main__":
     t0 = time.time()
-    main()
+    main("Pruned", prune=False)
     t1 = time.time()
     print("All processes completed in {} minutes".format((t1-t0)/60))
