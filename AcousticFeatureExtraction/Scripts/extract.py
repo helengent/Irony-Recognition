@@ -153,18 +153,20 @@ def makeLongDFs(wavPath, winSize):
                         longDict['mfcc'].append(c[h][m])
         elif i == 2:
             #deal with ams
-            #AMSLIST is an array of size (225, num_frames)
+            #AMSLIST is an array of size (375, num_frames)
             longDict['amsNum'] = []
             longDict['ams'] = []
             for j, c in enumerate(measure):
                 for h in range(np.shape(c)[1]):
-                    for m in range(225):
+                    for m in range(375):
                         longDict['filename'].append(GLOBALDICT['filename'][j])
                         longDict['speaker'].append(GLOBALDICT['speaker'][j].lower())
                         longDict['label'].append(GLOBALDICT['label'][j])
                         longDict['time'].append((h+1)/np.shape(c)[1])
                         longDict['amsNum'].append(m+1)
                         longDict['ams'].append(c[m][h])
+            longdf = pd.DataFrame(longDict)
+            longdf.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_{}ms/ams_long.csv".format(wavPath, winSize), index=False)
         elif i == 3:
             #deal with plp
             #RASTAPLPLIST is an array of size (9, num_frames)
@@ -180,9 +182,9 @@ def makeLongDFs(wavPath, winSize):
                         longDict['plpNum'].append(m+1)
                         longDict['plp'].append(c[m][h])
         
-        longdf = pd.DataFrame(longDict)
-        fileNames = ["f0", "mfcc", "ams", "plp"]
-        longdf.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_{}ms/{}_long.csv".format(wavPath, winSize, fileNames[i]), index=False)
+        # longdf = pd.DataFrame(longDict)
+        # fileNames = ["f0", "mfcc", "ams", "plp"]
+        # longdf.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_{}ms/{}_long.csv".format(wavPath, winSize, fileNames[i]), index=False)
 
 
 def extractVectors(wav, speakers, wavPath, winSize):
@@ -308,11 +310,11 @@ def main(wavPath, winSize="10", prune=True):
         print("Working on file {} of {}".format(i, len(wavs)))
         extractVectors(wav, speakers, wavPath, winSize)
 
-    #makeLongDFs(wavPath, winSize)
+    makeLongDFs(wavPath, winSize)
     #pruneAndSave(wavPath, winSize, prune=prune)
     
-    global_df = pd.DataFrame(GLOBALDICT)
-    global_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_global_measures.csv".format(wavPath), index=False)
+    # global_df = pd.DataFrame(GLOBALDICT)
+    # global_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_global_measures.csv".format(wavPath), index=False)
 
 if __name__ == "__main__":
     t0 = time.time()

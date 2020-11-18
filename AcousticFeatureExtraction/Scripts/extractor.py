@@ -10,7 +10,7 @@ from glob import glob
 from speaker import Speaker
 from numpy import genfromtxt
 import matplotlib.pyplot as plt
-from f0_parseltongue import smooth
+#from f0_parseltongue import smooth
 from scipy.io import wavfile as wave
 from silence import highPass, validateTs
 from reaper_f0extractor import f0VecTime
