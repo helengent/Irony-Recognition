@@ -8,7 +8,7 @@ for i in *.wav
 do
 # name=`basename $i .wav`    
 # sox -c 2 $i -c 1 $name_one.wav
-reaper -i $i -f $i.f0 -e 0.005 -a
+reaper -i $i -f $i.f0 -e 0.01 -a
 tail -n+8 $i.f0 > tmp
 mv tmp $i.f0
 done

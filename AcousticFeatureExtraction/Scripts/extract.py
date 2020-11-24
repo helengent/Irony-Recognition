@@ -65,7 +65,7 @@ def pruneAndSave(wavPath, winSize, prune=True):
 
     #All f0 contours are 1xtime
     #All MFCC grids are timex13
-    #All ams measures are 225xtime
+    #All ams measures are 375xtime
     #All plp measures are 9xtime
     newMFCCsPruned, newAMSpruned, newPLPpruned = list(), list(), list()
     for contour, mfcc, ams, plp in zip(f0Pruned, mfccsPruned, amsPruned, plpPruned):
@@ -78,7 +78,7 @@ def pruneAndSave(wavPath, winSize, prune=True):
         newMFCCsPruned.append(mfcc)
         
         while np.shape(ams)[1] < longest:
-            padding = np.full((225, 1), np.nan)
+            padding = np.full((375, 1), np.nan)
             ams = np.append(ams, padding, axis=1)
         newAMSpruned.append(ams)
         
@@ -97,7 +97,7 @@ def pruneAndSave(wavPath, winSize, prune=True):
             colName = "frame_" + str(i) + "_mfcc_" + str(j)
             newSequentialDict[colName] = [m[j] for m in ms]
             mfccSequentialDict[colName] = [m[j] for m in ms]
-        for j in range(225):
+        for j in range(375):
             colName = "frame_" + str(i) + "_ams_" + str(j)
             allTams = [ams[j][i] for ams in newAMSpruned]
             newSequentialDict[colName] = allTams
@@ -187,7 +187,7 @@ def makeLongDFs(wavPath, winSize):
         # longdf.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_{}ms/{}_long.csv".format(wavPath, winSize, fileNames[i]), index=False)
 
 
-def extractVectors(wav, speakers, wavPath, winSize):
+def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
     f = open("../ReaperTxtFiles/{}_{}ms_ReaperF0Results/{}.wav.f0.p".format(wavPath, winSize, os.path.basename(wav).split(".")[0]), "r")
     f0text = f.read()
     f.close()
@@ -254,32 +254,29 @@ def extractVectors(wav, speakers, wavPath, winSize):
         RASTAPLPLIST.append(plp) 
 
         ##This code saves out individual csv files for each sequential measure and for the global measure vector for each .wav file
-        # f0 = pd.DataFrame(np.array(f0))
-        # f0.to_csv("../../FeaturalAnalysis/handExtracted/Data/f0/{}.csv".format(fileID), index=False)
+        if saveIndv == True:
+            f0 = pd.DataFrame(np.array(f0))
+            f0.to_csv("../../FeaturalAnalysis/handExtracted/Data/f0/{}.csv".format(fileID), index=False)
 
-        # mfccs = pd.DataFrame(mfccs)
-        # mfccs.to_csv("../../FeaturalAnalysis/handExtracted/Data/mfccs/{}.csv".format(fileID), index=False)
+            mfccs = pd.DataFrame(mfccs)
+            mfccs.to_csv("../../FeaturalAnalysis/handExtracted/Data/mfccs/{}.csv".format(fileID), index=False)
 
-        # smolDict = {'duration': [dur], 'hnr': [hnr], 'f0globalMean': [meanF0], 'f0globalSD': [F0sd], 
-        #             'avgPauseLength': [apl], 'sound2silenceRatio': [s2s], 'totalPauses': [tp]}
-        # smolDict = pd.DataFrame(smolDict)
-        # smolDict.to_csv("../../FeaturalAnalysis/handExtracted/Data/globalVector/{}.csv".format(fileID), index=False)
+            smolDict = {'duration': [dur], 'hnr': [hnr], 'f0globalMean': [meanF0], 'f0globalSD': [F0sd], 
+                        'avgPauseLength': [apl], 'sound2silenceRatio': [s2s], 'totalPauses': [tp]}
+            smolDict = pd.DataFrame(smolDict)
+            smolDict.to_csv("../../FeaturalAnalysis/handExtracted/Data/globalVector/{}.csv".format(fileID), index=False)
 
 
-#This requires hand-modification for different speakers
-#Fix in the future
-def makeSpeakerList():
-    #initiate speakers list:
-    B = Speaker("B", "../SpeakerF0Stats/B.txt", gender="m")
-    G = Speaker("G", "../SpeakerF0Stats/G.txt", gender="f")
-    P = Speaker("P", "../SpeakerF0Stats/P.txt", gender="f")
-    R = Speaker("R", "../SpeakerF0Stats/R.txt", gender="nb")
-    Y = Speaker("Y", "../SpeakerF0Stats/Y.txt", gender="m")
-    speakers = [B, G, P, R, Y]
+def makeSpeakerList(s):
+    speakers = list()
+    genders = pd.read_csv("../SpeakerMetaData/speakersGenders.txt")
+    for speaker in s:
+        #TODO This works but it is SO dumb. Fix it someday.
+        speakers.append(Speaker(speaker, "../SpeakerMetaData/{}_f0.txt".format(speaker), gender=genders[genders['speaker']==speaker]['gender'].tolist()[0]))
     return speakers
   
 
-def main(wavPath, winSize="10", prune=True):
+def main(wavPath, speakerList, output, winSize="10", prune=True):
 
     global GLOBALDICT
     GLOBALDICT = {"filename": [], "label": [], "speaker": [], "gender": [], "duration": [], "hnr": [], "f0globalMean": [], 
@@ -300,7 +297,7 @@ def main(wavPath, winSize="10", prune=True):
     global RASTAPLPLIST
     RASTAPLPLIST = list()
 
-    speakers = makeSpeakerList()
+    speakers = makeSpeakerList(speakerList)
 
     wavs = glob('../../AudioData/Gated{}/*.wav'.format(wavPath))
     wavs.sort()
@@ -308,16 +305,23 @@ def main(wavPath, winSize="10", prune=True):
     for i, wav in enumerate(wavs):
 
         print("Working on file {} of {}".format(i, len(wavs)))
-        extractVectors(wav, speakers, wavPath, winSize)
+        sI = "individual" in output
+        extractVectors(wav, speakers, wavPath, winSize, saveIndv=sI)
 
-    makeLongDFs(wavPath, winSize)
-    #pruneAndSave(wavPath, winSize, prune=prune)
+    if "long" in output:
+        makeLongDFs(wavPath, winSize)
     
-    # global_df = pd.DataFrame(GLOBALDICT)
-    # global_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_global_measures.csv".format(wavPath), index=False)
+    if "sequential" in output:
+        pruneAndSave(wavPath, winSize, prune=prune)
+    
+    if ("global" in output) and ("sequential" not in output):
+        global_df = pd.DataFrame(GLOBALDICT)
+        global_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_global_measures.csv".format(wavPath), index=False)
 
 if __name__ == "__main__":
     t0 = time.time()
-    main("Pruned", prune=False)
+    speakers = ["B", "G", "P", "R", "Y"]
+    outputList = ['global', 'sequential', 'long', 'individual']
+    main("Pruned", speakers, outputList, prune=False)
     t1 = time.time()
     print("All processes completed in {} minutes".format((t1-t0)/60))

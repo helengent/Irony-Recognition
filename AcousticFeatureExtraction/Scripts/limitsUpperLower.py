@@ -92,7 +92,7 @@ def main(wavPath, winSize, speakerList):
         indv["lower"] = giveLowerLimit(vec)
         indv["mean"] = giveMean(vec)
         indv["sd"] = giveSD(vec)
-        with open('../SpeakerF0Stats/{}.txt'.format(speaker), 'w') as f:
+        with open('../SpeakerMetaData/{}_f0.txt'.format(speaker), 'w') as f:
             for key in indv.keys():
                 f.write("{}\t{}\n".format(key, str(indv[key])))
         f.close()
@@ -100,4 +100,4 @@ def main(wavPath, winSize, speakerList):
 if __name__=="__main__":
 
     speakerList = ["B", "G", "P", "R", "Y"]
-    main("Pruned", "10", speakerList)
+    main("test", "10", speakerList)

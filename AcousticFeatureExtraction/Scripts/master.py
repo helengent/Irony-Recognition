@@ -5,7 +5,7 @@ import preProcess
 import subprocess
 import limitsUpperLower
 
-def main(wavPath, speakerList, winSize=10, prune=True, needReaper=False, needAMS=False, needPLP=False):
+def main(wavPath, speakerList, outputType, winSize=10, prune=True, needReaper=False, needAMS=False, needPLP=False):
 
     #convert stereo audio to mono
     #downsample to 16000 Hz
@@ -18,10 +18,11 @@ def main(wavPath, speakerList, winSize=10, prune=True, needReaper=False, needAMS
     #Get rid of temp folder. Files now live in Gated{wavPath}
     subprocess.run("rm -r ../../AudioData/temp{}".format(wavPath), shell=True)
 
-    #TODO
     if needReaper == True:
-        pass
+        bashCommand = "mkdir ../ReaperTxtFiles/{}_{}ms_ReaperF0Results; cd ../../AudioData/Gated{}; ../../AcousticFeatureExtraction/Scripts/REAPER/reaper.sh; ../../AcousticFeatureExtraction/Scripts/REAPER/formatReaperOutputs.sh; mv *.p ../../AcousticFeatureExtraction/ReaperTxtFiles/{}_{}ms_ReaperF0Results/; rm *.f0; cd ../../AcousticFeatureExtraction/Scripts".format(wavPath, winSize, wavPath, wavPath, winSize)
+        subprocess.run(bashCommand, shell=True)
 
+    #TODO
     if needAMS == True:
         pass
 
@@ -32,10 +33,14 @@ def main(wavPath, speakerList, winSize=10, prune=True, needReaper=False, needAMS
     limitsUpperLower.main(wavPath, winSize, speakerList)
 
     #Extract acoustic features
-    #TODO streamline output format options
-    extract.main(wavPath, winSize=winSize, prune=prune)
+
+    #TODO add bash commands to create appropriate directories in ../../FeaturalAnalysis/handExtracted/Data
+
+    extract.main(wavPath, speakerList, outputType, winSize=winSize, prune=prune)
 
 
 if __name__=="__main__":
+    wavPath = "Pruned"
     speakerList = ["B", "G", "P", "R", "Y"]
-    main("Pruned", speakerList, prune=False)
+    outputList = ['global', 'sequential', 'long', 'individual']
+    main(wavPath, speakerList, outputList, prune=False, needReaper=True)

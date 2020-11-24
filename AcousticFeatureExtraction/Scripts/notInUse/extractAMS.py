@@ -234,7 +234,7 @@ def AMS_init(nFFT_speech, nFFT_ams, nChnl, Srate):
 
     win = np.hanning(nFFT_speech)
 
-    R = Srate/4000
+    R = np.floor(Srate/4000)
 
     lp_B, lp_A = butter(6, 400/Srate*R)
 
@@ -360,8 +360,8 @@ def extractAMS(x, fs, nChnl, nb_frames):
 
 
 if __name__ == "__main__":
-    #wavs = glob('../../AudioData/GatedAll/*.wav')
-    wavs = glob("./matlab_lib/AMS/*.wav")
+    wavs = glob('../../AudioData/GatedAll/*.wav')
+    # wavs = glob("./matlab_lib/AMS/*.wav")
 
     for i, wav in enumerate(wavs):
 
@@ -369,8 +369,8 @@ if __name__ == "__main__":
         readr = WR(wav)
         x = readr.getData()
         fs = readr.getSamplingRate()
-        nChnl = 15
-        nb_frames = int(np.ceil(len(x)/(0.005 * fs)))
+        nChnl = 25
+        nb_frames = int(np.ceil(len(x)/(0.01 * fs)))
 
         x, ratio = LTLAdjust(x, fs)
 
