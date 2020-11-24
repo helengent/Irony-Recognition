@@ -1,0 +1,614 @@
+---
+title: "plpGamms"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+setwd(choose.dir())
+```
+
+```{r, message=FALSE}
+require(tidyverse)
+require(mgcv)
+require(mgcViz)
+require(itsadug)
+```
+
+Load prepared plp data
+```{r}
+plpData = read.csv("plp_ready_for_gamms.csv")
+bplp = filter(plpData, plpData$speaker=="b")
+gplp = filter(plpData, plpData$speaker=="g")
+pplp = filter(plpData, plpData$speaker=="p")
+rplp = filter(plpData, plpData$speaker=="r")
+yplp = filter(plpData, plpData$speaker=="y")
+
+plpData$speaker = as.factor(plpData$speaker)
+plpData$label = as.factor(plpData$label)
+
+bplp$speaker = as.factor(bplp$speaker)
+bplp$label = as.factor(bplp$label)
+gplp$speaker = as.factor(gplp$speaker)
+gplp$label = as.factor(gplp$label)
+pplp$speaker = as.factor(pplp$speaker)
+pplp$label = as.factor(pplp$label)
+rplp$speaker = as.factor(rplp$speaker)
+rplp$label = as.factor(rplp$label)
+yplp$speaker = as.factor(yplp$speaker)
+yplp$label = as.factor(yplp$label)
+```
+
+GAM with tensor product interaction for plp
+```{r}
+m1plp=bam(plp ~ label + te(time, plpNum, by=label) + s(time, speaker, bs="fs", m=1) 
+          + s(plpNum, speaker, bs="fs", m=1), data=plpData)
+m1plpViz = getViz(m1plp)
+```
+
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(m1plpViz, allTerms=T), pages=3)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(m1plp, view="plpNum", shade=TRUE, comp=list(label=c("i", "n")))
+plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("i", "n")))
+
+par(mfrow=c(1, 1))
+par(mar=c(5, 5, 3, 8))
+plot_diff2(m1plp, view=c("time", "plpNum"), comp=list(label=c("i", "n")), 
+           main="Difference by label")
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
+par(mfrow=c(2, 2))
+plot.new
+plot_smooth(m1plp, view="time", cond=list("label"="i", plpNum=1), 
+            col="darkorchid1", main="plp1")
+plot_smooth(m1plp, view="time", cond=list("label"="n", plpNum=1), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=1), main="plp1")
+
+plot_smooth(m1plp, view="time", cond=list("label"="i", plpNum=2), 
+            col="darkorchid1", main="plp2")
+plot_smooth(m1plp, view="time", cond=list("label"="n", plpNum=2), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=2), main="plp2")
+
+plot_smooth(m1plp, view="time", cond=list("label"="i", plpNum=3), 
+            col="darkorchid1", main="plp3")
+plot_smooth(m1plp, view="time", cond=list("label"="n", plpNum=3),
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=3), main="plp3")
+
+plot_smooth(m1plp, view="time", cond=list("label"="i", plpNum=4), 
+            col="darkorchid1", main="plp4")
+plot_smooth(m1plp, view="time", cond=list("label"="n", plpNum=4), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=4), main="plp4")
+
+plot_smooth(m1plp, view="time", cond=list("label"="i", plpNum=5), 
+            col="darkorchid1", main="plp5")
+plot_smooth(m1plp, view="time", cond=list("label"="n", plpNum=5), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=5), main="plp5")
+
+plot_smooth(m1plp, view="time", cond=list("label"="i", plpNum=6), 
+            col="darkorchid1", main="plp6")
+plot_smooth(m1plp, view="time", cond=list("label"="n", plpNum=6), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=6), main="plp6")
+
+plot_smooth(m1plp, view="time", cond=list("label"="i", plpNum=7), 
+            col="darkorchid1", main="plp7")
+plot_smooth(m1plp, view="time", cond=list("label"="n", plpNum=7), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=7), main="plp7")
+
+plot_smooth(m1plp, view="time", cond=list("label"="i", plpNum=8), 
+            col="darkorchid1", main="plp8")
+plot_smooth(m1plp, view="time", cond=list("label"="n", plpNum=8), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=8), main="plp8")
+
+plot_smooth(m1plp, view="time", cond=list("label"="i", plpNum=9), 
+            col="darkorchid1", main="plp9")
+plot_smooth(m1plp, view="time", cond=list("label"="n", plpNum=9), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=9), main="plp9")
+
+```
+
+summary and plots
+```{r}
+summary(m1plp)
+```
+
+Individual Speaker Models
+Speaker B
+```{r}
+mBplp=bam(plp ~ label + te(time, plpNum, by=label), data=bplp)
+mBplpViz = getViz(mBplp)
+```
+
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mBplpViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mBplp, view="plpNum", shade=TRUE, comp=list(label=c("i", "n")))
+plot_diff(mBplp, view="time", shade=TRUE, comp=list(label=c("i", "n")))
+
+par(mfrow=c(1, 1))
+par(mar=c(5, 5, 3, 8))
+plot_diff2(mBplp, view=c("time", "plpNum"), comp=list(label=c("i", "n")), 
+           main="Difference by label")
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
+par(mfrow=c(2, 2))
+plot.new
+plot_smooth(mBplp, view="time", cond=list("label"="i", plpNum=1), 
+            col="darkorchid1", main="plp1")
+plot_smooth(mBplp, view="time", cond=list("label"="n", plpNum=1), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mBplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=1), main="plp1")
+
+plot_smooth(mBplp, view="time", cond=list("label"="i", plpNum=2), 
+            col="darkorchid1", main="plp2")
+plot_smooth(mBplp, view="time", cond=list("label"="n", plpNum=2),
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mBplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=2), main="plp2")
+
+plot_smooth(mBplp, view="time", cond=list("label"="i", plpNum=3), 
+            col="darkorchid1", main="plp3")
+plot_smooth(mBplp, view="time", cond=list("label"="n", plpNum=3), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mBplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=3), main="plp3")
+
+plot_smooth(mBplp, view="time", cond=list("label"="i", plpNum=4), 
+            col="darkorchid1", main="plp4")
+plot_smooth(mBplp, view="time", cond=list("label"="n", plpNum=4), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mBplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=4), main="plp4")
+
+plot_smooth(mBplp, view="time", cond=list("label"="i", plpNum=5), 
+            col="darkorchid1", main="plp5")
+plot_smooth(mBplp, view="time", cond=list("label"="n", plpNum=5), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mBplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=5), main="plp5")
+
+plot_smooth(mBplp, view="time", cond=list("label"="i", plpNum=6), 
+            col="darkorchid1", main="plp6")
+plot_smooth(mBplp, view="time", cond=list("label"="n", plpNum=6), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mBplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=6), main="plp6")
+
+plot_smooth(mBplp, view="time", cond=list("label"="i", plpNum=7), 
+            col="darkorchid1", main="plp7")
+plot_smooth(mBplp, view="time", cond=list("label"="n", plpNum=7), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mBplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=7), main="plp7")
+
+plot_smooth(mBplp, view="time", cond=list("label"="i", plpNum=8), 
+            col="darkorchid1", main="plp8")
+plot_smooth(mBplp, view="time", cond=list("label"="n", plpNum=8), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mBplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=8), main="plp8")
+
+plot_smooth(mBplp, view="time", cond=list("label"="i", plpNum=9), 
+            col="darkorchid1", main="plp9")
+plot_smooth(mBplp, view="time", cond=list("label"="n", plpNum=9), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mBplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=9), main="plp9")
+
+```
+
+
+```{r}
+summary(mBplp)
+```
+
+Speaker G
+```{r}
+mGplp=bam(plp ~ label + te(time, plpNum, by=label), data=gplp)
+mGplpViz = getViz(mGplp)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mGplpViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mGplp, view="plpNum", shade=TRUE, comp=list(label=c("i", "n")))
+plot_diff(mGplp, view="time", shade=TRUE, comp=list(label=c("i", "n")))
+
+par(mfrow=c(1, 1))
+par(mar=c(5, 5, 3, 8))
+plot_diff2(mGplp, view=c("time", "plpNum"), comp=list(label=c("i", "n")), 
+           main="Difference by label")
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
+par(mfrow=c(2, 2))
+plot.new
+plot_smooth(mGplp, view="time", cond=list("label"="i", plpNum=1), 
+            col="darkorchid1", main="plp1")
+plot_smooth(mGplp, view="time", cond=list("label"="n", plpNum=1), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mGplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=1), main="plp1")
+
+plot_smooth(mGplp, view="time", cond=list("label"="i", plpNum=2), 
+            col="darkorchid1", main="plp2")
+plot_smooth(mGplp, view="time", cond=list("label"="n", plpNum=2), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mGplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=2), main="plp2")
+
+plot_smooth(mGplp, view="time", cond=list("label"="i", plpNum=3), 
+            col="darkorchid1", main="plp3")
+plot_smooth(mGplp, view="time", cond=list("label"="n", plpNum=3), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mGplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=3), main="plp3")
+
+plot_smooth(mGplp, view="time", cond=list("label"="i", plpNum=4), 
+            col="darkorchid1", main="plp4")
+plot_smooth(mGplp, view="time", cond=list("label"="n", plpNum=4), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mGplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=4), main="plp4")
+
+plot_smooth(mGplp, view="time", cond=list("label"="i", plpNum=5), 
+            col="darkorchid1", main="plp5")
+plot_smooth(mGplp, view="time", cond=list("label"="n", plpNum=5), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mGplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=5), main="plp5")
+
+plot_smooth(mGplp, view="time", cond=list("label"="i", plpNum=6), 
+            col="darkorchid1", main="plp6")
+plot_smooth(mGplp, view="time", cond=list("label"="n", plpNum=6), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mGplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=6), main="plp6")
+
+plot_smooth(mGplp, view="time", cond=list("label"="i", plpNum=7), 
+            col="darkorchid1", main="plp7")
+plot_smooth(mGplp, view="time", cond=list("label"="n", plpNum=7), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mGplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=7), main="plp7")
+
+plot_smooth(mGplp, view="time", cond=list("label"="i", plpNum=8), 
+            col="darkorchid1", main="plp8")
+plot_smooth(mGplp, view="time", cond=list("label"="n", plpNum=8), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mGplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=8), main="plp8")
+
+plot_smooth(mGplp, view="time", cond=list("label"="i", plpNum=9), 
+            col="darkorchid1", main="plp9")
+plot_smooth(mGplp, view="time", cond=list("label"="n", plpNum=9), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mGplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=9), main="plp9")
+
+```
+
+
+```{r}
+summary(mGplp)
+```
+
+Speaker P
+```{r}
+mPplp=bam(plp ~ label + te(time, plpNum, by=label), data=pplp)
+mPplpViz = getViz(mPplp)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mPplpViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mPplp, view="plpNum", shade=TRUE, comp=list(label=c("i", "n")))
+plot_diff(mPplp, view="time", shade=TRUE, comp=list(label=c("i", "n")))
+
+par(mfrow=c(1, 1))
+par(mar=c(5, 5, 3, 8))
+plot_diff2(mPplp, view=c("time", "plpNum"), comp=list(label=c("i", "n")), 
+           main="Difference by label")
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
+par(mfrow=c(2, 2))
+plot.new
+plot_smooth(mPplp, view="time", cond=list("label"="i", plpNum=1), 
+            col="darkorchid1", main="plp1")
+plot_smooth(mPplp, view="time", cond=list("label"="n", plpNum=1), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mPplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=1), main="plp1")
+
+plot_smooth(mPplp, view="time", cond=list("label"="i", plpNum=2), 
+            col="darkorchid1", main="plp2")
+plot_smooth(mPplp, view="time", cond=list("label"="n", plpNum=2), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mPplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=2), main="plp2")
+
+plot_smooth(mPplp, view="time", cond=list("label"="i", plpNum=3), 
+            col="darkorchid1", main="plp3")
+plot_smooth(mPplp, view="time", cond=list("label"="n", plpNum=3), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mPplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=3), main="plp3")
+
+plot_smooth(mPplp, view="time", cond=list("label"="i", plpNum=4), 
+            col="darkorchid1", main="plp4")
+plot_smooth(mPplp, view="time", cond=list("label"="n", plpNum=4), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mPplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=4), main="plp4")
+
+plot_smooth(mPplp, view="time", cond=list("label"="i", plpNum=5), 
+            col="darkorchid1", main="plp5")
+plot_smooth(mPplp, view="time", cond=list("label"="n", plpNum=5), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mPplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=5), main="plp5")
+
+plot_smooth(mPplp, view="time", cond=list("label"="i", plpNum=6), 
+            col="darkorchid1", main="plp6")
+plot_smooth(mPplp, view="time", cond=list("label"="n", plpNum=6), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mPplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=6), main="plp6")
+
+plot_smooth(mPplp, view="time", cond=list("label"="i", plpNum=7), 
+            col="darkorchid1", main="plp7")
+plot_smooth(mPplp, view="time", cond=list("label"="n", plpNum=7), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mPplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=7), main="plp7")
+
+plot_smooth(mPplp, view="time", cond=list("label"="i", plpNum=8), 
+            col="darkorchid1", main="plp8")
+plot_smooth(mPplp, view="time", cond=list("label"="n", plpNum=8), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mPplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=8), main="plp8")
+
+plot_smooth(mPplp, view="time", cond=list("label"="i", plpNum=9), 
+            col="darkorchid1", main="plp9")
+plot_smooth(mPplp, view="time", cond=list("label"="n", plpNum=9), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mPplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=9), main="plp9")
+
+```
+
+
+```{r}
+summary(mPplp)
+```
+
+Speaker R
+```{r}
+mRplp=bam(plp ~ label + te(time, plpNum, by=label), data=rplp)
+mRplpViz = getViz(mGplp)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mRplpViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mRplp, view="plpNum", shade=TRUE, comp=list(label=c("i", "n")))
+plot_diff(mRplp, view="time", shade=TRUE, comp=list(label=c("i", "n")))
+
+par(mfrow=c(1, 1))
+par(mar=c(5, 5, 3, 8))
+plot_diff2(mRplp, view=c("time", "plpNum"), comp=list(label=c("i", "n")), 
+           main="Difference by label")
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
+par(mfrow=c(2, 2))
+plot.new
+plot_smooth(mRplp, view="time", cond=list("label"="i", plpNum=1), 
+            col="darkorchid1", main="plp1")
+plot_smooth(mRplp, view="time", cond=list("label"="n", plpNum=1), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mRplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=1), main="plp1")
+
+plot_smooth(mRplp, view="time", cond=list("label"="i", plpNum=2), 
+            col="darkorchid1", main="plp2")
+plot_smooth(mRplp, view="time", cond=list("label"="n", plpNum=2), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mRplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=2), main="plp2")
+
+plot_smooth(mRplp, view="time", cond=list("label"="i", plpNum=3), 
+            col="darkorchid1", main="plp3")
+plot_smooth(mRplp, view="time", cond=list("label"="n", plpNum=3),
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mRplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=3), main="plp3")
+
+plot_smooth(mRplp, view="time", cond=list("label"="i", plpNum=4), 
+            col="darkorchid1", main="plp4")
+plot_smooth(mRplp, view="time", cond=list("label"="n", plpNum=4), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mRplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=4), main="plp4")
+
+plot_smooth(mRplp, view="time", cond=list("label"="i", plpNum=5), 
+            col="darkorchid1", main="plp5")
+plot_smooth(mRplp, view="time", cond=list("label"="n", plpNum=5), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mRplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=5), main="plp5")
+
+plot_smooth(mRplp, view="time", cond=list("label"="i", plpNum=6), 
+            col="darkorchid1", main="plp6")
+plot_smooth(mRplp, view="time", cond=list("label"="n", plpNum=6), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mRplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=6), main="plp6")
+
+plot_smooth(mRplp, view="time", cond=list("label"="i", plpNum=7), 
+            col="darkorchid1", main="plp7")
+plot_smooth(mRplp, view="time", cond=list("label"="n", plpNum=7), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mRplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=7), main="plp7")
+
+plot_smooth(mRplp, view="time", cond=list("label"="i", plpNum=8), 
+            col="darkorchid1", main="plp8")
+plot_smooth(mRplp, view="time", cond=list("label"="n", plpNum=8), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mRplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=8), main="plp8")
+
+plot_smooth(mRplp, view="time", cond=list("label"="i", plpNum=9), 
+            col="darkorchid1", main="plp9")
+plot_smooth(mRplp, view="time", cond=list("label"="n", plpNum=9), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mRplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=9), main="plp9")
+
+```
+
+
+```{r}
+summary(mRplp)
+```
+
+Speaker Y
+```{r}
+mYplp=bam(plp ~ label + te(time, plpNum, by=label), data=yplp)
+mYplpViz = getViz(mYplp)
+
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mYplpViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mYplp, view="plpNum", shade=TRUE, comp=list(label=c("i", "n")))
+plot_diff(mYplp, view="time", shade=TRUE, comp=list(label=c("i", "n")))
+
+par(mfrow=c(1, 1))
+par(mar=c(5, 5, 3, 8))
+plot_diff2(mYplp, view=c("time", "plpNum"), comp=list(label=c("i", "n")), 
+           main="Difference by label")
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
+par(mfrow=c(2, 2))
+plot.new
+plot_smooth(mYplp, view="time", cond=list("label"="i", plpNum=1), 
+            col="darkorchid1", main="plp1")
+plot_smooth(mYplp, view="time", cond=list("label"="n", plpNum=1), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mYplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=1), main="plp1")
+
+plot_smooth(mYplp, view="time", cond=list("label"="i", plpNum=2), 
+            col="darkorchid1", main="plp2")
+plot_smooth(mYplp, view="time", cond=list("label"="n", plpNum=2), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mYplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=2), main="plp2")
+
+plot_smooth(mYplp, view="time", cond=list("label"="i", plpNum=3), 
+            col="darkorchid1", main="plp3")
+plot_smooth(mYplp, view="time", cond=list("label"="n", plpNum=3), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mYplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=3), main="plp3")
+
+plot_smooth(mYplp, view="time", cond=list("label"="i", plpNum=4), 
+            col="darkorchid1", main="plp4")
+plot_smooth(mYplp, view="time", cond=list("label"="n", plpNum=4), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mYplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=4), main="plp4")
+
+plot_smooth(mYplp, view="time", cond=list("label"="i", plpNum=5), 
+            col="darkorchid1", main="plp5")
+plot_smooth(mYplp, view="time", cond=list("label"="n", plpNum=5), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mYplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=5), main="plp5")
+
+plot_smooth(mYplp, view="time", cond=list("label"="i", plpNum=6), 
+            col="darkorchid1", main="plp6")
+plot_smooth(mYplp, view="time", cond=list("label"="n", plpNum=6), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mYplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=6), main="plp6")
+
+plot_smooth(mYplp, view="time", cond=list("label"="i", plpNum=7),
+            col="darkorchid1", main="plp7")
+plot_smooth(mYplp, view="time", cond=list("label"="n", plpNum=7), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mYplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=7), main="plp7")
+
+plot_smooth(mYplp, view="time", cond=list("label"="i", plpNum=8), 
+            col="darkorchid1", main="plp8")
+plot_smooth(mYplp, view="time", cond=list("label"="n", plpNum=8),
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mYplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=8), main="plp8")
+
+plot_smooth(mYplp, view="time", cond=list("label"="i", plpNum=9), 
+            col="darkorchid1", main="plp9")
+plot_smooth(mYplp, view="time", cond=list("label"="n", plpNum=9), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mYplp, view="time", shade=TRUE, comp=list(label=c("i", "n")), 
+          cond=list(plpNum=9), main="plp9")
+
+```
+
+
+```{r}
+summary(mYplp)
+```

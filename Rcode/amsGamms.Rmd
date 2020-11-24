@@ -1,0 +1,193 @@
+---
+title: "amsGamms"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+setwd(choose.dir())
+```
+
+```{r, message=FALSE}
+require(tidyverse)
+require(mgcv)
+require(mgcViz)
+require(itsadug)
+```
+
+Load prepared ams data
+```{r}
+amsData = read.csv("ams_ready_for_gamms.csv")
+bams = filter(amsData, amsData$speaker=="b")
+gams = filter(amsData, amsData$speaker=="g")
+pams = filter(amsData, amsData$speaker=="p")
+rams = filter(amsData, amsData$speaker=="r")
+yams = filter(amsData, amsData$speaker=="y")
+
+amsData$speaker = as.factor(amsData$speaker)
+amsData$label = as.factor(amsData$label)
+
+bams$speaker = as.factor(bams$speaker)
+bams$label = as.factor(bams$label)
+gams$speaker = as.factor(gams$speaker)
+gams$label = as.factor(gams$label)
+pams$speaker = as.factor(pams$speaker)
+pams$label = as.factor(pams$label)
+rams$speaker = as.factor(rams$speaker)
+rams$label = as.factor(rams$label)
+yams$speaker = as.factor(yams$speaker)
+yams$label = as.factor(yams$label)
+```
+
+GAM with tensor product interaction for ams
+```{r}
+m1ams=bam(ams ~ label + te(time, amsNum, by=label) + s(time, speaker, bs="fs", m=1) 
+          + s(amsNum, speaker, bs="fs", m=1), data=amsData)
+m1amsViz = getViz(m1ams)
+```
+
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(m1amsViz, allTerms=T), pages=3)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(m1ams, view="amsNum", shade=TRUE, comp=list(label=c("i", "n")))
+plot_diff(m1ams, view="time", shade=TRUE, comp=list(label=c("i", "n")))
+
+par(mfrow=c(1, 1))
+plot_diff2(m1ams, view=c('time', "amsNum"), comp=list(label=c("i", "n")), 
+           main="Difference by label", xlab="Time", ylab="amsNum")
+```
+
+summary
+```{r}
+summary(m1ams)
+```
+Individual Speaker Models
+Speaker B
+```{r}
+mBams=bam(ams ~ label + te(time, amsNum, by=label), data=bams)
+mBamsViz = getViz(mBams)
+```
+
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mBamsViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mBams, view="amsNum", shade=TRUE, comp=list(label=c("i", "n")))
+plot_diff(mBams, view="time", shade=TRUE, comp=list(label=c("i", "n")))
+
+par(mfrow=c(1, 1))
+plot_diff2(mBams, view=c('time', "amsNum"), comp=list(label=c("i", "n")), 
+           main="Difference by label", xlab="Time", ylab="amsNum")
+```
+
+```{r}
+summary(mBams)
+```
+
+Speaker G
+```{r}
+mGams=bam(ams ~ label + te(time, amsNum, by=label), data=gams)
+mGamsViz = getViz(mGams)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mGamsViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mGams, view="amsNum", shade=TRUE, comp=list(label=c("i", "n")))
+plot_diff(mGams, view="time", shade=TRUE, comp=list(label=c("i", "n")))
+
+par(mfrow=c(1, 1))
+plot_diff2(mGams, view=c('time', "amsNum"), comp=list(label=c("i", "n")), 
+           main="Difference by label", xlab="Time", ylab="amsNum")
+```
+
+```{r}
+summary(mGams)
+```
+
+Speaker P
+```{r}
+mPams=bam(ams ~ label + te(time, amsNum, by=label), data=pams)
+mPamsViz = getViz(mPams)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mPamsViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mPams, view="amsNum", shade=TRUE, comp=list(label=c("i", "n")))
+plot_diff(mPams, view="time", shade=TRUE, comp=list(label=c("i", "n")))
+
+par(mfrow=c(1, 1))
+plot_diff2(mPams, view=c('time', "amsNum"), comp=list(label=c("i", "n")), 
+           main="Difference by label", xlab="Time", ylab="amsNum")
+```
+
+```{r}
+summary(mPams)
+```
+
+Speaker R
+```{r}
+mRams=bam(ams ~ label + te(time, amsNum, by=label), data=rams)
+mRamsViz = getViz(mGams)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mRamsViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mRams, view="amsNum", shade=TRUE, comp=list(label=c("i", "n")))
+plot_diff(mRams, view="time", shade=TRUE, comp=list(label=c("i", "n")))
+
+par(mfrow=c(1, 1))
+plot_diff2(mRams, view=c('time', "amsNum"), comp=list(label=c("i", "n")), 
+           main="Difference by label", xlab="Time", ylab="amsNum")
+```
+
+```{r}
+summary(mRams)
+```
+
+Speaker Y
+```{r}
+mYams=bam(ams ~ label + te(time, amsNum, by=label), data=yams)
+mYamsViz = getViz(mYams)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mYamsViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mYams, view="amsNum", shade=TRUE, comp=list(label=c("i", "n")))
+plot_diff(mYams, view="time", shade=TRUE, comp=list(label=c("i", "n")))
+
+par(mfrow=c(1, 1))
+plot_diff2(mYams, view=c('time', "amsNum"), comp=list(label=c("i", "n")), 
+           main="Difference by label", xlab="Time", ylab="amsNum")
+```
+
+```{r}
+summary(mYams)
+```
