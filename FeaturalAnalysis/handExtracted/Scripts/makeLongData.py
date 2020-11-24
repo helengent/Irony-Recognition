@@ -87,8 +87,7 @@ def main(measure):
 
 if __name__=="__main__":
 
-    # measures = ["f0", "mfcc", 'ams', 'plp']
-    measures = ["ams"]
+    measures = ["f0", "mfcc", 'ams', 'plp']
     t0 = time.time()
     for measure in measures:
         main(measure)
