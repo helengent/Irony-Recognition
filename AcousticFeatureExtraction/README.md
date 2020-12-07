@@ -39,8 +39,11 @@ In order to run master.py, the following arguments to main() may be modified:
   3) outputType - desired output formats. Options:
      
      i) "global" - utterance global measures for all audio files in one dataframe
+     
      ii) "sequential" - all sequential measures for all audio files in one dataframe (with padding to account for variant file lengths)
+     
      iii) "long" - each sequential measure for all audio files in a long dataframe (this prepares data for GAM analysis - time-consuming)
+     
      iv) "individual" - an individual dataframe for each audio file for each sequential measure and for all global measures (for exploratory classifier analysis)
   
   4) prune - boolean. If True, extract.main() will remove outliers based on file length. This is recommended to be set to False if wavPath is "Prune" and True if wavPath is "All".
