@@ -2,6 +2,7 @@
 
 import os
 import time
+import shutil
 import pickle
 from sd import sd
 import numpy as np
@@ -110,18 +111,22 @@ def pruneAndSave(wavPath, winSize, prune=True):
 
     print("Saving global and sequential dataframes")
 
-    global_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_{}ms/global_measures.csv".format(wavPath, winSize), index=False)
+    dirPath = "../../FeaturalAnalysis/handExtracted/Data/{}_{}ms".format(wavPath, winSize)
+
+    global_df.to_csv("{}/global_measures.csv".format(dirPath), index=False)
 
     fileNames = ["all", "f0", "mfcc", "ams", "plp"]
 
     for d, f in zip(seqDictList, fileNames):
         print(f)
         sequential_df = pd.DataFrame(d)
-        sequential_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_{}ms/{}_Seqmeasures.csv".format(wavPath, winSize, f), index=False)
+        sequential_df.to_csv("{}/{}_Seqmeasures.csv".format(dirPath, f), index=False)
 
 
 #This creates long data - needed for GAM analysis
 def makeLongDFs(wavPath, winSize):
+
+    dirPath = "../../FeaturalAnalysis/handExtracted/Data/{}_{}ms".format(wavPath, winSize)
 
     for i, measure in enumerate([F0CONTOURS, MFCCS, AMSLIST, RASTAPLPLIST]):
         longDict = {'filename': [], 'speaker': [], 'label': [], 'time': []}
@@ -165,8 +170,6 @@ def makeLongDFs(wavPath, winSize):
                         longDict['time'].append((h+1)/np.shape(c)[1])
                         longDict['amsNum'].append(m+1)
                         longDict['ams'].append(c[m][h])
-            longdf = pd.DataFrame(longDict)
-            longdf.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_{}ms/ams_long.csv".format(wavPath, winSize), index=False)
         elif i == 3:
             #deal with plp
             #RASTAPLPLIST is an array of size (9, num_frames)
@@ -182,9 +185,9 @@ def makeLongDFs(wavPath, winSize):
                         longDict['plpNum'].append(m+1)
                         longDict['plp'].append(c[m][h])
         
-        # longdf = pd.DataFrame(longDict)
-        # fileNames = ["f0", "mfcc", "ams", "plp"]
-        # longdf.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_{}ms/{}_long.csv".format(wavPath, winSize, fileNames[i]), index=False)
+        longdf = pd.DataFrame(longDict)
+        fileNames = ["f0", "mfcc", "ams", "plp"]
+        longdf.to_csv("{}/{}_long.csv".format(dirPath, fileNames[i]), index=False)
 
 
 def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
@@ -255,6 +258,13 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
 
         ##This code saves out individual csv files for each sequential measure and for the global measure vector for each .wav file
         if saveIndv == True:
+
+            dirs = ["f0", "mfccs", "globalVector"]
+            for d in dirs:
+                if os.path.isdir("../../FeaturalAnalysis/handExtracted/Data/{}".format(d)):
+                    shutil.rmtree("../../FeaturalAnalysis/handExtracted/Data/{}".format(d))
+                os.mkdir("../../FeaturalAnalysis/handExtracted/Data/{}".format(d))
+
             f0 = pd.DataFrame(np.array(f0))
             f0.to_csv("../../FeaturalAnalysis/handExtracted/Data/f0/{}.csv".format(fileID), index=False)
 
@@ -309,9 +319,15 @@ def main(wavPath, speakerList, output, winSize="10", prune=True):
         extractVectors(wav, speakers, wavPath, winSize, saveIndv=sI)
 
     if "long" in output:
+        dirPath = "../../FeaturalAnalysis/handExtracted/Data/{}_{}ms".format(wavPath, winSize)
+        if not os.path.isdir(dirPath):
+            os.mkdir(dirPath)
         makeLongDFs(wavPath, winSize)
     
     if "sequential" in output:
+        dirPath = "../../FeaturalAnalysis/handExtracted/Data/{}_{}ms".format(wavPath, winSize)
+        if not os.path.isdir(dirPath):
+            os.mkdir(dirPath)
         pruneAndSave(wavPath, winSize, prune=prune)
     
     if ("global" in output) and ("sequential" not in output):
