@@ -29,6 +29,7 @@ In order to run master.py, the following arguments to main() may be modified:
   1) wavPath - this is the directory of the .wav files in Irony-Recognition/AudioData
      
      i) At present, the options for this parameter are "All" or "Pruned" where "Pruned" is a balanced selection of files with equal numbers of ironic and non-ironic samples per speaker
+     
      ii) If wavPath is set to "All", it is recommended that the "Prune" parameter be set to True in order to remove statistical outliers based on file length
   
   2) speakerList - the list of unique identifier strings for available speakers
