@@ -21,7 +21,7 @@ function ns_ams = extract_AMS(filename)
 %% read waveform
 % noisy speech
 [x fs] = audioread(filename);
-nChnl = 25;
+nChnl = 25; % Helen says this gotta be over 21???
 nb_frames = ceil(length(x) / (0.01 * fs)); %Note from Helen (9/29/20) minimum window size is 10 ms)
 
 %%
@@ -44,14 +44,22 @@ Nframes = floor(length(x)/len2)-len/len2+1;
 fs_env = 1/(env_step/1000); % Since we calculate the envelope every 0.25ms, the sampling rate for envelope is this.
 % win = hanning(len);
 win = window(@hann,len);
-s_frame_len = 20; %32ms for each frame
+s_frame_len = 10; %20 (used to be 20 with a 50% step; but for consistency I switched it to be like plp and mfcc) 32ms for each frame
 
 
 nFFT_speech = s_frame_len/1000*fs;
 AMS_frame_len = s_frame_len/env_step; % 128 frames of envelope corresponding to 128*0.25 = 32ms
-AMS_frame_step = AMS_frame_len/2; % step size
+AMS_frame_step = AMS_frame_len; % Changed to 0% overlap to be consistent with MFCC and PLP %AMS_frame_len/2; % step size
 
 nFFT_env = AMS_frame_len;
+if mod(nFFT_env, 2) ~= 0
+   nFFT_env = nFFT_env + 1;
+end
+
+if mod(nFFT_speech, 2) ~= 0
+   nFFT_speech = nFFT_speech + 1;
+end
+
 nFFT_ams = AMS_frame_len*2;
 
 k = 1;% sample position of the speech signal

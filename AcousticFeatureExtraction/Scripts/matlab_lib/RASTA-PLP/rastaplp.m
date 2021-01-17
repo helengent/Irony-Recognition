@@ -27,8 +27,8 @@ function [cepstra, spectra, pspectrum, lpcas, F, M] = rastaplp(filename)
 %end
 
 [samples, sr] = audioread(filename);
-dorasta = 0
-modelorder = 8
+dorasta = 0;
+modelorder = 8; % For MFCCs you usually have 13 per frame. Play around with this. 
 
 % add miniscule amount of noise
 %samples = samples + randn(size(samples))*0.0001;
@@ -36,7 +36,7 @@ modelorder = 8
 % first compute power spectrum
 %pspectrum = powspec(samples, sr);
 % to match STEP settings
-pspectrum = powspec(samples, sr, 0.01, 0.01);
+pspectrum = powspec(samples, sr, 0.01, 0.01); % Is the 0.01 miliseconds? # Here we have 0% overlap; ams is different
 
 % next group to critical bands
 aspectrum = audspec(pspectrum, sr);

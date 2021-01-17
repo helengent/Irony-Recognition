@@ -35,7 +35,7 @@ if nargin < 5
   dither = 1;
 end
 
-winpts = round(wintime*sr);
+winpts = round(wintime*sr); % Fix this so that it is the same as for AMS
 steppts = round(steptime*sr);
 
 NFFT = 2^(ceil(log(winpts)/log(2)));
