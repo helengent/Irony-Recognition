@@ -2,6 +2,7 @@
 
 import math
 import numpy as np
+import numpy.matlib
 from glob import glob
 import scipy.sparse as sps
 from lib.WAVReader import WAVReader as WR
@@ -335,33 +336,35 @@ def extractAMS(x, fs, nChnl, nb_frames):
     ns_env = ENV_x
 
     win_ams = np.hanning(AMS_frame_len)
-    repwin_ams = np.tile(win_ams, (1, nChnl))
+    win_ams = np.reshape(win_ams, (np.shape(win_ams)[0], 1))
+    # repwin_ams = np.tile(win_ams, (1, nChnl))
+    repwin_ams = np.matlib.repmat(win_ams, 1, nChnl)
 
-    for kk in range(KK+1):
+    for kk in range(KK):
         start_idx = AMS_frame_step*kk
         end_idx = AMS_frame_len + (AMS_frame_step*kk)
     
         if end_idx<=np.shape(ns_env)[1]:
-            ns_env_frm = ns_env[:, int(start_idx):1+int(end_idx)]
+            ns_env_frm = ns_env[:, int(start_idx):int(end_idx)]
         else:
             zero_padding =  np.zeros((np.shape(ns_env)[0], int(end_idx) - np.shape(ns_env)[1]))
-            ns_env_frm = ns_env[:,int(start_idx):len(ns_env)]
-            ns_env_frm = np.append(ns_env_frm, zero_padding, axis=0)
+            ns_env_frm = ns_env[:,int(start_idx):np.shape(ns_env)[1]]
+            ns_env_frm = np.append(ns_env_frm, zero_padding, axis=1)
 
         ns_env_frm = np.transpose(ns_env_frm)
-        ams = np.abs(np.fft.fft(ns_env_frm*repwin_ams,int(nFFT_ams)))
+        ams = np.abs(np.fft.fft(ns_env_frm*repwin_ams,int(nFFT_ams), axis=0))
         # ams = parameters["MF_T"]*ams[0:int(np.round(nFFT_ams/2)), :]
         ams = parameters["MF_T"].dot(ams[0:int(np.round(nFFT_ams/2)), :])
         ams = np.transpose(ams)
         newSize = np.shape(ams)[0] * np.shape(ams)[1]
-        ns_ams[:,kk] = np.reshape(ams, (newSize, 1), order="F")
+        ns_ams[:,kk] = np.reshape(ams, (newSize,), order="F")
 
     return ns_ams
 
 
 if __name__ == "__main__":
-    wavs = glob('../../AudioData/GatedAll/*.wav')
-    # wavs = glob("./matlab_lib/AMS/*.wav")
+    # wavs = glob('../../AudioData/GatedAll/*.wav')
+    wavs = glob("./matlab_lib/AMS/*.wav")
 
     for i, wav in enumerate(wavs):
 
@@ -375,4 +378,4 @@ if __name__ == "__main__":
         x, ratio = LTLAdjust(x, fs)
 
         ns_ams = extractAMS(x, fs, nChnl, nb_frames)
-        print(ns_ams)
+        numpy.savetxt("b1.csv", ns_ams, delimiter=",")

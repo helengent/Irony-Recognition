@@ -1,4 +1,6 @@
 
+winSize = 0.01
+
 inputFolder = "/home/hmgent2/Irony-Recognition/AudioData/GatedAll"; 
 
 filePattern = fullfile(inputFolder, '*.wav');
@@ -12,10 +14,8 @@ for k = 1 : length(theFiles)
     base = strrep(baseFileName, 'SPPep12_', '')
     base = strrep(base, '.wav', '.csv')
     fprintf(1, '%s\n', base)
-    ams = extract_AMS(fullFileName)
+    ams = extract_AMS(fullFileName, winSize)
     writematrix(ams, base)
-    % fprintf(1, 'Now reading %s\n', fullFileName);
-    % Now do whatever you want with this file name,
-    % such as reading it in as an image array with imread()
 end
+
 

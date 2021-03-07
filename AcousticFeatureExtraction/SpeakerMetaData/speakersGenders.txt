@@ -1,0 +1,6 @@
+speaker,gender
+B,m
+G,f
+P,f
+R,nb
+Y,m

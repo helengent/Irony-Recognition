@@ -31,7 +31,7 @@ def tr2ch(fileList, fileName):
 
 if __name__=="__main__":
 
-    sourceDir = "../../preAnnotationAudio/sad_boyz_8"
+    sourceDir = "../../preAnnotationAudio/sad_boyz_27"
 
     fileList = glob("{}/*".format(sourceDir))
 

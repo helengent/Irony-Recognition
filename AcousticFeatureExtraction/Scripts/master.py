@@ -37,8 +37,6 @@ def main(wavPath, speakerList, outputType, winSize=10, prune=True, needReaper=Fa
 
     #Extract acoustic features
 
-    #TODO add bash commands to create appropriate directories in ../../FeaturalAnalysis/handExtracted/Data
-
     extract.main(wavPath, speakerList, outputType, winSize=winSize, prune=prune)
 
 
