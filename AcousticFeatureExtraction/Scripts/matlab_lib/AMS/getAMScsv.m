@@ -1,5 +1,5 @@
 
-winSize = 0.01
+%winSize = 0.01
 
 inputFolder = "/home/hmgent2/Irony-Recognition/AudioData/GatedAll"; 
 
@@ -14,7 +14,8 @@ for k = 1 : length(theFiles)
     base = strrep(baseFileName, 'SPPep12_', '')
     base = strrep(base, '.wav', '.csv')
     fprintf(1, '%s\n', base)
-    ams = extract_AMS(fullFileName, winSize)
+%    ams = extract_AMS(fullFileName, winSize)
+    ams = extract_AMS(fullFileName)
     writematrix(ams, base)
 end
 
