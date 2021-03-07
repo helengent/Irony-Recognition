@@ -207,8 +207,10 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
     #set irony variable
     if wavfile[-1] == "I":
         irony = "i"
-    else:
+    elif wavfile[-1] == "N":
         irony = "n"
+    else:
+        print("Oh no.")
 
     extractor = Extractor(wav, f0text, speaker, irony, winSize=int(winSize))
     f0 = extractor.getF0Contour()
@@ -225,7 +227,7 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
         ams = extractor.getAMS()
         plp = extractor.getPLP()
 
-        fileID = wavfile.split("SPPep12_")[1]
+        fileID = wavfile.split("_")[1]
 
         #Append to GLOBALDICT
         GLOBALDICT['filename'].append(fileID)

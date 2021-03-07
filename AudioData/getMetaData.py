@@ -9,7 +9,7 @@ with open("metaData.txt", "a+") as m:
     m.write("filename\tspeaker\tgender\tlabel\n")
 
 for f in fileList:
-    name = f.split("SPPep12_")[1].split(".")[0]
+    name = f.split("_")[1].split(".")[0]
 
     if name[0] == "b":
         speaker = 0
