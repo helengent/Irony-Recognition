@@ -41,8 +41,8 @@ def main(wavPath, speakerList, outputType, winSize=10, prune=True, needReaper=Fa
 
 
 if __name__=="__main__":
-    wavPath = "Pruned"
+    wavPath = "All"
     speakerList = ["B", "G", "P", "R", "Y"]
     # outputList = ['global', 'sequential', 'long', 'individual']
     outputList = ['global', 'sequential', 'individual']
-    main(wavPath, speakerList, outputList, prune=False, needReaper=True)
+    main(wavPath, speakerList, outputList, prune=True, needReaper=True)
