@@ -54,10 +54,15 @@ class Extractor:
         return f0Contour 
 
     def getMeanf0(self):
-        return giveMean(self.f0Data) 
+        return giveMean(self.getF0Contour()) 
 
     def getSDF0(self):
-        return giveSD(self.f0Data)
+        return giveSD(self.getF0Contour())
+
+    def getMedianF0(self):
+        f0 = self.getF0Contour()
+        mid = int(len(f0))
+        return f0[mid]
 
     #Timing features
     #window size is hard-coded to 5ms for this one
@@ -107,9 +112,11 @@ class Extractor:
 
     #HNR
     def getHNR(self):
-        harmonicity = self.sound.to_harmonicity()
-        hnr = harmonicity.values.mean()
+        harmonicity = self.sound.to_harmonicity_cc()
+        hnr = [value[0] if value != -200 else 0 for value in harmonicity.values.transpose()]
         return hnr
+        # hnr = harmonicity.values.mean()
+        # return hnr
 
     #Jitter and Shimmer
     #TODO

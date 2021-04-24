@@ -14,6 +14,15 @@ from extractor import Extractor
 
 def pruneAndSave(wavPath, winSize, prune=True):
 
+    newSequentialDict = {"filename": [], "speaker": [], "label": []}
+    f0SequentialDict = {"filename": [], "speaker": [], "label": []}
+    mfccSequentialDict = {"filename": [], "speaker": [], "label": []}
+    amsSequentialDict = {"filename": [], "speaker": [], "label": []}
+    plpSequentialDict = {"filename": [], "speaker": [], "label": []}
+    hnrSequentialDict = {"filename": [], "speaker": [], "label": []}
+
+    seqDictList = [newSequentialDict, f0SequentialDict, mfccSequentialDict, amsSequentialDict, plpSequentialDict, hnrSequentialDict]
+
     if prune == True:
         meanDur = sum(GLOBALDICT["duration"])/len(GLOBALDICT["duration"])
         sdDur = sd(GLOBALDICT["duration"], meanDur)
@@ -29,23 +38,17 @@ def pruneAndSave(wavPath, winSize, prune=True):
         mfccsPruned = list()
         amsPruned = list()
         plpPruned = list()
+        hnrPruned = list()
 
         print("Pruning sequential data to match pruned global data")
 
-        newSequentialDict = {"filename": [], "speaker": [], "label": []}
-        f0SequentialDict = {"filename": [], "speaker": [], "label": []}
-        mfccSequentialDict = {"filename": [], "speaker": [], "label": []}
-        amsSequentialDict = {"filename": [], "speaker": [], "label": []}
-        plpSequentialDict = {"filename": [], "speaker": [], "label": []}
-
-        seqDictList = [newSequentialDict, f0SequentialDict, mfccSequentialDict, amsSequentialDict, plpSequentialDict]
-
-        for i, (contour, mfcc, ams, plp) in enumerate(zip(F0CONTOURS, MFCCS, AMSLIST, RASTAPLPLIST)):
+        for i, (contour, mfcc, ams, plp, hnr) in enumerate(zip(F0CONTOURS, MFCCS, AMSLIST, RASTAPLPLIST, HNR)):
             if SEQUENTIALDICT["filename"][i] in global_df.filename.tolist():
                 f0Pruned.append(contour)
                 mfccsPruned.append(mfcc)
                 amsPruned.append(ams)
                 plpPruned.append(plp)
+                hnrPruned.append(hnr)
                 for dictionary in seqDictList:
                     dictionary["filename"].append(SEQUENTIALDICT["filename"][i])
                     dictionary["speaker"].append(SEQUENTIALDICT["filename"][i][0])
@@ -57,22 +60,28 @@ def pruneAndSave(wavPath, winSize, prune=True):
         mfccsPruned = MFCCS[:]
         amsPruned = AMSLIST[:]
         plpPruned = RASTAPLPLIST[:]
+        hnrPruned = HNR[:]
 
     print("Padding sequential data to uniform length")
 
     longList = [np.max([len(contour) for contour in f0Pruned]), np.max([len(mfcc) for mfcc in mfccsPruned]), 
-                np.max([np.shape(ams)[1] for ams in amsPruned]), np.max([np.shape(plp)[1] for plp in plpPruned])]
+                np.max([np.shape(ams)[1] for ams in amsPruned]), np.max([np.shape(plp)[1] for plp in plpPruned]), 
+                np.max([len(hnr) for hnr in hnrPruned])]
     longest = np.max(longList)
 
     #All f0 contours are 1xtime
     #All MFCC grids are timex13
     #All ams measures are 375xtime
     #All plp measures are 9xtime
+    #All hnr measures are 1xtime
     newMFCCsPruned, newAMSpruned, newPLPpruned = list(), list(), list()
-    for contour, mfcc, ams, plp in zip(f0Pruned, mfccsPruned, amsPruned, plpPruned):
+    for contour, mfcc, ams, plp, hnr in zip(f0Pruned, mfccsPruned, amsPruned, plpPruned, hnrPruned):
         while len(contour) < longest:
             contour.append(np.nan)
-            
+
+        while len(hnr) < longest:
+            hnr.append(np.nan)
+
         while len(mfcc) < longest:
             padding = np.full((1,13), np.nan)
             mfcc = np.append(mfcc, padding, axis=0)
@@ -93,6 +102,11 @@ def pruneAndSave(wavPath, winSize, prune=True):
         f0colName = "frame_" + str(i) + "_f0"
         newSequentialDict[f0colName] = [contour[i] for contour in f0Pruned]
         f0SequentialDict[f0colName] = [contour[i] for contour in f0Pruned]
+
+        hnrcolName = "frame_" + str(i) + "_hnr"
+        newSequentialDict[hnrcolName] = [hnr[i] for hnr in hnrPruned]
+        hnrSequentialDict[hnrcolName] = [hnr[i] for hnr in hnrPruned]
+
         ms = [mfcc[i] for mfcc in newMFCCsPruned]
         for j in range(13):
             colName = "frame_" + str(i) + "_mfcc_" + str(j)
@@ -115,7 +129,7 @@ def pruneAndSave(wavPath, winSize, prune=True):
 
     global_df.to_csv("{}/global_measures.csv".format(dirPath), index=False)
 
-    fileNames = ["all", "f0", "mfcc", "ams", "plp"]
+    fileNames = ["all", "f0", "mfcc", "ams", "plp", "hnr"]
 
     for d, f in zip(seqDictList, fileNames):
         print(f)
@@ -128,7 +142,7 @@ def makeLongDFs(wavPath, winSize):
 
     dirPath = "../../FeaturalAnalysis/handExtracted/Data/{}_{}ms".format(wavPath, winSize)
 
-    for i, measure in enumerate([F0CONTOURS, MFCCS, AMSLIST, RASTAPLPLIST]):
+    for i, measure in enumerate([F0CONTOURS, MFCCS, AMSLIST, RASTAPLPLIST, HNR]):
         longDict = {'filename': [], 'speaker': [], 'label': [], 'time': []}
 
         if i == 0:
@@ -184,9 +198,20 @@ def makeLongDFs(wavPath, winSize):
                         longDict['time'].append((h+1)/np.shape(c)[1])
                         longDict['plpNum'].append(m+1)
                         longDict['plp'].append(c[m][h])
+        elif i == 4:
+            #deal with hnr
+            #HNR is a list of lists
+            longDict['hnr'] = []
+            for j, c in enumerate(measure):
+                for h, dataPoint in enumerate(c):
+                    longDict['filename'].append(GLOBALDICT['filename'][j])
+                    longDict['speaker'].append(GLOBALDICT['speaker'][j].lower())
+                    longDict['label'].append(GLOBALDICT['label'][j])
+                    longDict['time'].append((h+1)/len(c))
+                    longDict['hnr'].append(dataPoint)
         
         longdf = pd.DataFrame(longDict)
-        fileNames = ["f0", "mfcc", "ams", "plp"]
+        fileNames = ["f0", "mfcc", "ams", "plp", "hnr"]
         longdf.to_csv("{}/{}_long.csv".format(dirPath, fileNames[i]), index=False)
 
 
@@ -235,7 +260,6 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
         GLOBALDICT['speaker'].append(speaker.getSpeaker())
         GLOBALDICT['gender'].append(speaker.getGender())
         GLOBALDICT['duration'].append(dur)
-        GLOBALDICT['hnr'].append(hnr)
         GLOBALDICT['f0globalMean'].append(meanF0)
         GLOBALDICT['f0globalSD'].append(F0sd)
         GLOBALDICT['avgPauseLength'].append(apl)
@@ -252,6 +276,9 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
         #Append mfccs to MFCCS
         MFCCS.append(mfccs)
 
+        #Append hnr to HNR
+        HNR.append(hnr)
+
         #Append ams to AMSLIST
         AMSLIST.append(ams)
 
@@ -261,11 +288,11 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
         ##This code saves out individual csv files for each sequential measure and for the global measure vector for each .wav file
         if saveIndv == True:
 
-            dirs = ["f0", "mfccs", "globalVector"]
-            for d in dirs:
-                if os.path.isdir("../../FeaturalAnalysis/handExtracted/Data/{}".format(d)):
-                    shutil.rmtree("../../FeaturalAnalysis/handExtracted/Data/{}".format(d))
-                os.mkdir("../../FeaturalAnalysis/handExtracted/Data/{}".format(d))
+            # dirs = ["f0", "mfccs", "globalVector", "hnr"]
+            # for d in dirs:
+            #     if not os.path.isdir("../../FeaturalAnalysis/handExtracted/Data/{}".format(d)):
+            #         # shutil.rmtree("../../FeaturalAnalysis/handExtracted/Data/{}".format(d))
+            #         os.mkdir("../../FeaturalAnalysis/handExtracted/Data/{}".format(d))
 
             f0 = pd.DataFrame(np.array(f0))
             f0.to_csv("../../FeaturalAnalysis/handExtracted/Data/f0/{}.csv".format(fileID), index=False)
@@ -273,7 +300,10 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
             mfccs = pd.DataFrame(mfccs)
             mfccs.to_csv("../../FeaturalAnalysis/handExtracted/Data/mfccs/{}.csv".format(fileID), index=False)
 
-            smolDict = {'duration': [dur], 'hnr': [hnr], 'f0globalMean': [meanF0], 'f0globalSD': [F0sd], 
+            hnr = pd.DataFrame(hnr)
+            hnr.to_csv("../../FeaturalAnalysis/handExtracted/Data/hnr/{}.csv".format(fileID), index=False)
+
+            smolDict = {'duration': [dur], 'f0globalMean': [meanF0], 'f0globalSD': [F0sd], 
                         'avgPauseLength': [apl], 'sound2silenceRatio': [s2s], 'totalPauses': [tp]}
             smolDict = pd.DataFrame(smolDict)
             smolDict.to_csv("../../FeaturalAnalysis/handExtracted/Data/globalVector/{}.csv".format(fileID), index=False)
@@ -291,7 +321,7 @@ def makeSpeakerList(s):
 def main(wavPath, speakerList, output, winSize="10", prune=True):
 
     global GLOBALDICT
-    GLOBALDICT = {"filename": [], "label": [], "speaker": [], "gender": [], "duration": [], "hnr": [], "f0globalMean": [], 
+    GLOBALDICT = {"filename": [], "label": [], "speaker": [], "gender": [], "duration": [], "f0globalMean": [], 
                   "f0globalSD": [], "avgPauseLength": [], "sound2silenceRatio": [], "totalPauses": []}
 
     global SEQUENTIALDICT
@@ -302,6 +332,9 @@ def main(wavPath, speakerList, output, winSize="10", prune=True):
 
     global MFCCS
     MFCCS = list()
+
+    global HNR
+    HNR = list()
 
     global AMSLIST
     AMSLIST = list()
@@ -316,7 +349,7 @@ def main(wavPath, speakerList, output, winSize="10", prune=True):
 
     for i, wav in enumerate(wavs):
 
-        print("Working on file {} of {}".format(i, len(wavs)))
+        print("Working on file {} of {}".format(i+1, len(wavs)))
         sI = "individual" in output
         extractVectors(wav, speakers, wavPath, winSize, saveIndv=sI)
 

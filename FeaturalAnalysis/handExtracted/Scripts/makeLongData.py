@@ -74,7 +74,7 @@ def main(measure):
     long_df = pd.read_csv("../Data/Pruned_10ms/{}_long.csv".format(measure))
     print(long_df.shape)
 
-    if measure == "f0":
+    if (measure == "f0") or (measure == "hnr"):
         smoothed = interpolateF0(long_df)
 
     else:
@@ -87,7 +87,8 @@ def main(measure):
 
 if __name__=="__main__":
 
-    measures = ["f0", "mfcc", 'ams', 'plp']
+    # measures = ["f0", "mfcc", 'ams', 'plp', 'hnr']
+    measures = ["hnr"]
     t0 = time.time()
     for measure in measures:
         main(measure)

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
 import os
+import time
 import extract
 import preProcess
 import subprocess
+import numpy as np
 import limitsUpperLower
 
 def main(wavPath, speakerList, outputType, winSize=10, prune=True, needReaper=False, needAMS=False, needPLP=False):
@@ -41,8 +43,10 @@ def main(wavPath, speakerList, outputType, winSize=10, prune=True, needReaper=Fa
 
 
 if __name__=="__main__":
-    wavPath = "All"
+    wavPath = "Pruned"
     speakerList = ["B", "G", "P", "R", "Y"]
     # outputList = ['global', 'sequential', 'long', 'individual']
-    outputList = ['global', 'sequential', 'individual']
-    main(wavPath, speakerList, outputList, prune=True, needReaper=True)
+    outputList = ['global', 'long', 'individual']
+    t0 = time.time()
+    main(wavPath, speakerList, outputList, prune=False, needReaper=False)
+    print("All processes completed in {} minutes".format(np.round((time.time() - t0) / 60), 2))
