@@ -125,7 +125,7 @@ def main(wavPath):
 
     for i, wav in enumerate(wavList):
 
-        print("Working on {}.\tThis is file {}\t{}".format(os.path.basename(wav), i, len(wavList)))
+        print("Working on {}\tThis is file {}/{}".format(os.path.basename(wav), i, len(wavList)))
 
         newData, fs, bits = preProcess(wav, avgRMS, wavPath)
 
@@ -135,5 +135,5 @@ def main(wavPath):
         writer.write()
 
 if __name__ == "__main__":
-    main("Pruned")
+    main("ANH")
     

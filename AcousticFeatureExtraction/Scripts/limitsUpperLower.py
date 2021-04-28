@@ -99,5 +99,8 @@ def main(wavPath, winSize, speakerList):
 
 if __name__=="__main__":
 
-    speakerList = ["B", "G", "P", "R", "Y"]
-    main("test", "10", speakerList)
+    # speakerList = ["B", "G", "P", "R", "Y"]
+    # main("test", "10", speakerList)
+
+    speakerList = ["C", "D", "E"]
+    main(ANH, 10, speakerList)

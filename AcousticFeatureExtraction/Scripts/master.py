@@ -23,6 +23,8 @@ def main(wavPath, speakerList, outputType, winSize=10, prune=True, needReaper=Fa
         #Get rid of temp folder. Files now live in Gated{wavPath}
         subprocess.run("rm -r ../../AudioData/temp{}".format(wavPath), shell=True)
 
+    #This is a good place to include ASR and forced alignment
+
     if needReaper == True:
         bashCommand = "mkdir ../ReaperTxtFiles/{}_{}ms_ReaperF0Results; cd ../../AudioData/Gated{}; ../../AcousticFeatureExtraction/Scripts/REAPER/reaper.sh; ../../AcousticFeatureExtraction/Scripts/REAPER/formatReaperOutputs.sh; mv *.p ../../AcousticFeatureExtraction/ReaperTxtFiles/{}_{}ms_ReaperF0Results/; rm *.f0; cd ../../AcousticFeatureExtraction/Scripts".format(wavPath, winSize, wavPath, wavPath, winSize)
         subprocess.run(bashCommand, shell=True)
