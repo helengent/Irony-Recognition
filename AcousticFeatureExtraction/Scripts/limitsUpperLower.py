@@ -103,4 +103,4 @@ if __name__=="__main__":
     # main("test", "10", speakerList)
 
     speakerList = ["C", "D", "E"]
-    main(ANH, 10, speakerList)
+    main("ANH", 10, speakerList)

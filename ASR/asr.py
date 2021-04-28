@@ -6,14 +6,17 @@ from glob import glob
 import speech_recognition as sr
 
 
-def main(wavList, out_dir):
+def main(in_dir, out_dir):
 
-    os.mkdir("data/{}_asr".format(out_dir))
+    os.mkdir(out_dir)
 
     wit_key = "R5533FE2CVI32BM2LVQRLFMDPMSZ55L3"
 
     r = sr.Recognizer()
     textDict = {"filename": [], "speaker": [], "label": [], "transcription": []}
+
+    wavList = glob("{}/*.wav".format(in_dir))
+    wavList.sort()
 
     for wav in wavList:
         name = os.path.basename(wav)
@@ -31,12 +34,12 @@ def main(wavList, out_dir):
             print(text)
     
     textDF = pd.DataFrame(textDict)
-    textDF.to_csv("data/asr_transcriptions.csv", index=False)
+    textDF.to_csv("out_dir/asr_transcriptions.csv", index=False)
     
     for i, row in textDF.iterrows():
         print(row)
 
-        with open("data/{}_asr/{}.txt".format(out_dir, row.filename.split(".")[0]), "w") as f:
+        with open("out_dir/{}.txt".format(out_dir, row.filename.split(".")[0]), "w") as f:
             f.write(row.transcription)
 
 
@@ -47,4 +50,4 @@ if __name__=="__main__":
     wavList = glob("{}/*.wav".format(input_dir))
     wavList.sort()
 
-    main(wavList, os.path.basename(input_dir))
+    main(input_dir, "data/{}_asr".format(os.path.basename(input_dir)))

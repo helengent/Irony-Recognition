@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 import time
 import extract
 import preProcess
@@ -8,7 +9,10 @@ import subprocess
 import numpy as np
 import limitsUpperLower
 
-def main(wavPath, speakerList, outputType, winSize=10, prune=True, needReaper=False, needAMS=False, needPLP=False):
+sys.path.append(os.path.join(os.path.dirname(sys.path[0], 'ASR')))
+import asr
+
+def main(wavPath, speakerList, outputType, winSize=10, prune=True, needReaper=False, needAMS=False, needPLP=False, needASR=False, needFA=False, haveManualT=False):
 
     if not os.path.isdir("../../AudioData/Gated{}".format(wavPath)):
 
@@ -24,6 +28,17 @@ def main(wavPath, speakerList, outputType, winSize=10, prune=True, needReaper=Fa
         subprocess.run("rm -r ../../AudioData/temp{}".format(wavPath), shell=True)
 
     #This is a good place to include ASR and forced alignment
+    if needASR == True:
+        asr.main("../../AudioData/Gated{}".format(wavPath), "../../ASR/data/{}_asr".format(wavPath))
+
+    if needFA == True:
+        bashCommand = "cd ../../ASR; ./run_Penn.sh ../AudioData/Gated{} data/{}_asr; cd ../AcousticFeatureExtraction/Scripts".format(wavPath, wavPath)
+        subprocess.run(bashCommand, shell=True)
+
+        if haveManualT == True:
+            bashCommand = "cd ../../ASR; ./ASR/run_Penn.sh ../../AudioData/Gated{} ../../ASR/data/{}_manual; cd ../AcousticFeatureExtraction/Scripts".format(wavPath, wavPath)
+            subprocess.run(bashCommand, shell=True)
+
 
     if needReaper == True:
         bashCommand = "mkdir ../ReaperTxtFiles/{}_{}ms_ReaperF0Results; cd ../../AudioData/Gated{}; ../../AcousticFeatureExtraction/Scripts/REAPER/reaper.sh; ../../AcousticFeatureExtraction/Scripts/REAPER/formatReaperOutputs.sh; mv *.p ../../AcousticFeatureExtraction/ReaperTxtFiles/{}_{}ms_ReaperF0Results/; rm *.f0; cd ../../AcousticFeatureExtraction/Scripts".format(wavPath, winSize, wavPath, wavPath, winSize)
@@ -45,10 +60,13 @@ def main(wavPath, speakerList, outputType, winSize=10, prune=True, needReaper=Fa
 
 
 if __name__=="__main__":
-    wavPath = "Pruned"
-    speakerList = ["B", "G", "P", "R", "Y"]
+    wavPath = "ANH"
+    # wavPath = "Pruned"
+    speakerList = ["C", "D", "E"]
+    # speakerList = ["B", "G", "P", "R", "Y"]
     # outputList = ['global', 'sequential', 'long', 'individual']
-    outputList = ['global', 'long', 'individual']
+    # outputList = ['global', 'long', 'individual']
+    outputList = ['individual']
     t0 = time.time()
-    main(wavPath, speakerList, outputList, prune=False, needReaper=False)
+    main(wavPath, speakerList, outputList, prune=False, needReaper=False, needASR=False, needFA=False, haveManualT=True)
     print("All processes completed in {} minutes".format(np.round((time.time() - t0) / 60), 2))

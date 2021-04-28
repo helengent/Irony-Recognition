@@ -141,7 +141,7 @@ class Extractor:
                             if line != '"SIL"\n':
                                 wordList.append(line.strip())
                                 wordDuration.append(b - a)
-                            else: silenceDuration.append(b - 1)
+                            else: silenceDuration.append(b - a)
                         counter = 10 # Reset to the beginning of a new triplet
                     
                 else:
@@ -153,6 +153,7 @@ class Extractor:
         return np.mean(wordDuration), np.mean(silenceDuration) # Return a global average of both silence and word duration for a given speaker
 
 
+    # Dynamic Range in decibels
     def getDynamicRange(self):
 
         return calDynamicRange(self.data, self.fs)
@@ -194,6 +195,7 @@ class Extractor:
     # Landing space for extracting consonant-by-consonant metrics
     def getConsonantalInformation(self):
 
+        # Consonants are returned only if they are in the current utterance
         consonants = self.getConsonants()
         
         # Check to make sure we don't have anything non-ARPABET
@@ -205,7 +207,10 @@ class Extractor:
         averageConsonantalDuration = self.getConsonantalDuration(consonants)
         spectralArray = list()
         consonantCount = 0
+
+        # Iterate over all of our possible consonants from ARPABET
         for arpaC in self.arpabetConsonantalList:
+            # Check to see if the speaker produced the consonant during this particular utterance
             if arpaC in consonants:
                 cog, kur, ske, std, count = self.getSpectralMoments(consonants[arpaC])
                 spectralArray.append(cog)
@@ -214,7 +219,7 @@ class Extractor:
                 spectralArray.append(std)
                 consonantCount += count
             else:
-                for i in range(4):
+                for i in range(4): # Sometimes a speaker won't produced every consonant during every utterance; but we have to fill out the input feature vectors
                     spectralArray.append(np.nan)
         
         spectralArray.append(averageConsonantalDuration)
@@ -223,6 +228,7 @@ class Extractor:
 
     def getConsonants(self):
 
+        # For comments look to the wordDuration() call
         startWord, isSegment = False, False
         startData, wordList, wordDuration, silenceDuration = list(), list(), list(), list()
         counter = 0
@@ -260,7 +266,7 @@ class Extractor:
                             isSegment = True
                         elif a < (endSIL / 1000) < b:
                             isSegment = False
-                        # It's a consonant that we're interested in
+                        # It's a consonant that we're interested in if it passes the .isdigit() check
                         # LG is laughter, NS is noise, CG is cough, LS is lip smack, and SL can be silence  (https://phon.wordpress.ncsu.edu/lab-manual/forced-alignment/)
                         if isSegment:
                             if line != '"sil"\n' and line != '"lg"\n' and line != '"ns"\n' and line != '"cg"\n' and line != '"ls"\n' and line != '"sl"\n' and not any(map(str.isdigit, line.strip())):
@@ -280,10 +286,15 @@ class Extractor:
     def getSpectralMoments(self, c):
 
         cog, kur, ske, std, consonantCount = list(), list(), list(), list(), 0
+        # Iterate over all of the time-stamps for the consonants produced during a given utterance
         for start, end in c:
             consonantCount += 1
+            # TODO currently we are extracting from the large waveform and not from the normalised ones. 
+                # I need to figure out the mapping here from big to small with the TextGrids
             part = self.bw_sound.extract_part(from_time = start, to_time = end)
+            # Cast the waveform part to its spectrum
             spectrum = part.to_spectrum()
+            # Calculate spectral moments
             cog.append(self.getConsonantalCenterOfGravity(spectrum))
             kur.append(self.getConsonantalKurtosis(spectrum))
             ske.append(self.getConsonantalSkewness(spectrum))
@@ -312,6 +323,7 @@ class Extractor:
         return spectrum.get_standard_deviation()
 
 
+    # Return a mean for all consonants produced over the course of the utterance
     def getConsonantalDuration(self, consonants):
 
         durList = list()
