@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import os
+import sys
 import keras
 import numpy as np
 import pandas as pd
@@ -8,32 +10,43 @@ from keras import models
 from sklearn.model_selection import KFold
 from sklearn.model_selection import train_test_split
 
-def pilotNN(X_train, X_test, y_train, y_test):
-    
-    input_dim = np.shape(X_train)[1]
+sys.path.append(os.path.join('/'.join(sys.path[1].split("/")[:-3]), 'Models'))
+from FeedForward import FeedForwardNN
 
-    model = models.Sequential()
-    model.add(layers.Dense(12, input_dim=input_dim, activation='relu'))
-    model.add(layers.Dense(8, activation='relu'))
-    model.add(layers.Dense(8, activation='relu'))
-    model.add(layers.Dense(2, activation='softmax'))
 
-    model.summary()
-    print(1)
+def plotIt(history, modelName):
+    acc = history.history['binary_accuracy']
+    val_acc = history.history['val_binary_accuracy']
 
-    # model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    loss = history.history['loss']
+    val_loss = history.history['val_loss']
 
-def main(df):
+
+
+def main(df, csv_path, checkpoint_path):
     labs = np.array(df.pop("label"))
     newdf = np.array(df)
 
     X_train, X_test, y_train, y_test = train_test_split(newdf, labs, test_size=0.1, random_state=6)
+    X_train, X_dev, y_train, y_dev = train_test_split(X_train, y_train, test_size=0.1, random_state=6)
 
+    y_train = y_train.reshape((-1, 1))
+    y_dev = y_dev.reshape((-1, 1))
+    y_test = y_test.reshape((-1, 1))
+    
+    ffnn = FeedForwardNN(X_train, X_dev, X_test, y_train, y_dev, y_test, csv_path, checkpoint_path)
+
+    ffnn.train()
 
     print(1)
 
+
+
 if __name__ == "__main__":
-    with open("baseline_consolidated.pkl", "rb") as p:
+    with open("../Data/baseline_consolidated.pkl", "rb") as p:
         bigDF = pd.read_pickle(p)
 
-    main(bigDF)
+    csv_path = "../Checkpoints/ComParE_checkpoints.csv"
+    checkpoint_path = "../Checkpoints/ComParE_checkpoings.ckpt"
+
+    main(bigDF, csv_path, checkpoint_path)

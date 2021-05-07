@@ -49,8 +49,9 @@ class WAVWriter():
         total_samples = self.__SampleNo * self.__ChannelNO
         array_data = self.data
         if np.max(np.abs(array_data)) > 1:
-            array_data = dsp.scalesig(array_data) 
-            print("WARNING: The peak amplitude exceeds 1. The data will be scaled before writing to WAV file.")
+            # array_data = dsp.scalesig(array_data) 
+            # print("WARNING: The peak amplitude exceeds 1. The data will be scaled before writing to WAV file.")
+            raise Exception
 
         array_data.shape = (1, total_samples)
 

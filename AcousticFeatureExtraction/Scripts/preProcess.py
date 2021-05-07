@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 import shutil
 import numpy as np
 from glob import glob
@@ -11,16 +12,28 @@ from lib.WAVReader import WAVReader as WR
 from lib.WAVWriter import WAVWriter as WW
 from lib.DSP_Tools import rms, normaliseRMS, findEndpoint
 
+
+def doubleCheck(wavPath):
+    wavList = glob("../../AudioData/Gated{}/*.wav".format(wavPath))
+    rmsList = list()
+    for wav in wavList:
+        readr = WR(wav)
+        data = readr.getData()
+        rmsList.append(np.round(rms(data), 2))
+
+    return len(list(set(rmsList))) == 1
+
+
 def highPass(fs, low, filterOrder):
     bs = firwin((filterOrder+1), (low/(fs/2)), pass_zero=False)
     return bs
 
 
 def createDir(name):
-    dirs = os.listdir()
+    dirs = os.listdir("../../AudioData")
     if name in dirs:
-        shutil.rmtree(name)
-    os.mkdir(name)
+        shutil.rmtree("../../AudioData/{}".format(name))
+    os.mkdir("../../AudioData/{}".format(name))
 
 
 def plotIt(listoThings, x, listoLabels, xlabs, ylabs, name):
@@ -75,7 +88,7 @@ def trimSilence(signal, fs, win_size):
     return gated_sig, silences
 
 
-def preProcess(wav, tarRMS, wavPath):
+def preProcess(wav, tarRMS):
     readr = WR(wav)
     signal = readr.getData()
     fs = readr.getSamplingRate()
@@ -115,25 +128,62 @@ def findAvgRMS(wavs):
     return sum(rmsList)/len(rmsList)
 
 
-def main(wavPath):
- 
-    wavList = glob('../../AudioData/temp{}/*.wav'.format(wavPath))
-    avgRMS = findAvgRMS(wavList)
+def main(wavPath, k, attemptCount):
 
-    createDir("../../AudioData/Gated{}".format(wavPath))
+    if attemptCount > 100:
+        print("Attempts have exceed limit. Try something else.")
+        print("k = {}".format(k))
+        print("attempts = {}".format(attemptCount))
+        raise Exception
+
+    wavList = glob('../../AudioData/temp{}/*.wav'.format(wavPath))
+
+    createDir("Gated{}".format(wavPath))
     #createDir("../../SilenceTrimmingPlots/{}".format(wavPath))
 
     for i, wav in enumerate(wavList):
 
-        print("Working on {}\tThis is file {}/{}".format(os.path.basename(wav), i, len(wavList)))
+        if (i+1) % 10 == 0:
+            print("Working on {}\tThis is file {}/{}".format(os.path.basename(wav), i+1, len(wavList)))
 
-        newData, fs, bits = preProcess(wav, avgRMS, wavPath)
+        newData, fs, bits = preProcess(wav, k)
 
         #Write newData out as new wavFile in fresh directory
         name = "../../AudioData/Gated{}/".format(wavPath) + os.path.basename(wav)
-        writer = WW(name, newData, fs=fs, bits=bits)
-        writer.write()
+
+        try:
+            writer = WW(name, newData, fs=fs, bits=bits)
+            writer.write()
+        except:
+            attemptCount += 1
+            k -= 0.01
+            print()
+            print("Clipping problem. Starting over with new target rms")
+            print("This is attempt {}. Target rms = {}".format(attemptCount, np.round(k, 2)))
+            print()
+            main(wavPath, k, attemptCount)
+
+        if i == len(wavList) - 1:
+
+            allGood = doubleCheck(wavPath)
+
+            if allGood:
+                print("Successfully rms normalized all files to {} in {} attempts".format(np.round(k, 2), attemptCount))
+                sys.exit()
+            else:
+                print("Yo this still didn't work")
+                raise Exception
+
+def preMain(wavPath):
+
+    wavList = glob('../../AudioData/temp{}/*.wav'.format(wavPath))
+    avgRMS = findAvgRMS(wavList)
+    attemptCount = 1
+    
+    main(wavPath, avgRMS, attemptCount)
 
 if __name__ == "__main__":
-    main("ANH")
+
+    preMain("ANH")
+
     

@@ -311,10 +311,8 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
 
 def makeSpeakerList(s):
     speakers = list()
-    genders = pd.read_csv("../SpeakerMetaData/speakersGenders.txt")
     for speaker in s:
-        #TODO This works but it is SO dumb. Fix it someday.
-        speakers.append(Speaker(speaker, "../SpeakerMetaData/{}_f0.txt".format(speaker), gender=genders[genders['speaker']==speaker]['gender'].tolist()[0]))
+        speakers.append(Speaker(speaker, "../SpeakerMetaData/{}_f0.txt".format(speaker))
     return speakers
   
 

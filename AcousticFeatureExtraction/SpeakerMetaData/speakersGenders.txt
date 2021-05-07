@@ -1,5 +1,8 @@
 speaker,gender
 B,m
+C, m
+D, m
+E, f
 G,f
 P,f
 R,nb

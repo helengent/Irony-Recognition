@@ -39,7 +39,7 @@ def parse(f):
         phoneEnd = float(lines[i+1])
         phone = lines[i+2][1:-1]
 
-        phones.append((phone, phoneStart, phoneEnd))
+        phones.append((phone, phoneStart, phoneEnd, phoneEnd - phoneStart))
 
         i += 3
 
@@ -53,26 +53,24 @@ def parse(f):
         wordEnd = float(lines[i+1])
         word = lines[i+2][1:-1]
 
-        words.append((word, wordStart, wordEnd))
+        words.append((word, wordStart, wordEnd, wordEnd - wordStart))
 
         i += 3
 
     return fileStart, fileEnd, words, phones
 
 
-def main(input_dir):
-    
-    fileList = glob("{}/*.TextGrid".format(input_dir))
+def main(f):
 
-    print(len(fileList))
-
-    for f in fileList:
-        start, end, words, phones = parse(f)
-        lineUp(words, phones)
+    start, end, words, phones = parse(f)
+    combined = lineUp(words, phones)
+    return combined, words, phones
 
 
 if __name__=="__main__":
 
     input_dir = "data/ANH_manual"
+    fileList = glob("{}/*.TextGrid".format(input_dir))
 
-    main(input_dir)
+    for f in fileList:
+        main(f)
