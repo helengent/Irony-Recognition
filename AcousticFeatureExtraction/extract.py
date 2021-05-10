@@ -12,7 +12,7 @@ from speaker import Speaker
 from extractor import Extractor
 
 
-def pruneAndSave(wavPath, winSize, prune=True):
+def pruneAndSave(wavPath, winSize, dirPath, prune=True):
 
     newSequentialDict = {"filename": [], "speaker": [], "label": []}
     f0SequentialDict = {"filename": [], "speaker": [], "label": []}
@@ -125,8 +125,6 @@ def pruneAndSave(wavPath, winSize, prune=True):
 
     print("Saving global and sequential dataframes")
 
-    dirPath = "../../FeaturalAnalysis/handExtracted/Data/{}_{}ms".format(wavPath, winSize)
-
     global_df.to_csv("{}/global_measures.csv".format(dirPath), index=False)
 
     fileNames = ["all", "f0", "mfcc", "ams", "plp", "hnr"]
@@ -138,9 +136,7 @@ def pruneAndSave(wavPath, winSize, prune=True):
 
 
 #This creates long data - needed for GAM analysis
-def makeLongDFs(wavPath, winSize):
-
-    dirPath = "../../FeaturalAnalysis/handExtracted/Data/{}_{}ms".format(wavPath, winSize)
+def makeLongDFs(wavPath, winSize, dirPath):
 
     for i, measure in enumerate([F0CONTOURS, MFCCS, AMSLIST, RASTAPLPLIST, HNR]):
         longDict = {'filename': [], 'speaker': [], 'label': [], 'time': []}
@@ -216,17 +212,17 @@ def makeLongDFs(wavPath, winSize):
 
 
 def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
-    f = open("../ReaperTxtFiles/{}_{}ms_ReaperF0Results/{}.wav.f0.p".format(wavPath, winSize, os.path.basename(wav).split(".")[0]), "r")
-    f0text = f.read()
-    f.close()
-    f0text = f0text.split()
+    # f = open("../ReaperTxtFiles/{}_{}ms_ReaperF0Results/{}.wav.f0.p".format(wavPath, winSize, os.path.basename(wav).split(".")[0]), "r")
+    # f0text = f.read()
+    # f.close()
+    # f0text = f0text.split()
 
     wavfile = os.path.basename(wav).split(".")[0]
 
     #set speaker variable
     speaker = "NULL"
     for s in speakers:
-        if wavfile[8].upper() == s.getSpeaker():
+        if wavfile.split("_")[1][0].upper() == s.getSpeaker():
             speaker = s
 
     #set irony variable
@@ -237,7 +233,7 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
     else:
         print("Oh no.")
 
-    extractor = Extractor(wav, f0text, speaker, irony, winSize=int(winSize))
+    extractor = Extractor(wav, speaker, irony, winSize=int(winSize))
     f0 = extractor.getF0Contour()
     if len(list(set(f0))) == 1:
         print("Bad file: {}".format(wavfile))
@@ -252,7 +248,7 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
         ams = extractor.getAMS()
         plp = extractor.getPLP()
 
-        fileID = wavfile.split("_")[1]
+        fileID = wavfile
 
         #Append to GLOBALDICT
         GLOBALDICT['filename'].append(fileID)
@@ -295,24 +291,24 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
             #         os.mkdir("../../FeaturalAnalysis/handExtracted/Data/{}".format(d))
 
             f0 = pd.DataFrame(np.array(f0))
-            f0.to_csv("../../FeaturalAnalysis/handExtracted/Data/f0/{}.csv".format(fileID), index=False)
+            f0.to_csv("../AcousticData/f0/{}.csv".format(fileID), index=False)
 
             mfccs = pd.DataFrame(mfccs)
-            mfccs.to_csv("../../FeaturalAnalysis/handExtracted/Data/mfccs/{}.csv".format(fileID), index=False)
+            mfccs.to_csv("../AcousticData/mfccs/{}.csv".format(fileID), index=False)
 
             hnr = pd.DataFrame(hnr)
-            hnr.to_csv("../../FeaturalAnalysis/handExtracted/Data/hnr/{}.csv".format(fileID), index=False)
+            hnr.to_csv("../AcousticData/hnr/{}.csv".format(fileID), index=False)
 
             smolDict = {'duration': [dur], 'f0globalMean': [meanF0], 'f0globalSD': [F0sd], 
                         'avgPauseLength': [apl], 'sound2silenceRatio': [s2s], 'totalPauses': [tp]}
             smolDict = pd.DataFrame(smolDict)
-            smolDict.to_csv("../../FeaturalAnalysis/handExtracted/Data/globalVector/{}.csv".format(fileID), index=False)
+            smolDict.to_csv("../AcousticData/globalVector/{}.csv".format(fileID), index=False)
 
 
 def makeSpeakerList(s):
     speakers = list()
     for speaker in s:
-        speakers.append(Speaker(speaker, "../SpeakerMetaData/{}_f0.txt".format(speaker))
+        speakers.append(Speaker(speaker, "../AcousticData/SpeakerMetaData/{}_f0.txt".format(speaker))
     return speakers
   
 
@@ -342,7 +338,7 @@ def main(wavPath, speakerList, output, winSize="10", prune=True):
 
     speakers = makeSpeakerList(speakerList)
 
-    wavs = glob('../../AudioData/Gated{}/*.wav'.format(wavPath))
+    wavs = glob('../AudioData/Gated{}/*.wav'.format(wavPath))
     wavs.sort()
 
     for i, wav in enumerate(wavs):
@@ -352,20 +348,20 @@ def main(wavPath, speakerList, output, winSize="10", prune=True):
         extractVectors(wav, speakers, wavPath, winSize, saveIndv=sI)
 
     if "long" in output:
-        dirPath = "../../FeaturalAnalysis/handExtracted/Data/{}_{}ms".format(wavPath, winSize)
+        dirPath = "../AcousticData/{}_{}ms".format(wavPath, winSize)
         if not os.path.isdir(dirPath):
             os.mkdir(dirPath)
-        makeLongDFs(wavPath, winSize)
+        makeLongDFs(wavPath, winSize, dirPath)
     
     if "sequential" in output:
-        dirPath = "../../FeaturalAnalysis/handExtracted/Data/{}_{}ms".format(wavPath, winSize)
+        dirPath = "../AcousticData/{}_{}ms".format(wavPath, winSize)
         if not os.path.isdir(dirPath):
             os.mkdir(dirPath)
-        pruneAndSave(wavPath, winSize, prune=prune)
+        pruneAndSave(wavPath, winSize, dirPath, prune=prune)
     
     if ("global" in output) and ("sequential" not in output):
         global_df = pd.DataFrame(GLOBALDICT)
-        global_df.to_csv("../../FeaturalAnalysis/handExtracted/Data/{}_global_measures.csv".format(wavPath), index=False)
+        global_df.to_csv("../AcousticData/{}_global_measures.csv".format(wavPath), index=False)
 
 if __name__ == "__main__":
     t0 = time.time()

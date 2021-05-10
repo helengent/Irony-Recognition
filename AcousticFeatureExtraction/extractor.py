@@ -20,9 +20,9 @@ from python_speech_features import mfcc, logfbank
 from lib.DSP_Tools import findEndpoint, normaliseRMS
 
 class Extractor:
-    def __init__(self, wav, text, speaker, irony, winSize=5):
+    def __init__(self, wav, speaker, irony, winSize=5):
         self.name = wav
-        self.text = text
+        # self.text = text
         self.speaker = speaker
         self.irony = irony
         self.winSize = winSize
@@ -33,12 +33,15 @@ class Extractor:
         self.dur = self.wav.getDuration()
         self.f0Data = self.getF0Contour()
    
+   
     #Speaker features
     def getSpeaker(self):
         return self.speaker.getSpeaker()
 
+
     def getGender(self):
         return self.speaker.getGender()
+
 
     #F0 features
     def getF0Contour(self):
@@ -57,8 +60,10 @@ class Extractor:
     def getMeanf0(self):
         return giveMean(self.getF0Contour()) 
 
+
     def getSDF0(self):
         return giveSD(self.getF0Contour())
+
 
     def getMedianF0(self):
         f0 = self.getF0Contour()
