@@ -51,8 +51,6 @@ class Extractor:
         f0_array = list()
 
         #This is the code to get the Parselmouth f0 contour
-        #TODO make this more precise in terms of time steps!
-        # pitch = self.sound.to_pitch(time_step=(self.winSize/1000), pitch_floor=lowerLimit, pitch_ceiling=upperLimit)
         pitch = self.sound.to_pitch_cc(pitch_floor=lowerLimit, pitch_ceiling=upperLimit)
 
         start = 0
