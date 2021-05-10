@@ -1,9 +1,12 @@
 #/usr/bin/env python3
 
 import os
-from sd import sd
+import sys
 import parselmouth
 from glob import glob
+
+sys.path.append(os.path.dirname(sys.path[1]))
+from sd import sd
 
 
 def upperLimit(vec):

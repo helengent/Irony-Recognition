@@ -2,11 +2,13 @@
 
 import os, shutil, glob, sys
 from scipy.signal import firwin, lfilter
+import matplotlib.pyplot as plt
+import numpy as np
+
+sys.path.append(os.path.dirname(sys.path[1]))
 from lib.WAVReader import WAVReader as WR
 from lib.WAVWriter import WAVWriter as WW
 from lib.DSP_Tools import findEndpoint, normaliseRMS, rms
-import matplotlib.pyplot as plt
-import numpy as np
 
 def createDir(name):
     dirs = os.listdir()

@@ -12,10 +12,10 @@ from numpy import genfromtxt
 import matplotlib.pyplot as plt
 #from f0_parseltongue import smooth
 from scipy.io import wavfile as wave
-from silence import highPass, validateTs
-from reaper_f0extractor import f0VecTime
+from preProcessing.silence import highPass, validateTs
+# from reaper_f0extractor import f0VecTime
 from lib.WAVReader import WAVReader as WR
-from limitsUpperLower import giveMean, giveSD
+from preProcessing.limitsUpperLower import giveMean, giveSD
 from python_speech_features import mfcc, logfbank
 from lib.DSP_Tools import findEndpoint, normaliseRMS
 
@@ -33,7 +33,7 @@ class Extractor:
         self.dur = self.wav.getDuration()
         self.f0Data = self.getF0Contour()
    
-   
+
     #Speaker features
     def getSpeaker(self):
         return self.speaker.getSpeaker()
@@ -47,11 +47,26 @@ class Extractor:
     def getF0Contour(self):
         upperLimit = self.speaker.getUpperLimit()
         lowerLimit = self.speaker.getLowerLimit()
+        
+        f0_array = list()
 
         #This is the code to get the Parselmouth f0 contour
         #TODO make this more precise in terms of time steps!
-        pitch = self.sound.to_pitch(time_step=(self.winSize/1000), pitch_floor=lowerLimit, pitch_ceiling=upperLimit)
-        return pitch.selected_array['frequency']
+        # pitch = self.sound.to_pitch(time_step=(self.winSize/1000), pitch_floor=lowerLimit, pitch_ceiling=upperLimit)
+        pitch = self.sound.to_pitch_cc(pitch_floor=lowerLimit, pitch_ceiling=upperLimit)
+
+        start = 0
+        end = self.winSize / 1000
+
+        while end <= self.wav.getDuration():
+
+            t = pitch.get_value_at_time(start)
+                
+            f0_array.append(t)
+            start += self.winSize/1000
+            end += self.winSize/1000
+
+        return f0_array
     
         #This is the code to get the reaper f0 contour
         # f0Contour = f0VecTime(self.text, lowerLimit, upperLimit, ms=self.winSize)
@@ -144,14 +159,14 @@ class Extractor:
     #Perceptual Linear Prediction
     def getPLP(self):
         n = os.path.basename(self.name).split("_")[1].split(".")[0]
-        rastaFile = "../../FeaturalAnalysis/handExtracted/Data/rastaplp/{}.csv".format(n)
+        rastaFile = "../AcousticData/rastaplp/{}.csv".format(n)
         rasta = genfromtxt(rastaFile, delimiter=',')
         return rasta
 
     #Amplitude modulation spectrum
     def getAMS(self):
         n = os.path.basename(self.name).split("_")[1].split(".")[0]
-        amsFile = "../../FeaturalAnalysis/handExtracted/Data/ams/{}.csv".format(n)
+        amsFile = "../AcousticData/ams/{}.csv".format(n)
         ams = genfromtxt(amsFile, delimiter=',')
         return ams
 

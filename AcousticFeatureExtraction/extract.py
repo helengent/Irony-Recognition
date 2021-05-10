@@ -308,7 +308,7 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
 def makeSpeakerList(s):
     speakers = list()
     for speaker in s:
-        speakers.append(Speaker(speaker, "../AcousticData/SpeakerMetaData/{}_f0.txt".format(speaker))
+        speakers.append(Speaker(speaker, "../AcousticData/SpeakerMetaData/{}_f0.txt".format(speaker)))
     return speakers
   
 
@@ -366,7 +366,8 @@ def main(wavPath, speakerList, output, winSize="10", prune=True):
 if __name__ == "__main__":
     t0 = time.time()
     speakers = ["B", "G", "P", "R", "Y"]
-    outputList = ['global', 'sequential', 'long', 'individual']
+    # outputList = ['global', 'sequential', 'long', 'individual']
+    outputList = []
     main("Pruned", speakers, outputList, prune=False)
     t1 = time.time()
     print("All processes completed in {} minutes".format((t1-t0)/60))
