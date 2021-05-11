@@ -17,7 +17,7 @@ from lib.DSP_Tools import rms, normaliseRMS, findEndpoint
 
 
 def doubleCheck(wavPath):
-    wavList = glob("../../AudioData/Gated{}/*.wav".format(wavPath))
+    wavList = glob("../AudioData/Gated{}/*.wav".format(wavPath))
     rmsList = list()
     for wav in wavList:
         readr = WR(wav)
@@ -33,10 +33,10 @@ def highPass(fs, low, filterOrder):
 
 
 def createDir(name):
-    dirs = os.listdir("../../AudioData")
+    dirs = os.listdir("../AudioData")
     if name in dirs:
-        shutil.rmtree("../../AudioData/{}".format(name))
-    os.mkdir("../../AudioData/{}".format(name))
+        shutil.rmtree("../AudioData/{}".format(name))
+    os.mkdir("../AudioData/{}".format(name))
 
 
 def validateTs(T, nb_cw=2):
@@ -129,7 +129,7 @@ def main(wavPath, k, attemptCount):
         print("attempts = {}".format(attemptCount))
         raise Exception
 
-    wavList = glob('../../AudioData/temp{}/*.wav'.format(wavPath))
+    wavList = glob('../AudioData/temp{}/*.wav'.format(wavPath))
 
     createDir("Gated{}".format(wavPath))
     #createDir("../../SilenceTrimmingPlots/{}".format(wavPath))
@@ -142,7 +142,7 @@ def main(wavPath, k, attemptCount):
         newData, fs, bits = preProcess(wav, k)
 
         #Write newData out as new wavFile in fresh directory
-        name = "../../AudioData/Gated{}/".format(wavPath) + os.path.basename(wav)
+        name = "../AudioData/Gated{}/".format(wavPath) + os.path.basename(wav)
 
         try:
             writer = WW(name, newData, fs=fs, bits=bits)
@@ -173,17 +173,17 @@ def preMain(wavPath):
 
     #convert stereo audio to mono
     #downsample to 16000 Hz
-    bashCommand = "cd ../../AudioData/{}; mkdir downsampled; ../../AcousticFeatureExtraction/preProcessing/monoDown.sh; mkdir ../temp{}; mv downsampled/* ../temp{}; rm -r downsampled; cd ../../AcousticFeatureExtraction/preProcessing".format(wavPath, wavPath, wavPath)
+    bashCommand = "cd ../AudioData/{}; mkdir downsampled; ../../AcousticFeatureExtraction/preProcessing/monoDown.sh; mkdir ../temp{}; mv downsampled/* ../temp{}; rm -r downsampled; cd ../../AcousticFeatureExtraction".format(wavPath, wavPath, wavPath)
     subprocess.run(bashCommand, shell=True)
 
-    wavList = glob('../../AudioData/temp{}/*.wav'.format(wavPath))
+    wavList = glob('../AudioData/temp{}/*.wav'.format(wavPath))
     avgRMS = findAvgRMS(wavList)
     attemptCount = 1
     
     main(wavPath, avgRMS, attemptCount)
 
     #Get rid of temp folder. Files now live in Gated{wavPath}
-    subprocess.run("rm -r ../../AudioData/temp{}".format(wavPath), shell=True)
+    subprocess.run("rm -r ../AudioData/temp{}".format(wavPath), shell=True)
 
 if __name__ == "__main__":
 

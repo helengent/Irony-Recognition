@@ -83,7 +83,7 @@ def giveSD(vec):
 
 def main(wavPath, winSize, speakerList):
     # f0Files = glob('../ReaperTxtFiles/{}_{}ms_ReaperF0Results/*.f0.p'.format(wavPath, winSize))
-    f0Files = glob('../../AudioData/Gated{}/*.wav'.format(wavPath))
+    f0Files = glob('../AudioData/Gated{}/*.wav'.format(wavPath))
     for speaker in speakerList:
         filesList = []
         indv = {}
@@ -96,7 +96,7 @@ def main(wavPath, winSize, speakerList):
         indv["lower"] = giveLowerLimit(vec)
         indv["mean"] = giveMean(vec)
         indv["sd"] = giveSD(vec)
-        with open('../../AcousticData/SpeakerMetaData/{}_f0.txt'.format(speaker), 'w') as f:
+        with open('../AcousticData/SpeakerMetaData/{}_f0.txt'.format(speaker), 'w') as f:
             for key in indv.keys():
                 f.write("{}\t{}\n".format(key, str(indv[key])))
         f.close()

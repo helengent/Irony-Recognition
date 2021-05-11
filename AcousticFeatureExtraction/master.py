@@ -8,9 +8,6 @@ import subprocess
 import numpy as np
 from preProcessing import preProcessAudio, asrFA, limitsUpperLower, getSpeakerDurationData
 
-sys.path.append(os.path.join(os.path.dirname(sys.path[0], 'ASR')))
-import asr
-
 def main(wavPath, speakerList, outputType, winSize=10, prune=True, needReaper=False, needAMS=False, needPLP=False, needASR=False, needFA=False, haveManualT=False):
 
     # Downsample to 16000 Hz and convert to mono
@@ -76,17 +73,17 @@ def main(wavPath, speakerList, outputType, winSize=10, prune=True, needReaper=Fa
 
     #Extract acoustic features
 
-    extract.main(wavPath, speakerList, outputType, winSize=winSize, prune=prune)
+    # extract.main(wavPath, speakerList, outputType, winSize=winSize, prune=prune)
 
 
 if __name__=="__main__":
-    wavPath = "ANH"
-    # wavPath = "Pruned"
-    speakerList = ["C", "D", "E"]
-    # speakerList = ["B", "G", "P", "R", "Y"]
+    # wavPath = "ANH"
+    wavPath = "Pruned"
+    # speakerList = ["C", "D", "E"]
+    speakerList = ["B", "G", "P", "R", "Y"]
     # outputList = ['global', 'sequential', 'long', 'individual']
     # outputList = ['global', 'long', 'individual']
     outputList = ['individual']
     t0 = time.time()
-    main(wavPath, speakerList, outputList, prune=False, needReaper=False, needASR=False, needFA=False, haveManualT=True)
-    print("All processes completed in {} minutes".format(np.round((time.time() - t0) / 60), 2))
+    main(wavPath, speakerList, outputList, prune=False, needReaper=False, needASR=False, needFA=False, haveManualT=False)
+    print("All processes2 completed in {} minutes".format(np.round((time.time() - t0) / 60), 2))

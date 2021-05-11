@@ -3,8 +3,10 @@
 wav_dir=$1
 txt_dir=$2
 
-out_dir="$(basename -- $txt_dir)"
-out_dir=data/${out_dir}
+# out_dir="$(basename -- $txt_dir)"
+# out_dir=data/${out_dir}
+
+out_dir=$2
 
 mkdir -p $out_dir
 

@@ -9,4 +9,4 @@ Created lattice with 13 nodes / 12 arcs from label file
  WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
  WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
  WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
-sp I sp WAS sp BORN sp SIXTEEN sp YEARS sp OLD sp  ==  [167 frames] 15.3168 [Ac=2557.9 LM=0.0] (Act=52.1)
+sp I sp WAS sp BORN sp SIXTEEN sp YEARS sp OLD sp  ==  [167 frames] 15.3136 [Ac=2557.4 LM=0.0] (Act=52.1)

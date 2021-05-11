@@ -2,13 +2,13 @@ File type = "ooTextFile short"
 "TextGrid"
 
 0.0125
-0.6425
+0.6525
 <exists>
 2
 "IntervalTier"
 "phone"
 0.0125
-0.6425
+0.6525
 4
 0.0125
 0.3025
@@ -20,12 +20,12 @@ File type = "ooTextFile short"
 0.4825
 "OW1"
 0.4825
-0.6425
+0.6525
 "sp"
 "IntervalTier"
 "word"
 0.0125
-0.6425
+0.6525
 3
 0.0125
 0.3025
@@ -34,5 +34,5 @@ File type = "ooTextFile short"
 0.4825
 "WOAH"
 0.4825
-0.6425
+0.6525
 "sp"

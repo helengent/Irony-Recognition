@@ -20,7 +20,7 @@ def main(in_dir, out_dir):
 
     for wav in wavList:
         name = os.path.basename(wav)
-        print(name)
+        # print(name)
         textDict["filename"].append(name)
         textDict["speaker"].append(name.split("_")[1][0])
         if name[-6] == "F":
@@ -31,7 +31,7 @@ def main(in_dir, out_dir):
             w = r.listen(source)
             text = r.recognize_wit(w, wit_key)
             textDict["transcription"].append(text)
-            print(text)
+            # print(text)
     
     textDF = pd.DataFrame(textDict)
     textDF.to_csv("{}/asr_transcriptions.csv".format(out_dir), index=False)

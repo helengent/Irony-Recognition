@@ -2,7 +2,7 @@
 
 import os
 import numpy as np
-from ASR import parseTextGrid
+from preProcessing.ASR import parseTextGrid
 from glob import glob
 
 arpabetConsonantalList = ['K', 'S', 'L', 'M', 'SH', 'N', 'P', 'T', 'Z', 'W', 'D', 'B', 
@@ -44,7 +44,7 @@ def speakerDurationData(input_dir, speakerList):
         for p in phoneDict.keys():
             phoneDict[p] = np.mean(phoneDict[p])
 
-        with open("../../AcousticData/SpeakerMetaData/{}_avgDur.txt".format(speaker), "w") as f:
+        with open("../AcousticData/SpeakerMetaData/{}_avgDur.txt".format(speaker), "w") as f:
             f.write("speaker\t{}\n".format(speaker))
             f.write("avgWordDur\t{}\n".format(np.mean([wordDict[key] for key in wordDict.keys() if key != 'sp' and key != "{LG}"])))
             f.write("avgVowelDur\t{}\n".format(np.mean([phoneDict[key] for key in phoneDict.keys() if key in arpabetVocalicList])))
