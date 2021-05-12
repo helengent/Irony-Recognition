@@ -49,8 +49,10 @@ def speakerDurationData(input_dir, speakerList):
             f.write("avgWordDur\t{}\n".format(np.mean([wordDict[key] for key in wordDict.keys() if key != 'sp' and key != "{LG}"])))
             f.write("avgVowelDur\t{}\n".format(np.mean([phoneDict[key] for key in phoneDict.keys() if key in arpabetVocalicList])))
             f.write("avgConsonantDur\t{}\n".format(np.mean([phoneDict[key] for key in phoneDict.keys() if key in arpabetConsonantalList])))
-            f.write("avgPauseDur\t{}\n".format(wordDict['sp']))
-            f.write("avgLaughDur\t{}\n".format(wordDict["{LG}"]))
+            if 'sp' in wordDict.keys():
+                f.write("avgPauseDur\t{}\n".format(wordDict['sp']))
+            if "{LG}" in wordDict.keys():
+                f.write("avgLaughDur\t{}\n".format(wordDict["{LG}"]))
             for p in phoneDict.keys():
                 if p in arpabetConsonantalList or p in arpabetVocalicList:
                     f.write("{}\t{}\n".format(p, phoneDict[p]))
@@ -59,7 +61,10 @@ def speakerDurationData(input_dir, speakerList):
 
 if __name__=="__main__":
 
-    input_dir = "../../TextData/ANH_manual"
-    speakerList = ["C", "D", "E"]
+    # input_dir = "../TextData/ANH_manual"
+    # speakerList = ["C", "D", "E"]
+
+    input_dir = "../TextData/Pruned_asr"
+    speakerList = ["B", "G", "P", "R", "Y"]
 
     speakerDurationData(input_dir, speakerList)

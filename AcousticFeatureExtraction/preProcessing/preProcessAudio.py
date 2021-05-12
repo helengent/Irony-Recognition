@@ -24,7 +24,7 @@ def doubleCheck(wavPath):
         data = readr.getData()
         rmsList.append(np.round(rms(data), 2))
 
-    return len(list(set(rmsList))) == 1
+    return len(list(set(rmsList))) == 1, list(set(rmsList))
 
 
 def highPass(fs, low, filterOrder):
@@ -159,14 +159,16 @@ def main(wavPath, k, attemptCount):
 
         if i == len(wavList) - 1:
 
-            allGood = doubleCheck(wavPath)
+            allGood, t = doubleCheck(wavPath)
 
             if allGood:
                 print("Successfully rms normalized all files to {} in {} attempts".format(np.round(k, 2), attemptCount))
                 return
             else:
                 print("Yo this still didn't work")
-                raise Exception
+                print(t)
+                print()
+                # raise Exception
 
 
 def preMain(wavPath):
