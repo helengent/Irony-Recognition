@@ -284,11 +284,7 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
         ##This code saves out individual csv files for each sequential measure and for the global measure vector for each .wav file
         if saveIndv == True:
 
-            # dirs = ["f0", "mfccs", "globalVector", "hnr"]
-            # for d in dirs:
-            #     if not os.path.isdir("../../FeaturalAnalysis/handExtracted/Data/{}".format(d)):
-            #         # shutil.rmtree("../../FeaturalAnalysis/handExtracted/Data/{}".format(d))
-            #         os.mkdir("../../FeaturalAnalysis/handExtracted/Data/{}".format(d))
+
 
             f0 = pd.DataFrame(np.array(f0))
             f0.to_csv("../AcousticData/f0/{}.csv".format(fileID), index=False)

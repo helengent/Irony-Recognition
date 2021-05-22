@@ -5,8 +5,7 @@ import numpy as np
 import pandas as pd
 from keras import layers
 from keras import models
-from sklearn.model_selection import KFold
-from sklearn.model_selection import train_test_split
+from sklearn.metrics import precision_recall_fscore_support
 
 
 #This is designed to handle ComParE-style data where the input is non-sequential
@@ -54,6 +53,17 @@ class FeedForwardNN():
 
         # Fit the model
         self.history = self.model.fit(self.train_in, self.train_out, epochs = 150, batch_size = 64, validation_data = (self.dev_in, self.dev_out), callbacks=[es, csv, cp])
+
+
+    def test(self):
+
+        train_preds = self.model.predict(self.train_in)
+        test_preds = self.model.predict(self.test_in)
+
+        train_performance = precision_recall_fscore_support(train_out, train_preds)
+        test_performance = precision_recall_fscore_support(test_out, test_preds)
+
+        return(train_performance, test_performance)
 
 
             

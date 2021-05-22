@@ -43,11 +43,11 @@ def main(wavPath, speakerList, outputType, winSize=10, needAMS=False, needPLP=Fa
 
 
 if __name__=="__main__":
-    wavPath = "ANH"
+    # wavPath = "ANH"
     # wavPath = "Pruned"
-    # wavPath = "All"
-    speakerList = ["C", "D", "E"]
-    # speakerList = ["B", "G", "P", "R", "Y"]
+    wavPath = "All"
+    # speakerList = ["C", "D", "E"]
+    speakerList = ["B", "G", "P", "R", "Y"]
     # outputList = ['global', 'sequential', 'long', 'individual']
     # outputList = ['global', 'long', 'individual']
     outputList = ['individual']

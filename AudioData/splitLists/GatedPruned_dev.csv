@@ -1,0 +1,16 @@
+id,speaker,label
+SPPep12_g21-I,g,I
+SPPep12_g82-I,g,I
+SPPep12_b50-N,b,N
+SPPep12_b103-N,b,N
+SPPep12_b107-N,b,N
+SPPep12_g43-N,g,N
+SPPep12_y60-I,y,I
+SPPep12_g96-I,g,I
+SPPep12_y3-I,y,I
+SPPep12_b13-N,b,N
+SPPep12_r150-N,r,N
+SPPep12_b108-I,b,I
+SPPep12_r122-I,r,I
+SPPep12_r13-I,r,I
+SPPep12_p114-N,p,N

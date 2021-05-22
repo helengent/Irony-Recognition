@@ -59,6 +59,8 @@ class Extractor:
         while end <= self.wav.getDuration():
 
             t = pitch.get_value_at_time(start)
+            if np.isnan(t):
+                t = 0
                 
             f0_array.append(t)
             start += self.winSize/1000

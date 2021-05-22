@@ -1,0 +1,47 @@
+Speaker c left out
+
+Training performance
+Precision:	[0.  0.7]
+Recall:	[0. 1.]
+F1:	[0.         0.82352941]
+
+Test performance
+Precision:	[0.         0.72727273]
+Recall:	[0. 1.]
+F1:	[0.         0.84210526]
+
+Speaker d left out
+
+Training performance
+Precision:	[0.         0.76388889]
+Recall:	[0. 1.]
+F1:	[0.         0.86614173]
+
+Test performance
+Precision:	[0.        0.5952381]
+Recall:	[0. 1.]
+F1:	[0.         0.74626866]
+
+Speaker e left out
+
+Training performance
+Precision:	[0.         0.65789474]
+Recall:	[0. 1.]
+F1:	[0.         0.79365079]
+
+Test performance
+Precision:	[0.         0.81081081]
+Recall:	[0. 1.]
+F1:	[0.         0.89552239]
+
+Cross-Speaker Average Performance
+
+Train performance
+Precision:	[0.         0.70726121]
+Recall:	[0. 1.]
+F1:	[0.         0.82777398]
+
+Test performance
+Precision:	[0.         0.71110721]
+Recall:	[0. 1.]
+F1:	[0.         0.82796544]
