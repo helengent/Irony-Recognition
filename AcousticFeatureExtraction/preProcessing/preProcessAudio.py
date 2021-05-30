@@ -10,7 +10,7 @@ from scipy.signal import decimate
 from matplotlib import pyplot as plt
 from scipy.signal import firwin, lfilter
 
-sys.path.append(os.path.dirname(sys.path[1]))
+sys.path.append(os.path.dirname(sys.path[0]))
 from lib.WAVReader import WAVReader as WR
 from lib.WAVWriter import WAVWriter as WW
 from lib.DSP_Tools import rms, normaliseRMS, findEndpoint

@@ -39,17 +39,21 @@ def main(wavPath, speakerList, outputType, winSize=10, needAMS=False, needPLP=Fa
 
     #Extract acoustic features
 
-    extract.main(wavPath, speakerList, outputType, winSize=winSize)
+    # extract.main(wavPath, speakerList, outputType, winSize=winSize)
 
 
 if __name__=="__main__":
     # wavPath = "ANH"
     # wavPath = "Pruned"
-    wavPath = "All"
+    # wavPath = "All"
     # speakerList = ["C", "D", "E"]
-    speakerList = ["B", "G", "P", "R", "Y"]
+    # speakerList = ["B", "G", "P", "R", "Y"]
     # outputList = ['global', 'sequential', 'long', 'individual']
     # outputList = ['global', 'long', 'individual']
+
+    wavPath = "Pruned2"
+    speakerList = ["C", "D", "E", "S", "U"]
+
     outputList = ['individual']
     t0 = time.time()
     main(wavPath, speakerList, outputList, haveManualT=False)
