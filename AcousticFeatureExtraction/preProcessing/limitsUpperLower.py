@@ -96,7 +96,7 @@ def main(wavPath, winSize, speakerList):
         indv["lower"] = giveLowerLimit(vec)
         indv["mean"] = giveMean(vec)
         indv["sd"] = giveSD(vec)
-        with open('../AcousticData/SpeakerMetaData/{}_f0.txt'.format(speaker), 'w') as f:
+        with open('../../Data/AcousticData/SpeakerMetaData/{}_f0.txt'.format(speaker), 'w') as f:
             for key in indv.keys():
                 f.write("{}\t{}\n".format(key, str(indv[key])))
         f.close()

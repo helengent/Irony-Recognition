@@ -44,7 +44,7 @@ def speakerDurationData(input_dir, speakerList):
         for p in phoneDict.keys():
             phoneDict[p] = np.mean(phoneDict[p])
 
-        with open("../AcousticData/SpeakerMetaData/{}_avgDur.txt".format(speaker), "w") as f:
+        with open("../../Data/AcousticData/SpeakerMetaData/{}_avgDur.txt".format(speaker), "w") as f:
             f.write("speaker\t{}\n".format(speaker))
             f.write("avgWordDur\t{}\n".format(np.mean([wordDict[key] for key in wordDict.keys() if key != 'sp' and key != "{LG}"])))
             f.write("avgVowelDur\t{}\n".format(np.mean([phoneDict[key] for key in phoneDict.keys() if key in arpabetVocalicList])))

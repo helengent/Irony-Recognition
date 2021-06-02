@@ -27,7 +27,7 @@ class Extractor:
         self.name = wav # Short, "normalised" waveforms (3-10 seconds)
         self.id = os.path.basename(self.name).split('_')[1][0].upper()
 
-        self.speaker = Speaker(self.id, "../SpeakerMetaData/{}_f0.txt".format(self.id), "../SpeakerMetaData/{}_avgDur.txt".format(self.id))
+        self.speaker = Speaker(self.id, "../../Data/AcousticData/SpeakerMetaData/{}_f0.txt".format(self.id), "../../Data/AcousticData/SpeakerMetaData/{}_avgDur.txt".format(self.id))
 
         self.tg = tg # The TextGrid - from the "full-wave enhanced"
         self.sound = parselmouth.Sound(self.name)

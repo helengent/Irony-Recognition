@@ -287,24 +287,24 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
 
 
             f0 = pd.DataFrame(np.array(f0))
-            f0.to_csv("../AcousticData/f0/{}.csv".format(fileID), index=False)
+            f0.to_csv("../../Data/AcousticData/f0/{}.csv".format(fileID), index=False)
 
             mfccs = pd.DataFrame(mfccs)
-            mfccs.to_csv("../AcousticData/mfccs/{}.csv".format(fileID), index=False)
+            mfccs.to_csv("../../Data/AcousticData/mfccs/{}.csv".format(fileID), index=False)
 
             hnr = pd.DataFrame(hnr)
-            hnr.to_csv("../AcousticData/hnr/{}.csv".format(fileID), index=False)
+            hnr.to_csv("../../Data/AcousticData/hnr/{}.csv".format(fileID), index=False)
 
             smolDict = {'duration': [dur], 'f0globalMean': [meanF0], 'f0globalSD': [F0sd], 
                         'avgPauseLength': [apl], 'sound2silenceRatio': [s2s], 'totalPauses': [tp]}
             smolDict = pd.DataFrame(smolDict)
-            smolDict.to_csv("../AcousticData/globalVector/{}.csv".format(fileID), index=False)
+            smolDict.to_csv("../../Data/AcousticData/globalVector/{}.csv".format(fileID), index=False)
 
 
 def makeSpeakerList(s):
     speakers = list()
     for speaker in s:
-        speakers.append(Speaker(speaker, "../AcousticData/SpeakerMetaData/{}_f0.txt".format(speaker)))
+        speakers.append(Speaker(speaker, "../../Data/AcousticData/SpeakerMetaData/{}_f0.txt".format(speaker)))
     return speakers
   
 
@@ -344,7 +344,7 @@ def main(wavPath, speakerList, output, winSize="10"):
         extractVectors(wav, speakers, wavPath, winSize, saveIndv=sI)
 
     if "long" in output:
-        dirPath = "../AcousticData/{}_{}ms".format(wavPath, winSize)
+        dirPath = "../../Data/AcousticData/{}_{}ms".format(wavPath, winSize)
         if not os.path.isdir(dirPath):
             os.mkdir(dirPath)
         makeLongDFs(wavPath, winSize, dirPath)
@@ -357,7 +357,7 @@ def main(wavPath, speakerList, output, winSize="10"):
     
     if ("global" in output) and ("sequential" not in output):
         global_df = pd.DataFrame(GLOBALDICT)
-        global_df.to_csv("../AcousticData/{}_global_measures.csv".format(wavPath), index=False)
+        global_df.to_csv("../../Data/AcousticData/{}_global_measures.csv".format(wavPath), index=False)
 
 if __name__ == "__main__":
     t0 = time.time()

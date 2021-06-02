@@ -25,9 +25,9 @@ def main(wavPath, speakerList, outputType, winSize=10, needAMS=False, needPLP=Fa
 
     # Generates and records duration-based metadata for each speaker
     if haveManualT == True:
-        getSpeakerDurationData.speakerDurationData("../TextData/{}_manual".format(wavPath), speakerList)
+        getSpeakerDurationData.speakerDurationData("../../Data/TextData/{}_manual".format(wavPath), speakerList)
     else:
-        getSpeakerDurationData.speakerDurationData("../TextData/{}_asr".format(wavPath), speakerList)
+        getSpeakerDurationData.speakerDurationData("../../Data/TextData/{}_asr".format(wavPath), speakerList)
 
     #TODO
     if needAMS == True:

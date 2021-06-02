@@ -159,14 +159,14 @@ class Extractor:
     #Perceptual Linear Prediction
     def getPLP(self):
         n = os.path.basename(self.name).split(".")[0]
-        rastaFile = "../AcousticData/rastaplp/{}.csv".format(n)
+        rastaFile = "../../Data/AcousticData/rastaplp/{}.csv".format(n)
         rasta = genfromtxt(rastaFile, delimiter=',')
         return rasta
 
     #Amplitude modulation spectrum
     def getAMS(self):
         n = os.path.basename(self.name).split(".")[0]
-        amsFile = "../AcousticData/ams/{}.csv".format(n)
+        amsFile = "../../Data/AcousticData/ams/{}.csv".format(n)
         ams = genfromtxt(amsFile, delimiter=',')
         return ams
 
