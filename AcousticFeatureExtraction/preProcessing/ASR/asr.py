@@ -8,7 +8,11 @@ import speech_recognition as sr
 
 def main(in_dir, out_dir):
 
-    os.mkdir(out_dir)
+    if os.path.isdir(out_dir):
+        done = [line.strip("\n") for line in open("{}/done.txt".format(out_dir))]
+    else:
+        os.mkdir(out_dir)
+        done = list()
 
     wit_key = "R5533FE2CVI32BM2LVQRLFMDPMSZ55L3"
 
@@ -18,29 +22,28 @@ def main(in_dir, out_dir):
     wavList = glob("{}/*.wav".format(in_dir))
     wavList.sort()
 
-    for wav in wavList:
-        name = os.path.basename(wav)
-        # print(name)
-        textDict["filename"].append(name)
-        textDict["speaker"].append(name.split("_")[1][0])
-        if name[-6] == "F":
-            textDict["label"].append(name[-6:-4])
-        else:
-            textDict["label"].append(name[-5])
-        with sr.AudioFile(wav) as source:
-            w = r.listen(source)
-            text = r.recognize_wit(w, wit_key)
-            textDict["transcription"].append(text)
-            # print(text)
-    
-    textDF = pd.DataFrame(textDict)
-    textDF.to_csv("{}/asr_transcriptions.csv".format(out_dir), index=False)
-    
-    for i, row in textDF.iterrows():
-        print(row)
+    for i, wav in enumerate(wavList):
 
-        with open("{}/{}.txt".format(out_dir, row.filename.split(".")[0]), "w") as f:
-            f.write(row.transcription)
+        if (i + 1) % 100 == 0:
+            print("working on file {}/{}".format(i+1, len(wavList)))
+
+        name = os.path.basename(wav)
+
+        if name.split(".")[0] not in done:
+            with sr.AudioFile(wav) as source:
+                w = r.listen(source)
+                text = r.recognize_wit(w, wit_key)
+
+                print("File {}/{}\t{}".format(i+1, len(wavList), name.split(".")[0]))
+                print(text)
+                print()
+
+                with open("{}/{}.txt".format(out_dir, name.split(".")[0]), "w") as f:
+                    f.write(text)
+
+            with open("{}/done.txt".format(out_dir), "a+") as f:
+                f.write(name.split(".")[0] + "\n")
+    
 
 
 if __name__=="__main__":

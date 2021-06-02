@@ -361,9 +361,11 @@ def main(wavPath, speakerList, output, winSize="10"):
 
 if __name__ == "__main__":
     t0 = time.time()
-    speakers = ["B", "G", "P", "R", "Y"]
+    # speakers = ["B", "G", "P", "R", "Y"]
+
+    speakers = ["C", "D", "E", "S", "U"]
     # outputList = ['global', 'sequential', 'long', 'individual']
-    outputList = []
-    main("Pruned", speakers, outputList)
+    outputList = ['long']
+    main("Pruned2", speakers, outputList)
     t1 = time.time()
     print("All processes completed in {} minutes".format((t1-t0)/60))

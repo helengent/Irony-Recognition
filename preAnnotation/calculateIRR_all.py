@@ -37,8 +37,8 @@ def compareWithH(df):
     hList = list()
     matchList = list()
     for i, row in df.iterrows():
-        hList.append(hDict[row[0]])
-        matchList.append(row[-2] == hDict[row[0]])
+        hList.append(hDict[row[0].split("_")[1]])
+        matchList.append(row[-2] == hDict[row[0].split("_")[1]])
 
     df["Hresponse"] = hList
     df["Hmatch"] = matchList
@@ -59,8 +59,8 @@ def getReadyForKrippendorf(df):
                     outList[j - 1][row[0]] = 2
                 elif item == "I":
                     outList[j - 1][row[0]] = 1
-                # elif item == "P":
-                #     outList[j - 1][row[0]] = 2
+                elif item == "P":
+                    outList[j - 1][row[0]] = 2
                 else:
                     raise Exception
             j += 1
@@ -152,7 +152,7 @@ if __name__=="__main__":
 
     print("Krippendorf's alpha: {}".format(krippendorff_alpha(kList)))
 
-    print("Fleiss' Kappa: {}".format(fleiss_kappa(Fdf, method="fleiss")))
+    # print("Fleiss' Kappa: {}".format(fleiss_kappa(Fdf, method="fleiss")))
 
     df = compareWithH(df)
 
@@ -163,7 +163,8 @@ if __name__=="__main__":
     annPairList = list()
     ##Pairwise scores
 
-    current = ["ANps", "ANhd", "ANkj", "ANpn", "ANwj", "ANgm"]
+    # current = ["ANps", "ANhd", "ANkj", "ANpn", "ANwj", "ANgm", "ANsa"]
+    current = ["ANsa", "ANam", "ANgm", "ANpm", "ANkj", "ANhd", "ANwj", "ANpn"]
 
     for k, a in zip(kPairs, annPairs):
         kScore = np.round(krippendorff_alpha(k), 2)

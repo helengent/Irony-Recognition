@@ -15,11 +15,10 @@ def main(wavPath, speakerList, outputType, winSize=10, needAMS=False, needPLP=Fa
         # Normalize rms and trim leading and trailing silence
         preProcessAudio.preMain(wavPath)
 
-    if not os.path.isdir("../TextData/{}_asr".format(wavPath)):
-        # Generates ASR transcriptions for all audio files
-        # Runs forced alignment for ASR transcriptions
-        # If manual transcriptsions are available, runs forced alignment on them as well
-        asrFA.main(wavPath, haveManualT=haveManualT)
+    # Generates ASR transcriptions for all audio files
+    # Runs forced alignment for ASR transcriptions
+    # If manual transcriptsions are available, runs forced alignment on them as well
+    asrFA.main(wavPath, haveManualT=haveManualT)
 
     # Finds and records upper and lower limits on F0 for each speaker, as well as mean and sd
     limitsUpperLower.main(wavPath, winSize, speakerList)
@@ -39,7 +38,7 @@ def main(wavPath, speakerList, outputType, winSize=10, needAMS=False, needPLP=Fa
 
     #Extract acoustic features
 
-    # extract.main(wavPath, speakerList, outputType, winSize=winSize)
+    extract.main(wavPath, speakerList, outputType, winSize=winSize)
 
 
 if __name__=="__main__":
@@ -54,7 +53,7 @@ if __name__=="__main__":
     wavPath = "Pruned2"
     speakerList = ["C", "D", "E", "S", "U"]
 
-    outputList = ['individual']
+    outputList = ['individual', 'long']
     t0 = time.time()
     main(wavPath, speakerList, outputList, haveManualT=False)
     print("All processes completed in {} minutes".format(np.round((time.time() - t0) / 60), 2))
