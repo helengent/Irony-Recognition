@@ -116,6 +116,6 @@ def main(episodePath):
 
 if __name__=="__main__":
 
-    episodePath = "/Users/helengent/Desktop/reconcile/SBep21"
+    episodePath = "/Users/helengent/Desktop/reconcile/SBep6"
 
     main(episodePath)

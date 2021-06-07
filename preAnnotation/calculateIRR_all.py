@@ -163,15 +163,14 @@ if __name__=="__main__":
     annPairList = list()
     ##Pairwise scores
 
-    # current = ["ANps", "ANhd", "ANkj", "ANpn", "ANwj", "ANgm", "ANsa"]
-    current = ["ANsa", "ANam", "ANgm", "ANpm", "ANkj", "ANhd", "ANwj", "ANpn"]
+    current = ["ANhd", "ANpd"]
 
     for k, a in zip(kPairs, annPairs):
         kScore = np.round(krippendorff_alpha(k), 2)
         kScoreList.append(kScore)
         annPairList.append(a)
 
-        if a[0] in current and a[1] in current:
+        if a[0] in current or a[1] in current:
             print("Krippendorff's alpha for annotator pair {}:\t{}".format(a, kScore))
 
     print("\n")

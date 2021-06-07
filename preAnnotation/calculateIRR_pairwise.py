@@ -12,7 +12,7 @@ from calculateIRR_all import parseFileNames, getReadyForKrippendorf, getAverages
 
 
 if __name__=="__main__":
-    sourceDir = "../../forIRR/ANfj_ANom"
+    sourceDir = "../../forIRR/ANeb_ANps"
     df, annotators, Fdf = parseFileNames(sourceDir)
 
     kList = getReadyForKrippendorf(df)
