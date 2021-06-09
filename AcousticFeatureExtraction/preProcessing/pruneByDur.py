@@ -44,8 +44,8 @@ def main(allDir, outDir):
     durDict = recordDurations(allDir)
     durDict = pd.DataFrame(durDict)
 
-    # durDict.to_csv("{}_durations.csv".format(os.path.basename(allDir)))
-    # durDict = pd.read_csv("{}_durations.csv".format(os.path.basename(allDir)))
+    durDict.to_csv("{}_durations.csv".format(os.path.basename(allDir)))
+    durDict = pd.read_csv("{}_durations.csv".format(os.path.basename(allDir)))
 
     durMean, durSD = getDurationStats(durDict['duration'].tolist())
 

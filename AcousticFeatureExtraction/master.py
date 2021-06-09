@@ -8,7 +8,8 @@ import subprocess
 import numpy as np
 from preProcessing import preProcessAudio, asrFA, limitsUpperLower, getSpeakerDurationData
 
-def main(wavPath, speakerList, outputType, winSize=10, needAMS=False, needPLP=False, haveManualT=False):
+
+def preProcess(wavPath, speakerList, winSize=10, needAMS=False, needPLP=False, haveManualT=False):
 
     if not os.path.isdir("../AudioData/Gated{}".format(wavPath)):
         # Downsample to 16000 Hz and convert to mono
@@ -36,6 +37,8 @@ def main(wavPath, speakerList, outputType, winSize=10, needAMS=False, needPLP=Fa
     if needPLP == True:
         pass
 
+def extractFeats(wavPath, speakerList, outputType, winSize=10):
+
     #Extract acoustic features
 
     extract.main(wavPath, speakerList, outputType, winSize=winSize)
@@ -51,9 +54,10 @@ if __name__=="__main__":
     # outputList = ['global', 'long', 'individual']
 
     wavPath = "Pruned2"
-    speakerList = ["C", "D", "E", "S", "U"]
+    speakerList = ["C", "D", "E", "J", "O", "S", "U"]
 
     outputList = ['individual', 'long']
     t0 = time.time()
-    main(wavPath, speakerList, outputList, haveManualT=False)
+    preProcess(wavPath, speakerList, haveManualT=False)
+    # extractFeats(wavPath, speakerList, outputList)
     print("All processes completed in {} minutes".format(np.round((time.time() - t0) / 60), 2))
