@@ -7,36 +7,36 @@ import pandas as pd
 from glob import glob
 
 #Create consolidated dataframe that incorporates speaker information and irony label
-def main():
+def main(data_dir):
+
     bigDF = pd.DataFrame()
     speakerList, labelList, genderList = list(), list(), list()
+    genders = pd.read_csv("../../../AcousticData/SpeakerMetaData/speakersGenders.txt")
+    speakerDict = dict()
 
-    for f in glob("baselineResultsPruned/*"):
+    out_dir = os.path.dirname(data_dir)
+    mod = data_dir.split("/")[-1].strip("baseline")
+
+    speakerCounter = 0
+    for f in glob("{}/*.csv".format(data_dir)):
 
         #Set speaker
-        #speaker = f[16]
         speaker = os.path.basename(f).split("_")[1][0]
 
-        #Set speaker gender (numerified)
-        if speaker == "b":
-            speaker = 1
-            gender = 1
-        elif speaker == "y":
-            speaker = 5
-            gender = 1
-        elif speaker == "g":
-            speaker = 2
-            gender = 2
-        elif speaker == "p":
-            speaker = 3
-            gender = 2
-        elif speaker == "r":
-            speaker = 4
-            gender = 3
+        if speaker in speakerDict.keys():
+            gender = speakerDict[speaker][1]
+            speaker = speakerDict[speaker][0]
         else:
-            print("Helen, wtf did you do?")
-            print(f, speaker)
-            sys.exit()
+            gender = genders[genders["speaker"] == speaker.upper()]["gender"].tolist()[0]
+            if gender == "m":
+                gender = 0
+            elif gender == "f":
+                gender = 1
+            else:
+                gender = 2
+            speakerDict[speaker] = (speakerCounter, gender)
+            speaker = speakerCounter 
+            speakerCounter += 1
 
         #Set irony label
         if f[-5] == "I":
@@ -48,7 +48,7 @@ def main():
         labelList.append(irony)
         genderList.append(gender)
 
-        row = pd.read_csv(f, sep=";", engine="python")
+        row = pd.read_csv(f)
         bigDF = bigDF.append(row, ignore_index=True)
         print(bigDF.shape)
 
@@ -62,8 +62,11 @@ def main():
 
     print(bigDF.shape)
     
-    with open("baseline_consolidated_pruned.pkl", "wb") as p:
+    with open("{}/baseline_consolidated_{}.pkl".format(out_dir, mod), "wb") as p:
         pickle.dump(bigDF, p, protocol=4)
 
 if __name__=="__main__":
-    main()
+
+    data_dir = "../../../AcousticData/ComParE/baselinePruned2"
+
+    main(data_dir)

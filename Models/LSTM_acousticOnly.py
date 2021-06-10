@@ -34,9 +34,9 @@ class acousticOnlyLSTM():
 
         self.model = models.Sequential()
         self.model.add(layers.LSTM(12, activation="relu", dropout=0.5, recurrent_dropout=0.2))
-        self.model.add(layers.Dense(1, activation='softmax'))
+        self.model.add(layers.Dense(2, activation='softmax'))
 
-        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['binary_accuracy'])
+        self.model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 
     def train(self):

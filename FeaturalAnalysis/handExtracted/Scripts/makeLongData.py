@@ -71,7 +71,7 @@ def main(measure):
 
     print(measure)
 
-    long_df = pd.read_csv("../Data/Pruned_10ms/{}_long.csv".format(measure))
+    long_df = pd.read_csv("../../../../Data/AcousticData/Pruned2_10ms/{}_long.csv".format(measure))
     print(long_df.shape)
 
     if (measure == "f0") or (measure == "hnr"):
@@ -82,13 +82,13 @@ def main(measure):
 
     print(smoothed.shape)
     print()
-    smoothed.to_csv("../Data/Pruned_10ms/{}_ready_for_gamms.csv".format(measure), index=False)
+    smoothed.to_csv("../../../../Data/AcousticData/Pruned2_10ms/{}_ready_for_gamms.csv".format(measure), index=False)
 
 
 if __name__=="__main__":
 
-    # measures = ["f0", "mfcc", 'ams', 'plp', 'hnr']
-    measures = ["hnr"]
+    measures = ["f0", "mfcc", 'ams', 'plp', 'hnr']
+    # measures = ["hnr"]
     t0 = time.time()
     for measure in measures:
         main(measure)

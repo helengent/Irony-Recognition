@@ -1,0 +1,10 @@
+Training performance
+Precision:	[0.         0.67362146]
+Recall:	[0. 1.]
+F1:	[0.         0.80498664]
+
+Test performance
+Precision:	[0.         0.67068273]
+Recall:	[0. 1.]
+F1:	[0.         0.80288462]
+

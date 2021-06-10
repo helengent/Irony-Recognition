@@ -19,7 +19,7 @@ def preProcess(wavPath, speakerList, winSize=10, needAMS=False, needPLP=False, h
     # Generates ASR transcriptions for all audio files
     # Runs forced alignment for ASR transcriptions
     # If manual transcriptsions are available, runs forced alignment on them as well
-    asrFA.main(wavPath, haveManualT=haveManualT)
+    # asrFA.main(wavPath, haveManualT=haveManualT)
 
     # Finds and records upper and lower limits on F0 for each speaker, as well as mean and sd
     limitsUpperLower.main(wavPath, winSize, speakerList)
