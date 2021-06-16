@@ -7,7 +7,7 @@ from extractor_textDependent import Extractor
 
 def main(wavPath, tg_mod):
 
-    fileList = glob("../../AudioData/Gated{}/*.wav".format(wavPath))
+    fileList = glob("../AudioData/Gated{}/*.wav".format(wavPath))
 
     for f in fileList:
         tg = "../../Data/TextData/data/{}_{}/{}.TextGrid".format(wavPath, tg_mod, os.path.basename(f).split(".")[0])
@@ -18,4 +18,4 @@ def main(wavPath, tg_mod):
 
 
 if __name__=="__main__":
-    main("ANH", "manual")
+    main("Pruned2", "ASR")

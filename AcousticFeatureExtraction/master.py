@@ -45,18 +45,11 @@ def extractFeats(wavPath, speakerList, outputType, winSize=10):
 
 
 if __name__=="__main__":
-    # wavPath = "ANH"
-    # wavPath = "Pruned"
-    # wavPath = "All"
-    # speakerList = ["C", "D", "E"]
-    # speakerList = ["B", "G", "P", "R", "Y"]
-    # outputList = ['global', 'sequential', 'long', 'individual']
-    # outputList = ['global', 'long', 'individual']
 
     wavPath = "Pruned2"
     speakerList = ["C", "D", "E", "J", "O", "S", "U"]
-
-    outputList = ['individual']
+    outputList = ['individual', 'global']
+    
     t0 = time.time()
     # preProcess(wavPath, speakerList, haveManualT=False)
     extractFeats(wavPath, speakerList, outputList)
