@@ -1,16 +1,16 @@
-f0
-(428866, 5)
-(122250, 5)
+f0 2802
+(210150, 5)
 
-Traceback (most recent call last):
-  File "makeLongData.py", line 94, in <module>
-    main(measure)
-  File "makeLongData.py", line 85, in main
-    smoothed.to_csv("../../../../Data/Acoustic_Data/Pruned2_10ms/{}_ready_for_gamms.csv".format(measure), index=False)
-  File "/home/hmgent2/.local/lib/python3.6/site-packages/pandas/core/generic.py", line 3170, in to_csv
-    formatter.save()
-  File "/home/hmgent2/.local/lib/python3.6/site-packages/pandas/io/formats/csvs.py", line 190, in save
-    compression=dict(self.compression_args, method=self.compression),
-  File "/home/hmgent2/.local/lib/python3.6/site-packages/pandas/io/common.py", line 493, in get_handle
-    f = open(path_or_buf, mode, encoding=encoding, errors=errors, newline="")
-FileNotFoundError: [Errno 2] No such file or directory: '../../../../Data/Acoustic_Data/Pruned2_10ms/f0_ready_for_gamms.csv'
+mfcc 2802
+(2731950, 6)
+
+ams 2802
+(78806250, 6)
+
+plp 2802
+(1891350, 6)
+
+hnr 2802
+(210150, 5)
+
+Data longification completed in 16.955191723505656 minutes

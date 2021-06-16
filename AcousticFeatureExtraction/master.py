@@ -56,8 +56,8 @@ if __name__=="__main__":
     wavPath = "Pruned2"
     speakerList = ["C", "D", "E", "J", "O", "S", "U"]
 
-    outputList = ['individual', 'long']
+    outputList = ['individual']
     t0 = time.time()
-    preProcess(wavPath, speakerList, haveManualT=False)
-    # extractFeats(wavPath, speakerList, outputList)
+    # preProcess(wavPath, speakerList, haveManualT=False)
+    extractFeats(wavPath, speakerList, outputList)
     print("All processes completed in {} minutes".format(np.round((time.time() - t0) / 60), 2))

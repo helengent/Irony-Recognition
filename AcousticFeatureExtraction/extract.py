@@ -135,80 +135,80 @@ from extractor import Extractor
 #         sequential_df.to_csv("{}/{}_Seqmeasures.csv".format(dirPath, f), index=False)
 
 
-#This creates long data - needed for GAM analysis
-def makeLongDFs(wavPath, winSize, dirPath):
+# #This creates long data - needed for GAM analysis
+# def makeLongDFs(wavPath, winSize, dirPath):
 
-    for i, measure in enumerate([F0CONTOURS, MFCCS, AMSLIST, RASTAPLPLIST, HNR]):
-        longDict = {'filename': [], 'speaker': [], 'label': [], 'time': []}
+#     for i, measure in enumerate([F0CONTOURS, MFCCS, AMSLIST, RASTAPLPLIST, HNR]):
+#         longDict = {'filename': [], 'speaker': [], 'label': [], 'time': []}
 
-        if i == 0:
-            #deal with f0
-            #F0CONTOURS is a list of lists
-            longDict['f0'] = []
-            for j, c in enumerate(measure):
-                for h, dataPoint in enumerate(c):
-                    longDict['filename'].append(GLOBALDICT['filename'][j])
-                    longDict['speaker'].append(GLOBALDICT['speaker'][j].lower())
-                    longDict['label'].append(GLOBALDICT['label'][j])
-                    longDict['time'].append((h+1)/len(c))
-                    longDict['f0'].append(dataPoint)
-        elif i == 1:
-            #deal with mfccs
-            #MFCCS is an array of size (num_frames, 13)
-            longDict['mfccNum'] = []
-            longDict['mfcc'] = []
-            for j, c in enumerate(measure):
-                for h in range(np.shape(c)[0]):
-                    for m in range(13):
-                        longDict['filename'].append(GLOBALDICT['filename'][j])
-                        longDict['speaker'].append(GLOBALDICT['speaker'][j].lower())
-                        longDict['label'].append(GLOBALDICT['label'][j])
-                        longDict['time'].append((h+1)/np.shape(c)[0])
-                        longDict['mfccNum'].append(m+1)
-                        longDict['mfcc'].append(c[h][m])
-        elif i == 2:
-            #deal with ams
-            #AMSLIST is an array of size (375, num_frames)
-            longDict['amsNum'] = []
-            longDict['ams'] = []
-            for j, c in enumerate(measure):
-                for h in range(np.shape(c)[1]):
-                    for m in range(375):
-                        longDict['filename'].append(GLOBALDICT['filename'][j])
-                        longDict['speaker'].append(GLOBALDICT['speaker'][j].lower())
-                        longDict['label'].append(GLOBALDICT['label'][j])
-                        longDict['time'].append((h+1)/np.shape(c)[1])
-                        longDict['amsNum'].append(m+1)
-                        longDict['ams'].append(c[m][h])
-        elif i == 3:
-            #deal with plp
-            #RASTAPLPLIST is an array of size (9, num_frames)
-            longDict['plpNum'] = []
-            longDict['plp'] = []
-            for j, c in enumerate(measure):
-                for h in range(np.shape(c)[1]):
-                    for m in range(9):
-                        longDict['filename'].append(GLOBALDICT['filename'][j])
-                        longDict['speaker'].append(GLOBALDICT['speaker'][j].lower())
-                        longDict['label'].append(GLOBALDICT['label'][j])
-                        longDict['time'].append((h+1)/np.shape(c)[1])
-                        longDict['plpNum'].append(m+1)
-                        longDict['plp'].append(c[m][h])
-        elif i == 4:
-            #deal with hnr
-            #HNR is a list of lists
-            longDict['hnr'] = []
-            for j, c in enumerate(measure):
-                for h, dataPoint in enumerate(c):
-                    longDict['filename'].append(GLOBALDICT['filename'][j])
-                    longDict['speaker'].append(GLOBALDICT['speaker'][j].lower())
-                    longDict['label'].append(GLOBALDICT['label'][j])
-                    longDict['time'].append((h+1)/len(c))
-                    longDict['hnr'].append(dataPoint)
+#         if i == 0:
+#             #deal with f0
+#             #F0CONTOURS is a list of lists
+#             longDict['f0'] = []
+#             for j, c in enumerate(measure):
+#                 for h, dataPoint in enumerate(c):
+#                     longDict['filename'].append(GLOBALDICT['filename'][j])
+#                     longDict['speaker'].append(GLOBALDICT['speaker'][j].lower())
+#                     longDict['label'].append(GLOBALDICT['label'][j])
+#                     longDict['time'].append((h+1)/len(c))
+#                     longDict['f0'].append(dataPoint)
+#         elif i == 1:
+#             #deal with mfccs
+#             #MFCCS is an array of size (num_frames, 13)
+#             longDict['mfccNum'] = []
+#             longDict['mfcc'] = []
+#             for j, c in enumerate(measure):
+#                 for h in range(np.shape(c)[0]):
+#                     for m in range(13):
+#                         longDict['filename'].append(GLOBALDICT['filename'][j])
+#                         longDict['speaker'].append(GLOBALDICT['speaker'][j].lower())
+#                         longDict['label'].append(GLOBALDICT['label'][j])
+#                         longDict['time'].append((h+1)/np.shape(c)[0])
+#                         longDict['mfccNum'].append(m+1)
+#                         longDict['mfcc'].append(c[h][m])
+#         elif i == 2:
+#             #deal with ams
+#             #AMSLIST is an array of size (375, num_frames)
+#             longDict['amsNum'] = []
+#             longDict['ams'] = []
+#             for j, c in enumerate(measure):
+#                 for h in range(np.shape(c)[1]):
+#                     for m in range(375):
+#                         longDict['filename'].append(GLOBALDICT['filename'][j])
+#                         longDict['speaker'].append(GLOBALDICT['speaker'][j].lower())
+#                         longDict['label'].append(GLOBALDICT['label'][j])
+#                         longDict['time'].append((h+1)/np.shape(c)[1])
+#                         longDict['amsNum'].append(m+1)
+#                         longDict['ams'].append(c[m][h])
+#         elif i == 3:
+#             #deal with plp
+#             #RASTAPLPLIST is an array of size (9, num_frames)
+#             longDict['plpNum'] = []
+#             longDict['plp'] = []
+#             for j, c in enumerate(measure):
+#                 for h in range(np.shape(c)[1]):
+#                     for m in range(9):
+#                         longDict['filename'].append(GLOBALDICT['filename'][j])
+#                         longDict['speaker'].append(GLOBALDICT['speaker'][j].lower())
+#                         longDict['label'].append(GLOBALDICT['label'][j])
+#                         longDict['time'].append((h+1)/np.shape(c)[1])
+#                         longDict['plpNum'].append(m+1)
+#                         longDict['plp'].append(c[m][h])
+#         elif i == 4:
+#             #deal with hnr
+#             #HNR is a list of lists
+#             longDict['hnr'] = []
+#             for j, c in enumerate(measure):
+#                 for h, dataPoint in enumerate(c):
+#                     longDict['filename'].append(GLOBALDICT['filename'][j])
+#                     longDict['speaker'].append(GLOBALDICT['speaker'][j].lower())
+#                     longDict['label'].append(GLOBALDICT['label'][j])
+#                     longDict['time'].append((h+1)/len(c))
+#                     longDict['hnr'].append(dataPoint)
         
-        longdf = pd.DataFrame(longDict)
-        fileNames = ["f0", "mfcc", "ams", "plp", "hnr"]
-        longdf.to_csv("{}/{}_long.csv".format(dirPath, fileNames[i]), index=False)
+#         longdf = pd.DataFrame(longDict)
+#         fileNames = ["f0", "mfcc", "ams", "plp", "hnr"]
+#         longdf.to_csv("{}/{}_long.csv".format(dirPath, fileNames[i]), index=False)
 
 
 def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
@@ -284,8 +284,6 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
         ##This code saves out individual csv files for each sequential measure and for the global measure vector for each .wav file
         if saveIndv == True:
 
-
-
             f0 = pd.DataFrame(np.array(f0))
             f0.to_csv("../../Data/AcousticData/f0/{}.csv".format(fileID), index=False)
 
@@ -294,6 +292,12 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
 
             hnr = pd.DataFrame(hnr)
             hnr.to_csv("../../Data/AcousticData/hnr/{}.csv".format(fileID), index=False)
+
+            ams = pd.DataFrame(np.transpose(ams))
+            ams.to_csv("../../Data/AcousticData/ams/{}.csv".format(fileID), index=False)
+
+            plp = pd.DataFrame(np.transpose(plp))
+            plp.to_csv("../../Data/AcousticData/plp/{}.csv".format(fileID), index=False)
 
             smolDict = {'duration': [dur], 'f0globalMean': [meanF0], 'f0globalSD': [F0sd], 
                         'avgPauseLength': [apl], 'sound2silenceRatio': [s2s], 'totalPauses': [tp]}
@@ -343,11 +347,11 @@ def main(wavPath, speakerList, output, winSize="10"):
         sI = "individual" in output
         extractVectors(wav, speakers, wavPath, winSize, saveIndv=sI)
 
-    if "long" in output:
-        dirPath = "../../Data/AcousticData/{}_{}ms".format(wavPath, winSize)
-        if not os.path.isdir(dirPath):
-            os.mkdir(dirPath)
-        makeLongDFs(wavPath, winSize, dirPath)
+    # if "long" in output:
+    #     dirPath = "../../Data/AcousticData/{}_{}ms".format(wavPath, winSize)
+    #     if not os.path.isdir(dirPath):
+    #         os.mkdir(dirPath)
+    #     makeLongDFs(wavPath, winSize, dirPath)
     
     # if "sequential" in output:
     #     dirPath = "../AcousticData/{}_{}ms".format(wavPath, winSize)

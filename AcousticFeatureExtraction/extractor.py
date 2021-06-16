@@ -20,7 +20,7 @@ from python_speech_features import mfcc, logfbank
 from lib.DSP_Tools import findEndpoint, normaliseRMS
 
 class Extractor:
-    def __init__(self, wav, speaker, irony, winSize=5):
+    def __init__(self, wav, speaker, irony, winSize=10):
         self.name = wav
         # self.text = text
         self.speaker = speaker
@@ -159,14 +159,14 @@ class Extractor:
     #Perceptual Linear Prediction
     def getPLP(self):
         n = os.path.basename(self.name).split(".")[0]
-        rastaFile = "../../Data/AcousticData/rastaplp/{}.csv".format(n)
+        rastaFile = "../../Data/AcousticData/rastaplp_untransposed/{}.csv".format(n)
         rasta = genfromtxt(rastaFile, delimiter=',')
         return rasta
 
     #Amplitude modulation spectrum
     def getAMS(self):
         n = os.path.basename(self.name).split(".")[0]
-        amsFile = "../../Data/AcousticData/ams/{}.csv".format(n)
+        amsFile = "../../Data/AcousticData/ams_untransposed/{}.csv".format(n)
         ams = genfromtxt(amsFile, delimiter=',')
         return ams
 
