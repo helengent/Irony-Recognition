@@ -48,6 +48,6 @@ def main(input_dir, speakerSplit="independent"):
 
 if __name__=="__main__":
 
-    input_dir = "GatedAll"
+    input_dir = "GatedPruned2"
 
-    main(input_dir)
+    main(input_dir, speakerSplit="dependent")

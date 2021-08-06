@@ -68,7 +68,7 @@ def main(fileMod, speakerList, csv_path, checkpoint_path):
 
     train_performance_list, test_performance_list = list(), list()
 
-    class_weights = {0.0: 1.0, 1.0: 50.0}
+    class_weights = {0.0: 2.0, 1.0: 1.0}
     
     for speaker in speakerList:
 
@@ -102,8 +102,9 @@ if __name__=="__main__":
     csv_path = "../Checkpoints/LSTM_checkpoints.csv"
     checkpoint_path = "../Checkpoints/LSTM_checkpoints.ckpt"
 
-    fileMod = "ANH"
+    fileMod = "Pruned2"
     # speakerList = ["b", "g", "p", "r", "y"]
-    speakerList = ["c", "d", "e"]
+    # speakerList = ["c", "d", "e"]
+    speakerList = ["c", "d", "e", "j", "o", "s", "u"]
 
     main(fileMod, speakerList, csv_path, checkpoint_path)

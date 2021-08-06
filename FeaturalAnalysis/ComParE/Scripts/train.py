@@ -49,7 +49,7 @@ def main(df, csv_path, checkpoint_path, fileMod):
     y_dev = y_dev.reshape((-1, 1))
     y_test = y_test.reshape((-1, 1))
 
-    class_weights = {0.0: 1.0, 1.0: 50.0}
+    class_weights = {0.0: 1.0, 1.0: 1.0}
     
     ffnn = FeedForwardNN(X_train, X_dev, X_test, y_train, y_dev, y_test, csv_path, checkpoint_path, class_weights)
 
@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
     fileMod = "Pruned2"
 
-    with open("../../../AcousticData/ComParE/baseline_consolidated_{}.pkl".format(fileMod), "rb") as p:
+    with open("../../../../Data/AcousticData/ComParE/baseline_consolidated_{}.pkl".format(fileMod), "rb") as p:
         bigDF = pd.read_pickle(p)
 
     csv_path = "../Checkpoints/ComParE_checkpoints_{}.csv".format(fileMod)

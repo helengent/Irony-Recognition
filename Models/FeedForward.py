@@ -32,12 +32,21 @@ class FeedForwardNN():
         input_dim = np.shape(self.train_in)[-1]
 
         self.model = models.Sequential()
-        self.model.add(layers.Dense(12, input_dim=input_dim, activation='relu'))
-        self.model.add(layers.Dropout(0.5))
-        self.model.add(layers.Dense(8, activation='relu'))
-        self.model.add(layers.Dropout(0.5))
-        self.model.add(layers.Dense(4, activation='relu'))
-        self.model.add(layers.Dropout(0.5))
+        self.model.add(layers.Dense(42, input_dim=input_dim, activation='relu'))
+        self.model.add(layers.Dense(38, activation='relu'))
+        self.model.add(layers.Dropout(0.3))
+        self.model.add(layers.Dense(48, activation='relu'))
+        self.model.add(layers.Dense(46, activation='relu'))
+        self.model.add(layers.Dropout(0.2))
+        self.model.add(layers.Dense(44, activation='relu'))
+        self.model.add(layers.Dense(56, activation='relu'))
+        self.model.add(layers.Dropout(0.45))
+        self.model.add(layers.Dense(42, activation='relu'))
+        self.model.add(layers.Dropout(0.2))
+        self.model.add(layers.Dense(42, activation='relu'))
+        self.model.add(layers.Dropout(0.45))
+        self.model.add(layers.Dense(38, activation='relu'))
+
         self.model.add(layers.Dense(2, activation='softmax'))
 
         self.model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])

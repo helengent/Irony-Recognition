@@ -12,12 +12,11 @@ import pandas as pd
 from speaker import Speaker
 from scipy.io import wavfile as wave
 from lib.DynamicRange import calDynamicRange
-from silence import highPass, validateTs
+from preProcessing.silence import highPass, validateTs
 from lib.WAVReader import WAVReader as WR
 from lib.DSP_Tools import findEndpoint
 
-sys.path.append(os.path.join(os.path.dirname(os.path.dirname(sys.path[0])), 'ASR'))
-import parseTextGrid
+from preProcessing.ASR import parseTextGrid
 
 
 class Extractor:

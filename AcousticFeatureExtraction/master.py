@@ -37,6 +37,7 @@ def preProcess(wavPath, speakerList, winSize=10, needAMS=False, needPLP=False, h
     if needPLP == True:
         pass
 
+
 def extractFeats(wavPath, speakerList, outputType, winSize=10):
 
     #Extract acoustic features
@@ -49,7 +50,7 @@ if __name__=="__main__":
     wavPath = "Pruned2"
     speakerList = ["C", "D", "E", "J", "O", "S", "U"]
     outputList = ['individual', 'global']
-    
+
     t0 = time.time()
     # preProcess(wavPath, speakerList, haveManualT=False)
     extractFeats(wavPath, speakerList, outputList)

@@ -60,7 +60,7 @@ def assembleArray_Raw(listMod, fileList, measureList, frame_max, fileMod, speake
         toStack = list()
 
         if "f0" in measureList:
-            f0 = np.array(pd.read_csv("../../../AcousticData/f0/{}.csv".format(fileName))["0"].tolist())
+            f0 = np.array(pd.read_csv("../../../../Data/AcousticData/f0/{}.csv".format(fileName))["0"].tolist())
             while len(f0) < frame_max:
                 f0 = np.append(f0, 0)
             if len(f0) > frame_max:
@@ -69,7 +69,7 @@ def assembleArray_Raw(listMod, fileList, measureList, frame_max, fileMod, speake
             toStack.append(f0)
 
         if "hnr" in measureList:
-            hnr = np.array(pd.read_csv("../../../AcousticData/hnr/{}.csv".format(fileName))["0"].tolist())
+            hnr = np.array(pd.read_csv("../../../../Data/AcousticData/hnr/{}.csv".format(fileName))["0"].tolist())
             while len(hnr) < frame_max:
                 hnr = np.append(hnr, 0)
             if len(hnr) > frame_max:
@@ -77,9 +77,9 @@ def assembleArray_Raw(listMod, fileList, measureList, frame_max, fileMod, speake
             hnr = hnr.reshape((-1, 1))
             toStack.append(hnr)
 
-        if "mfccs" in measureList:
+        if "mfcc" in measureList:
             for i in range(13):
-                mfcc = np.array(pd.read_csv("../../../AcousticData/mfccs/{}.csv".format(fileName))[str(i)].tolist())
+                mfcc = np.array(pd.read_csv("../../../../Data/AcousticData/mfcc/{}.csv".format(fileName))[str(i)].tolist())
                 while len(mfcc) < frame_max:
                     mfcc = np.append(mfcc, 0)
                 if len(mfcc) > frame_max:
@@ -87,9 +87,9 @@ def assembleArray_Raw(listMod, fileList, measureList, frame_max, fileMod, speake
                 mfcc = mfcc.reshape((-1, 1))
                 toStack.append(mfcc)
 
-        if "rastaplp" in measureList:
+        if "plp" in measureList:
             for i in range(9):
-                plp = np.array(pd.read_csv("../../../AcousticData/rastaplp/{}.csv".format(fileName), header=None).transpose()[i].tolist())
+                plp = np.array(pd.read_csv("../../../../Data/AcousticData/plp/{}.csv".format(fileName), header=None)[i].tolist())
                 while len(plp) < frame_max:
                     plp = np.append(plp, 0)
                 if len(plp) > frame_max:
@@ -99,7 +99,7 @@ def assembleArray_Raw(listMod, fileList, measureList, frame_max, fileMod, speake
 
         if "ams" in measureList:
             for i in range(375):
-                ams = np.array(pd.read_csv("../../../AcousticData/ams/{}.csv".format(fileName), header=None).transpose()[i].tolist())
+                ams = np.array(pd.read_csv("../../../../Data/AcousticData/ams/{}.csv".format(fileName), header=None)[i].tolist())
                 while len(ams) < frame_max:
                     ams = np.append(ams, 0)
                 if len(ams) > frame_max:
@@ -163,22 +163,22 @@ def main(listMod, speakerList, measureList, frame_max, speakerSplit="independent
         dev = pd.read_csv("../../../AudioData/splitLists/Gated{}_dev.csv".format(listMod))
         test = pd.read_csv("../../../AudioData/splitLists/Gated{}_test.csv".format(listMod))
 
-    
-
-
-
 
 if __name__=="__main__":
 
-    measureList = ["ams", "f0", "hnr", "mfccs", "rastaplp"]
+    measureList = ["ams", "f0", "hnr", "mfcc", "plp"]
     frame_max = 550 #Chosen because it's roughly the 90th percentile for file length in what I have so far
     
-    speakerLists = [["c", "d", "e"], ["b", "g", "p", "r", "y"], ["b", "g", "p", "r", "y"]]
-    listMods = ["ANH", "Pruned", "All"]
+    # speakerLists = [["c", "d", "e"], ["b", "g", "p", "r", "y"], ["b", "g", "p", "r", "y"]]
+    # listMods = ["ANH", "Pruned", "All"]
 
-    # speakerList = ["b", "g", "p", "r", "y"]
-    # listMod ="All"
+    # # speakerList = ["b", "g", "p", "r", "y"]
+    # # listMod ="All"
 
-    for speakerList, listMod in zip(speakerLists, listMods):
+    # for speakerList, listMod in zip(speakerLists, listMods):
 
-        main(listMod, speakerList, measureList, frame_max)
+        # 
+        
+    speakerList = ["c", "d", "e", "j", "o", "s", "u"]
+    listMod = "Pruned2"
+    main(listMod, speakerList, measureList, frame_max)

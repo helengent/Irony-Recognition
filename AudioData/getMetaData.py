@@ -3,7 +3,9 @@
 import os
 from glob import glob
 
-fileList = glob("./GatedAll/*.wav")
+fileList = glob("./GatedPruned2/*.wav")
+
+#This hasn't been touched since the filename re-work
 
 with open("metaData.txt", "a+") as m:
     m.write("filename\tspeaker\tgender\tlabel\n")

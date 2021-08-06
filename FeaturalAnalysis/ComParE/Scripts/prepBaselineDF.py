@@ -11,7 +11,7 @@ def main(data_dir):
 
     bigDF = pd.DataFrame()
     speakerList, labelList, genderList = list(), list(), list()
-    genders = pd.read_csv("../../../AcousticData/SpeakerMetaData/speakersGenders.txt")
+    genders = pd.read_csv("../../../../Data/AcousticData/SpeakerMetaData/speakersGenders.txt")
     speakerDict = dict()
 
     out_dir = os.path.dirname(data_dir)
@@ -67,6 +67,6 @@ def main(data_dir):
 
 if __name__=="__main__":
 
-    data_dir = "../../../AcousticData/ComParE/baselinePruned2"
+    data_dir = "../../../../Data/AcousticData/ComParE/baselinePruned2"
 
     main(data_dir)

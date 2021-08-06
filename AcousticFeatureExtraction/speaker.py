@@ -6,7 +6,7 @@ import pandas as pd
 class Speaker:
     def __init__(self, speaker, f0_txt, dur_txt=None):
 
-        genders = pd.read_csv("../../Data/AcousticData/SpeakerMetaData/speakersGenders.txt")
+        genders = pd.read_csv("~/Data/AcousticData/SpeakerMetaData/speakersGenders.txt")
         if speaker in genders["speaker"].tolist():
             self.gender = genders[genders['speaker']==speaker]['gender'].tolist()[0].strip()
         else:
