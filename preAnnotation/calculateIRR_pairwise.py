@@ -12,17 +12,30 @@ from calculateIRR_all import parseFileNames, getReadyForKrippendorf, getAverages
 
 
 if __name__=="__main__":
-    sourceDir = "../../forIRR/ANeb_ANps"
-    df, annotators, Fdf = parseFileNames(sourceDir)
 
-    kList = getReadyForKrippendorf(df)
-    kPairs = combinations(kList, 2)
-    annPairs = combinations(annotators, 2)
+    annPairs = ["ANmy_ANri"]
 
-    df = getAverages(df)
+    for pair in annPairs:
 
-    print("Inter-Rater Reliability: {}%".format(np.round((sum(list(df['IRR']))/len(df) * 100), 2)))
+        sourceDir = "../../forIRR/{}".format(pair)
+        df, annotators, Fdf = parseFileNames(sourceDir)
 
-    print("Krippendorf's alpha: {}".format(krippendorff_alpha(kList)))
+        kList = getReadyForKrippendorf(df)
+        kPairs = combinations(kList, 2)
+        annPairs = combinations(annotators, 2)
 
-    print("Fleiss' Kappa: {}".format(fleiss_kappa(Fdf, method="fleiss")))
+        df = getAverages(df)
+
+        sharedSamples = len(glob("{}/{}/*.wav".format(sourceDir, pair.split("_")[0])))
+
+        print(pair)
+
+        print("Total Shared Samples: {}".format(sharedSamples))
+
+        print("Inter-Rater Reliability: {}%".format(np.round((sum(list(df['IRR']))/len(df) * 100), 2)))
+
+        print("Krippendorf's alpha: {}".format(krippendorff_alpha(kList)))
+
+        print("Fleiss' Kappa: {}".format(fleiss_kappa(Fdf, method="fleiss")))
+
+        print()

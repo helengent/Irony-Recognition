@@ -62,6 +62,8 @@ def getReadyForKrippendorf(df):
                 elif item == "P":
                     outList[j - 1][row[0]] = 2
                 else:
+                    print(item)
+                    print(row)
                     raise Exception
             j += 1
     return outList
