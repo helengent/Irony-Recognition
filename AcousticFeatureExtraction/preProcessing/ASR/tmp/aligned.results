@@ -1,11 +1,6 @@
 Read 76 physical / 76 logical HMMs
 Label file will be used to align each file
 Aligning File: ./tmp/tmp.plp
-Created lattice with 11 nodes / 10 arcs from label file
+Created lattice with 5 nodes / 4 arcs from label file
  WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
  WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
- WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
- WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
- WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
- WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
-sp WE'VE sp MAPPED sp IT sp ALL sp TOGETHER sp  ==  [191 frames] 3.9908 [Ac=762.2 LM=0.0] (Act=33.2)
