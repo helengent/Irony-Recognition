@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import numpy as np
 import pandas as pd
 from glob import glob
 from extractor_textDependent import Extractor
@@ -18,32 +19,36 @@ def main(wavPath, tg_mod, saveWhole = False):
     for f in fileList:
         tg = "../../Data/TextData/{}_{}/{}.TextGrid".format(wavPath, tg_mod, os.path.basename(f).split(".")[0])
 
-        try:
-            E = Extractor(f, tg)
+        print(os.path.basename(f).split(".")[0])
 
-            m = E.returnMatrix()
-            ml = E.matrix_labels
+        E = Extractor(f, tg)
 
-            df = pd.DataFrame([m], columns = ml)
-            df.to_csv("../../Data/AcousticData/text_feats/{}/{}.csv".format(tg_mod, os.path.basename(f).split(".")[0]), index=False)
+        m = E.returnMatrix()
+        ml = E.matrix_labels
 
-            if saveWhole:
-                lorgeDF = lorgeDF.append(df)
-                fNames.append(os.path.basename(f).split(".")[0])
-                labs.append(os.path.basename(f).split(".")[0][-1])
-                speakers.append(os.path.basename(f).split(".")[0].split("_")[1][0])
+        df = pd.DataFrame([m], columns = ml)
+        df.to_csv("../../Data/AcousticData/text_feats/{}/{}.csv".format(tg_mod, os.path.basename(f).split(".")[0]), index=False)
 
+        if saveWhole:
+            lorgeDF = lorgeDF.append(df)
+            fNames.append(os.path.basename(f).split(".")[0])
+            labs.append(os.path.basename(f).split(".")[0][-1])
+            speakers.append(os.path.basename(f).split(".")[0].split("_")[1][0])
+
+            try:
                 globAcoustic = pd.read_csv("../../Data/AcousticData/globalVector/{}.csv".format(os.path.basename(f).split(".")[0]))
                 durs.append(globAcoustic["duration"].item())
                 f0globalMeans.append(globAcoustic["f0globalMean"].item())
                 f0globalSDs.append(globAcoustic["f0globalSD"].item())
                 sound2sil.append(globAcoustic["sound2silenceRatio"].item())
                 totalPauses.append(globAcoustic["totalPauses"].item())
+            except:
+                durs.append(np.nan)
+                f0globalMeans.append(np.nan)
+                f0globalSDs.append(np.nan)
+                sound2sil.append(np.nan)
+                totalPauses.append(np.nan)
 
-
-        except:
-
-            print("No TextGrid found for: {}".format(os.path.basename(f).split(".")[0]))
 
     if saveWhole:
         lorgeDF["fileName"] = fNames

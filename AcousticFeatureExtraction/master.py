@@ -3,10 +3,12 @@
 import os
 import sys
 import time
-import extract
 import subprocess
 import numpy as np
 from preProcessing import preProcessAudio, asrFA, limitsUpperLower, getSpeakerDurationData
+
+import extract
+import extract_textDependent
 
 
 def preProcess(wavPath, speakerList, winSize=10, needAMS=False, needPLP=False, haveManualT=False):
@@ -38,11 +40,13 @@ def preProcess(wavPath, speakerList, winSize=10, needAMS=False, needPLP=False, h
         pass
 
 
-def extractFeats(wavPath, speakerList, outputType, winSize=10):
+def extractFeats(wavPath, speakerList, outputType, winSize=10, tg_mod="asr", saveWhole=False):
 
     #Extract acoustic features
 
     extract.main(wavPath, speakerList, outputType, winSize=winSize)
+
+    extract_textDependent.main(wavPath, tg_mod, saveWhole=saveWhole)
 
 
 if __name__=="__main__":
@@ -51,7 +55,10 @@ if __name__=="__main__":
     speakerList = ["C", "D", "E", "J", "O", "S", "T", "U"]
     outputList = ['individual', 'global']
 
+    tg_mod = "asr"
+    saveWhole = True
+
     t0 = time.time()
-    preProcess(wavPath, speakerList, haveManualT=False)
-    # extractFeats(wavPath, speakerList, outputList)
+    # preProcess(wavPath, speakerList, haveManualT=False)
+    extractFeats(wavPath, speakerList, outputList, tg_mod=tg_mod, saveWhole=saveWhole)
     print("All processes completed in {} minutes".format(np.round((time.time() - t0) / 60), 2))

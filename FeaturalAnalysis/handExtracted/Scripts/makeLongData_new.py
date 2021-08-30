@@ -128,7 +128,7 @@ def main(measure, fileList, win_size):
 
     print(smoothed.shape)
     print()
-    smoothed.to_csv("../../../../Data/AcousticData/Pruned2_10ms/{}_ready_for_gamms.csv".format(measure), index=False)
+    smoothed.to_csv("../../../../Data/AcousticData/Pruned3_10ms/{}_ready_for_gamms.csv".format(measure), index=False)
 
 
 if __name__=="__main__":
@@ -136,7 +136,7 @@ if __name__=="__main__":
     measures = ["f0", "mfcc", 'ams', 'plp', 'hnr']
     # measures = ["hnr"]
 
-    fileList = glob("../../../AudioData/GatedPruned2/*.wav")
+    fileList = glob("../../../AudioData/GatedPruned3/*.wav")
 
     t0 = time.time()
     for measure in measures:

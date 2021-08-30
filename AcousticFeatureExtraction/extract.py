@@ -89,7 +89,7 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
             f0.to_csv("../../Data/AcousticData/f0/{}.csv".format(fileID), index=False)
 
             mfccs = pd.DataFrame(mfccs)
-            mfccs.to_csv("../../Data/AcousticData/mfccs/{}.csv".format(fileID), index=False)
+            mfccs.to_csv("../../Data/AcousticData/mfcc/{}.csv".format(fileID), index=False)
 
             hnr = pd.DataFrame(hnr)
             hnr.to_csv("../../Data/AcousticData/hnr/{}.csv".format(fileID), index=False)

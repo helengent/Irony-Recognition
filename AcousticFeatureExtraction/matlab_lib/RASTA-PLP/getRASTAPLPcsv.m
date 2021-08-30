@@ -1,4 +1,4 @@
-inputFolder = "/home/hmgent2/Irony-Recognition/AudioData/GatedPruned2";
+inputFolder = "/home/hmgent2/Irony-Recognition/AudioData/GatedPruned3";
 
 filePattern = fullfile(inputFolder, '*.wav');
 

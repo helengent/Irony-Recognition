@@ -19,6 +19,7 @@ def parse(f):
     with open(f, "r") as t:
         raw = t.read()
     lines = raw.split("\n")
+    lines = [line.strip() for line in lines]
 
     fileStart = float(lines[3])
     fileEnd = float(lines[4])
