@@ -18,6 +18,7 @@ def preProcess(wavPath, speakerList, winSize=10, needAMS=False, needPLP=False, h
         # Normalize rms and trim leading and trailing silence
         preProcessAudio.preMain(wavPath)
 
+
     # Generates ASR transcriptions for all audio files
     # Runs forced alignment for ASR transcriptions
     # If manual transcriptsions are available, runs forced alignment on them as well
@@ -59,6 +60,6 @@ if __name__=="__main__":
     saveWhole = True
 
     t0 = time.time()
-    # preProcess(wavPath, speakerList, haveManualT=False)
-    extractFeats(wavPath, speakerList, outputList, tg_mod=tg_mod, saveWhole=saveWhole)
+    preProcess(wavPath, speakerList, haveManualT=False)
+    # extractFeats(wavPath, speakerList, outputList, tg_mod=tg_mod, saveWhole=saveWhole)
     print("All processes completed in {} minutes".format(np.round((time.time() - t0) / 60), 2))

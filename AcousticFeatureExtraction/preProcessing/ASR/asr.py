@@ -63,7 +63,4 @@ if __name__=="__main__":
 
     input_dir = "../../../AudioData/ANH"
 
-    wavList = glob("{}/*.wav".format(input_dir))
-    wavList.sort()
-
     main(input_dir, "../../../TextData/{}_asr".format(os.path.basename(input_dir)))
