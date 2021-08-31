@@ -60,6 +60,6 @@ if __name__=="__main__":
     saveWhole = True
 
     t0 = time.time()
-    preProcess(wavPath, speakerList, haveManualT=False)
-    # extractFeats(wavPath, speakerList, outputList, tg_mod=tg_mod, saveWhole=saveWhole)
+    # preProcess(wavPath, speakerList, haveManualT=False)
+    extractFeats(wavPath, speakerList, outputList, tg_mod=tg_mod, saveWhole=saveWhole)
     print("All processes completed in {} minutes".format(np.round((time.time() - t0) / 60), 2))
