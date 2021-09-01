@@ -26,8 +26,8 @@ def recordDurations(allDir):
 
     for i, wav in enumerate(glob("{}/*.wav".format(allDir))):
 
-        if i % 100 == 0:
-            print(i)
+        # if i % 100 == 0:
+        #     print(i)
 
         readr = WR(wav)
         base = os.path.basename(wav).split(".")[0]
