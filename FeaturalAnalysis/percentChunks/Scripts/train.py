@@ -145,8 +145,8 @@ if __name__=="__main__":
     csv_path = "../Checkpoints/LSTM_checkpoints.csv"
     checkpoint_path = "../Checkpoints/LSTM_checkpoints.ckpt"
 
-    fileMod = "Pruned2"
-    speakerList = ["e", "j", "o", "s", "u", "c", "d"]
+    fileMod = "Pruned3"
+    speakerList = ["e", "j", "o", "s", "u", "t", "c", "d"]
     speakerSplits = ["dependent", "independent"]
 
     for speakerSplit in speakerSplits:

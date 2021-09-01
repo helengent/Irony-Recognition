@@ -87,11 +87,11 @@ def chunkStats(x, percentage):
 
         chunkMean = np.mean(chunk)
         chunkSD = sd(chunk, chunkMean)
-        chunkDeltaList = [chunk[x] - chunk[x-1] for x in range(1, len(chunk))]
-        chunkDelta = np.mean(chunkDeltaList)
-        chunkDubDelta = np.mean([chunkDeltaList[x] - chunkDeltaList[x-1] for x in range(1, len(chunkDeltaList))])
+        # chunkDeltaList = [chunk[x] - chunk[x-1] for x in range(1, len(chunk))]
+        # chunkDelta = np.mean(chunkDeltaList)
+        # chunkDubDelta = np.mean([chunkDeltaList[x] - chunkDeltaList[x-1] for x in range(1, len(chunkDeltaList))])
 
-        stats.append([chunkMean, chunkSD, chunkDelta, chunkDubDelta])
+        stats.append([chunkMean, chunkSD])#, chunkDelta, chunkDubDelta])
 
         start += chunkSize
 
@@ -227,8 +227,8 @@ if __name__=="__main__":
 
     # measureList = ["ams", "f0", "hnr", "mfcc", "plp"]
     measureList = ["f0", "hnr"]
-    speakerList = ["c", "d", "e", "j", "o", "s", "u"]
-    listMod = "Pruned2"
+    speakerList = ["c", "d", "e", "j", "o", "s", "t", "u"]
+    listMod = "Pruned3"
     f0Normed = False
     text = "asr"
     speakerSplit = "independent"

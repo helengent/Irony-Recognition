@@ -102,7 +102,7 @@ def main(fileMod, dataPath, modelType, dataType="timeSeries"):
 
 if __name__=="__main__":
 
-    fileMod = "Pruned2"
+    fileMod = "Pruned3"
 
     dataPath = "../percentChunks/Data"
     modelType = "lstm"

@@ -1,0 +1,107 @@
+Speaker e left out
+
+Training performance
+Precision:	[0.67871486 0.73014649]
+Recall:	[0.7716895 0.6284008]
+F1:	[0.72222222 0.67546362]
+
+Test performance
+Precision:	[0.41463415 0.80555556]
+Recall:	[0.70833333 0.54716981]
+F1:	[0.52307692 0.65168539]
+
+Speaker j left out
+
+Training performance
+Precision:	[0.66439628 0.71352986]
+Recall:	[0.73898072 0.63526245]
+F1:	[0.69970655 0.67212531]
+
+Test performance
+Precision:	[0.77142857 0.6       ]
+Recall:	[0.70434783 0.68      ]
+F1:	[0.73636364 0.6375    ]
+
+Speaker o left out
+
+Training performance
+Precision:	[0.68495575 0.7333894 ]
+Recall:	[0.78552097 0.62019915]
+F1:	[0.73179956 0.67206166]
+
+Test performance
+Precision:	[0.44897959 0.80769231]
+Recall:	[0.76744186 0.50909091]
+F1:	[0.56652361 0.62453532]
+
+Speaker s left out
+
+Training performance
+Precision:	[0.68676196 0.71385768]
+Recall:	[0.74310693 0.65408373]
+F1:	[0.71382429 0.68266476]
+
+Test performance
+Precision:	[0.51764706 0.67676768]
+Recall:	[0.57894737 0.62037037]
+F1:	[0.54658385 0.647343  ]
+
+Speaker u left out
+
+Training performance
+Precision:	[0.68313253 0.70584046]
+Recall:	[0.73303167 0.65326302]
+F1:	[0.70720299 0.67853475]
+
+Test performance
+Precision:	[0.26086957 0.89285714]
+Recall:	[0.66666667 0.5952381 ]
+F1:	[0.375      0.71428571]
+
+Speaker t left out
+
+Training performance
+Precision:	[0.67710843 0.71510379]
+Recall:	[0.73850197 0.65081433]
+F1:	[0.70647392 0.68144611]
+
+Test performance
+Precision:	[0.79310345 0.51724138]
+Recall:	[0.62162162 0.71428571]
+F1:	[0.6969697 0.6      ]
+
+Speaker c left out
+
+Training performance
+Precision:	[0.67017544 0.77474403]
+Recall:	[0.87856486 0.49134199]
+F1:	[0.76035032 0.6013245 ]
+
+Test performance
+Precision:	[0.54375    0.79761905]
+Recall:	[0.83653846 0.47857143]
+F1:	[0.65909091 0.59821429]
+
+Speaker d left out
+
+Training performance
+Precision:	[0.66052227 0.70272572]
+Recall:	[0.55198973 0.78871893]
+F1:	[0.6013986  0.74324324]
+
+Test performance
+Precision:	[0.78512397 0.52919708]
+Recall:	[0.55104408 0.7699115 ]
+F1:	[0.6475801  0.62725306]
+
+Cross-Speaker Average Performance
+
+Train performance
+Precision:	[0.67572094 0.72366718]
+Recall:	[0.74267329 0.64026055]
+F1:	[0.70537231 0.67585799]
+
+Test performance
+Precision:	[0.56694204 0.70336627]
+Recall:	[0.67936765 0.61432973]
+F1:	[0.59389859 0.6376021 ]
