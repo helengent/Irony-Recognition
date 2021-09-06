@@ -13,7 +13,7 @@ from calculateIRR_all import parseFileNames, getReadyForKrippendorf, getAverages
 
 if __name__=="__main__":
 
-    annPairs = ["ANmy_ANri"]
+    annPairs = ["ANam_ANsa"]
 
     for pair in annPairs:
 

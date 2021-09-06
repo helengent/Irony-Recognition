@@ -165,7 +165,7 @@ if __name__=="__main__":
     annPairList = list()
     ##Pairwise scores
 
-    current = ["ANhd", "ANpd"]
+    current = ["ANpn"]
 
     for k, a in zip(kPairs, annPairs):
         kScore = np.round(krippendorff_alpha(k), 2)
@@ -192,6 +192,6 @@ if __name__=="__main__":
     for a in annotators:
         print("Rater: {}\t Group Consistency: {}%\t Control Consistency: {}%".format(a, np.round((df["{}_group_consistency".format(a)].tolist().count(True)/len(df)) * 100, 2), np.round((df["{}_H_consistency".format(a)].tolist().count(True)/len(df)) * 100, 2)))
 
-    # df.to_csv("NormScores.csv", index=False)
+    df.to_csv("NormScores.csv", index=False)
 
 
