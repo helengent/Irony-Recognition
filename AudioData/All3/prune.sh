@@ -5,7 +5,7 @@ for i in *.wav; do
 	read decision
 
 	if [ $decision == y ]; then
-		mv $i good/
+		mv $i good2/
 	elif [ $decision == n ]; then
 		mv $i bad/
 	fi

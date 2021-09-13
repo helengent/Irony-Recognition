@@ -24,6 +24,8 @@ def preProcess(wavPath, speakerList, winSize=10, needAMS=False, needPLP=False, h
     # If manual transcriptsions are available, runs forced alignment on them as well
     asrFA.main(wavPath, haveManualT=haveManualT)
 
+    sys.exit()
+
     # Finds and records upper and lower limits on F0 for each speaker, as well as mean and sd
     limitsUpperLower.main(wavPath, winSize, speakerList)
 
@@ -52,14 +54,15 @@ def extractFeats(wavPath, speakerList, outputType, winSize=10, tg_mod="asr", sav
 
 if __name__=="__main__":
 
-    wavPath = "Pruned3"
-    speakerList = ["C", "D", "E", "J", "O", "S", "T", "U"]
+    # wavPath = "Pruned3"
+    wavPath = "tmp"
+    speakerList = ["C", "D", "E", "H", "J", "K", "O", "S", "T", "U"]
     outputList = ['individual', 'global']
 
     tg_mod = "asr"
     saveWhole = True
 
     t0 = time.time()
-    # preProcess(wavPath, speakerList, haveManualT=False)
-    extractFeats(wavPath, speakerList, outputList, tg_mod=tg_mod, saveWhole=saveWhole)
+    preProcess(wavPath, speakerList, haveManualT=False)
+    # extractFeats(wavPath, speakerList, outputList, tg_mod=tg_mod, saveWhole=saveWhole)
     print("All processes completed in {} minutes".format(np.round((time.time() - t0) / 60), 2))

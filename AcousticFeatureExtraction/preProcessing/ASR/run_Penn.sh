@@ -19,6 +19,7 @@ for i in ${wav_dir}/*.wav; do
 
     outName=${out_dir}/$filename.TextGrid
     
+    echo $filename
     python3 lib/Penn/align.py $i $t $outName
 
     done

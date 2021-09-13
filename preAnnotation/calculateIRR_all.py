@@ -165,7 +165,7 @@ if __name__=="__main__":
     annPairList = list()
     ##Pairwise scores
 
-    current = ["ANpn"]
+    current = ["ANgm"]
 
     for k, a in zip(kPairs, annPairs):
         kScore = np.round(krippendorff_alpha(k), 2)
