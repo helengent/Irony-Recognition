@@ -5,6 +5,7 @@ import sys
 import math
 import string
 import librosa
+from numpy.lib.shape_base import apply_along_axis
 import parselmouth
 import numpy as np
 import pandas as pd
@@ -17,6 +18,7 @@ from lib.WAVReader import WAVReader as WR
 from lib.DSP_Tools import findEndpoint
 
 from preProcessing.ASR import parseTextGrid
+from parselmouth.praat import call
 
 
 class Extractor:
@@ -45,6 +47,8 @@ class Extractor:
         self.wordList = list()
 
         self.matrix, self.matrix_labels = self.getMatrix()
+
+        self.sequentialArray = self.getSequential()
 
 
     # Landing space for extracting all values and placing them into an NxM matrix
@@ -88,6 +92,7 @@ class Extractor:
             for spacing in ['1', '2', '3', '4', '5']:
                 for formant in ['F1', 'F2', 'F3']:
                     matrixLabelsList.append('{}-{}_{}'.format(arpaV, formant, spacing))
+
         matrixLabelsList.append('Avg. Voca. Dur.')
 
         assert len(matrixList) == len(matrixLabelsList), "You are missing labels or data."
@@ -267,6 +272,7 @@ class Extractor:
                 for i in information:
                     vocalicArray.append(i)
             else:
+                #TODO
                 for _ in range(20):
                     vocalicArray.append(np.nan)
 

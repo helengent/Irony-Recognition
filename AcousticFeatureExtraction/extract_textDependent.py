@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 import numpy as np
 import pandas as pd
 from glob import glob
@@ -27,6 +28,9 @@ def main(wavPath, tg_mod, saveWhole = False):
         ml = E.matrix_labels
 
         df = pd.DataFrame([m], columns = ml)
+
+        sys.exit()
+
         df.to_csv("../../Data/AcousticData/text_feats/{}/{}.csv".format(tg_mod, os.path.basename(f).split(".")[0]), index=False)
 
         if saveWhole:
@@ -69,4 +73,4 @@ def main(wavPath, tg_mod, saveWhole = False):
 
 if __name__=="__main__":
 
-    main("Pruned2", "asr", saveWhole=True)
+    main("Pruned3", "asr", saveWhole=True)

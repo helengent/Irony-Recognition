@@ -1,7 +1,7 @@
 
 %winSize = 0.01
 
-inputFolder = "/home/hmgent2/Irony-Recognition/AudioData/GatedPruned3"; 
+inputFolder = "/home/hmgent2/Irony-Recognition/AudioData/Gatedtmp"; 
 
 filePattern = fullfile(inputFolder, '*.wav');
 
