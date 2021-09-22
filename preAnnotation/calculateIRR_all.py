@@ -165,18 +165,23 @@ if __name__=="__main__":
     annPairList = list()
     ##Pairwise scores
 
-    current = ["ANgm"]
+    focus = ["ANwk"]
+    current = ["ANwk", "ANkr", "ANmj", "ANdd", "ANam", "ANbc", "ANgm", "ANsa", "ANpn"]
 
     for k, a in zip(kPairs, annPairs):
-        kScore = np.round(krippendorff_alpha(k), 2)
-        kScoreList.append(kScore)
-        annPairList.append(a)
 
-        if a[0] in current or a[1] in current:
+        if a[0] in current and a[1] in current:
+            kScore = np.round(krippendorff_alpha(k), 2)
+            kScoreList.append(kScore)
+            annPairList.append(a)
+
+        if a[0] in focus and a[1] in current:
+            print("Krippendorff's alpha for annotator pair {}:\t{}".format(a, kScore))
+        elif a[1] in focus and a[0] in current:
             print("Krippendorff's alpha for annotator pair {}:\t{}".format(a, kScore))
 
     print("\n")
-    print("Total pairs of annotators:\t{}".format(len(kScoreList)))
+    print("Total pairs of annotator currently under consideration:\t{}".format(len(kScoreList)))
     print("Total pairs with scores of at least 0.67:\t{}".format(len([item for item in kScoreList if item >= 0.67])))
     print("Average pairwise Krippendorff's alpha:\t{}".format(sum(kScoreList)/len(kScoreList)))
     print("Maximum pairwise Krippendorff's alpha:\t{}\t with annotators {}".format(np.max(kScoreList), annPairList[np.argmax(kScoreList)]))

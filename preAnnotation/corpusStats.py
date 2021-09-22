@@ -16,7 +16,10 @@ def main():
     print("**********************************************************")
     print()
 
-    durDict = pd.read_csv("../AcousticFeatureExtraction/preProcessing/good_durations.csv")
+    durDict = recordDurations("../AudioData/All3/good")
+    durDict = pd.DataFrame(durDict)
+
+    # durDict = pd.read_csv("../AcousticFeatureExtraction/preProcessing/good_durations.csv")
 
     #total number of samples in corpus
     print("Total Samples: {}".format(len(durDict)))

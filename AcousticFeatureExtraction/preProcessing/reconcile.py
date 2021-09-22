@@ -117,7 +117,7 @@ def main(episodePath):
 if __name__=="__main__":
 
     # episodePath = "/Users/helengent/Desktop/reconcile/SBep27"
-    nums = ["4", "19"]
+    nums = ["3"]
     
     for num in nums:
         episodePath = "/Users/helengent/Desktop/reconcile/SBep{}".format(num)
