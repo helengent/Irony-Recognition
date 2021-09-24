@@ -1,0 +1,1153 @@
+---
+title: "mfccGamms"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, message=FALSE}
+require(tidyverse)
+require(mgcv)
+require(mgcViz)
+require(itsadug)
+```
+
+Load prepared mfcc data
+```{r}
+
+setwd(choose.dir())
+
+mfccData = read.csv("mfcc_ready_for_gamms.csv")
+Cmfcc = filter(mfccData, mfccData$speaker=="c")
+Dmfcc = filter(mfccData, mfccData$speaker=="d")
+Emfcc = filter(mfccData, mfccData$speaker=="e")
+Jmfcc = filter(mfccData, mfccData$speaker=="j")
+Omfcc = filter(mfccData, mfccData$speaker=="o")
+Smfcc = filter(mfccData, mfccData$speaker=="s")
+Tmfcc = filter(mfccData, mfccData$speaker=="t")
+Umfcc = filter(mfccData, mfccData$speaker=="u")
+
+mfccData$speaker = as.factor(mfccData$speaker)
+mfccData$label = as.factor(mfccData$label)
+
+Cmfcc$speaker = as.factor(Cmfcc$speaker)
+Cmfcc$label = as.factor(Cmfcc$label)
+Dmfcc$speaker = as.factor(Dmfcc$speaker)
+Dmfcc$label = as.factor(Dmfcc$label)
+Emfcc$speaker = as.factor(Emfcc$speaker)
+Emfcc$label = as.factor(Emfcc$label)
+Jmfcc$speaker = as.factor(Jmfcc$speaker)
+Jmfcc$label = as.factor(Jmfcc$label)
+Omfcc$speaker = as.factor(Omfcc$speaker)
+Omfcc$label = as.factor(Omfcc$label)
+Smfcc$speaker = as.factor(Smfcc$speaker)
+Smfcc$label = as.factor(Smfcc$label)
+Tmfcc$speaker = as.factor(Tmfcc$speaker)
+Tmfcc$label = as.factor(Tmfcc$label)
+Umfcc$speaker = as.factor(Umfcc$speaker)
+Umfcc$label = as.factor(Umfcc$label)
+```
+
+GAM with tensor product interaction for mfcc
+```{r}
+m1mfcc=bam(mfcc ~ label + te(time, mfccNum, by=label) + s(time, speaker, bs="fs", m=1) 
+           + s(mfccNum, speaker, bs="fs", m=1), data=mfccData)
+m1mfccViz = getViz(m1mfcc)
+```
+
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(m1mfccViz, allTerms=T), pages=3)
+```
+
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(m1mfcc, view="mfccNum", shade=TRUE, comp=list(label=c("I", "N")))
+plot_diff(m1mfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+par(mfrow=c(1, 1))
+par(mar=c(5, 5, 3, 8))
+plot_diff2(m1mfcc, view=c('time', "mfccNum"), comp=list(label=c("I", "N")), 
+           main="Difference by label", xlab="Time", ylab="mfccNum")
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
+par(mfrow=c(2, 2))
+plot.new
+plot_smooth(m1mfcc, view="time", cond=list("label"="I", mfccNum=1), 
+            col="darkorchid1", main="MFCC1")
+plot_smooth(m1mfcc, view="time", cond=list("label"="N", mfccNum=1), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1mfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=1), main="MFCC1")
+
+plot_smooth(m1mfcc, view="time", cond=list("label"="I", mfccNum=2), 
+            col="darkorchid1", main="MFCC2")
+plot_smooth(m1mfcc, view="time", cond=list("label"="N", mfccNum=2), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1mfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=2), main="MFCC2")
+
+plot_smooth(m1mfcc, view="time", cond=list("label"="I", mfccNum=3), 
+            col="darkorchid1", main="MFCC3")
+plot_smooth(m1mfcc, view="time", cond=list("label"="N", mfccNum=3), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1mfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=3), main="MFCC3")
+
+plot_smooth(m1mfcc, view="time", cond=list("label"="I", mfccNum=4), 
+            col="darkorchid1", main="MFCC4")
+plot_smooth(m1mfcc, view="time", cond=list("label"="N", mfccNum=4), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1mfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=4), main="MFCC4")
+
+plot_smooth(m1mfcc, view="time", cond=list("label"="I", mfccNum=5), 
+            col="darkorchid1", main="MFCC5")
+plot_smooth(m1mfcc, view="time", cond=list("label"="N", mfccNum=5), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1mfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=5), main="MFCC5")
+
+plot_smooth(m1mfcc, view="time", cond=list("label"="I", mfccNum=6), 
+            col="darkorchid1", main="MFCC6")
+plot_smooth(m1mfcc, view="time", cond=list("label"="N", mfccNum=6), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1mfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=6), main="MFCC6")
+
+plot_smooth(m1mfcc, view="time", cond=list("label"="I", mfccNum=7), 
+            col="darkorchid1", main="MFCC7")
+plot_smooth(m1mfcc, view="time", cond=list("label"="N", mfccNum=7), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1mfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=7), main="MFCC7")
+
+plot_smooth(m1mfcc, view="time", cond=list("label"="I", mfccNum=8), 
+            col="darkorchid1", main="MFCC8")
+plot_smooth(m1mfcc, view="time", cond=list("label"="N", mfccNum=8), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1mfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=8), main="MFCC8")
+
+plot_smooth(m1mfcc, view="time", cond=list("label"="I", mfccNum=9), 
+            col="darkorchid1", main="MFCC9")
+plot_smooth(m1mfcc, view="time", cond=list("label"="N", mfccNum=9), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1mfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=9), main="MFCC9")
+
+plot_smooth(m1mfcc, view="time", cond=list("label"="I", mfccNum=10), 
+            col="darkorchid1", main="MFCC10")
+plot_smooth(m1mfcc, view="time", cond=list("label"="N", mfccNum=10), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1mfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=10), main="MFCC10")
+
+plot_smooth(m1mfcc, view="time", cond=list("label"="I", mfccNum=11), 
+            col="darkorchid1", main="MFCC11")
+plot_smooth(m1mfcc, view="time", cond=list("label"="N", mfccNum=11), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1mfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=11), main="MFCC11")
+
+plot_smooth(m1mfcc, view="time", cond=list("label"="I", mfccNum=12), 
+            col="darkorchid1", main="MFCC12")
+plot_smooth(m1mfcc, view="time", cond=list("label"="N", mfccNum=12), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1mfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=12), main="MFCC12")
+
+plot_smooth(m1mfcc, view="time", cond=list("label"="I", mfccNum=13), 
+            col="darkorchid1", main="MFCC13")
+plot_smooth(m1mfcc, view="time", cond=list("label"="N", mfccNum=13), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(m1mfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=13), main="MFCC13")
+
+```
+
+summary
+```{r}
+summary(m1mfcc)
+```
+
+Individual Speaker Models
+Speaker C
+```{r}
+mCmfcc=bam(mfcc ~ label + te(time, mfccNum, by=label), data=Cmfcc)
+mCmfccViz = getViz(mCmfcc)
+```
+
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mCmfccViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mCmfcc, view="mfccNum", shade=TRUE, comp=list(label=c("I", "N")))
+plot_diff(mCmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+par(mfrow=c(1, 1))
+par(mar=c(5, 5, 3, 8))
+plot_diff2(mCmfcc, view=c("time", "mfccNum"), comp=list(label=c("I", "N")), 
+           main="Difference by label")
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
+par(mfrow=c(2, 2))
+plot.new
+plot_smooth(mCmfcc, view="time", cond=list("label"="I", mfccNum=1), 
+            col="darkorchid1", main="MFCC1")
+plot_smooth(mCmfcc, view="time", cond=list("label"="N", mfccNum=1), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mCmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=1), main="MFCC1")
+
+plot_smooth(mCmfcc, view="time", cond=list("label"="I", mfccNum=2), 
+            col="darkorchid1", main="MFCC2")
+plot_smooth(mCmfcc, view="time", cond=list("label"="N", mfccNum=2), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mCmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=2), main="MFCC2")
+
+plot_smooth(mCmfcc, view="time", cond=list("label"="I", mfccNum=3), 
+            col="darkorchid1", main="MFCC3")
+plot_smooth(mCmfcc, view="time", cond=list("label"="N", mfccNum=3), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mCmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=3), main="MFCC3")
+
+plot_smooth(mCmfcc, view="time", cond=list("label"="I", mfccNum=4), 
+            col="darkorchid1", main="MFCC4")
+plot_smooth(mCmfcc, view="time", cond=list("label"="N", mfccNum=4), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mCmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=4), main="MFCC4")
+
+plot_smooth(mCmfcc, view="time", cond=list("label"="I", mfccNum=5), 
+            col="darkorchid1", main="MFCC5")
+plot_smooth(mCmfcc, view="time", cond=list("label"="N", mfccNum=5), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mCmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=5), main="MFCC5")
+
+plot_smooth(mCmfcc, view="time", cond=list("label"="I", mfccNum=6), 
+            col="darkorchid1", main="MFCC6")
+plot_smooth(mCmfcc, view="time", cond=list("label"="N", mfccNum=6), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mCmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=6), main="MFCC6")
+
+plot_smooth(mCmfcc, view="time", cond=list("label"="I", mfccNum=7), 
+            col="darkorchid1", main="MFCC7")
+plot_smooth(mCmfcc, view="time", cond=list("label"="N", mfccNum=7), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mCmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=7), main="MFCC7")
+
+plot_smooth(mCmfcc, view="time", cond=list("label"="I", mfccNum=8), 
+            col="darkorchid1", main="MFCC8")
+plot_smooth(mCmfcc, view="time", cond=list("label"="N", mfccNum=8), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mCmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=8), main="MFCC8")
+
+plot_smooth(mCmfcc, view="time", cond=list("label"="I", mfccNum=9), 
+            col="darkorchid1", main="MFCC9")
+plot_smooth(mCmfcc, view="time", cond=list("label"="N", mfccNum=9), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mCmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=9), main="MFCC9")
+
+plot_smooth(mCmfcc, view="time", cond=list("label"="I", mfccNum=10), 
+            col="darkorchid1", main="MFCC10")
+plot_smooth(mCmfcc, view="time", cond=list("label"="N", mfccNum=10), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mCmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=10), main="MFCC10")
+
+plot_smooth(mCmfcc, view="time", cond=list("label"="I", mfccNum=11), 
+            col="darkorchid1", main="MFCC11")
+plot_smooth(mCmfcc, view="time", cond=list("label"="N", mfccNum=11), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mCmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=11), main="MFCC11")
+
+plot_smooth(mCmfcc, view="time", cond=list("label"="I", mfccNum=12), 
+            col="darkorchid1", main="MFCC12")
+plot_smooth(mCmfcc, view="time", cond=list("label"="N", mfccNum=12), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mCmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=12), main="MFCC12")
+
+plot_smooth(mCmfcc, view="time", cond=list("label"="I", mfccNum=13), 
+            col="darkorchid1", main="MFCC13")
+plot_smooth(mCmfcc, view="time", cond=list("label"="N", mfccNum=13),
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mCmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=13), main="MFCC13")
+```
+
+
+```{r}
+summary(mCmfcc)
+```
+
+Speaker D
+```{r}
+mDmfcc=bam(mfcc ~ label + te(time, mfccNum, by=label), data=Dmfcc)
+mDmfccViz = getViz(mDmfcc)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mDmfccViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mDmfcc, view="mfccNum", shade=TRUE, comp=list(label=c("I", "N")))
+plot_diff(mDmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+par(mfrow=c(1, 1))
+par(mar=c(5, 5, 3, 8))
+plot_diff2(mDmfcc, view=c("time", "mfccNum"), comp=list(label=c("I", "N")), 
+           main="Difference by label")
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
+par(mfrow=c(2, 2))
+plot.new
+plot_smooth(mDmfcc, view="time", cond=list("label"="I", mfccNum=1), 
+            col="darkorchid1", main="MFCC1")
+plot_smooth(mDmfcc, view="time", cond=list("label"="N", mfccNum=1), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mDmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=1), main="MFCC1")
+
+plot_smooth(mDmfcc, view="time", cond=list("label"="I", mfccNum=2), 
+            col="darkorchid1", main="MFCC2")
+plot_smooth(mDmfcc, view="time", cond=list("label"="N", mfccNum=2), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mDmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=2), main="MFCC2")
+
+plot_smooth(mDmfcc, view="time", cond=list("label"="I", mfccNum=3), 
+            col="darkorchid1", main="MFCC3")
+plot_smooth(mDmfcc, view="time", cond=list("label"="N", mfccNum=3), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mDmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=3), main="MFCC3")
+
+plot_smooth(mDmfcc, view="time", cond=list("label"="I", mfccNum=4), 
+            col="darkorchid1", main="MFCC4")
+plot_smooth(mDmfcc, view="time", cond=list("label"="N", mfccNum=4), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mDmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=4), main="MFCC4")
+
+plot_smooth(mDmfcc, view="time", cond=list("label"="I", mfccNum=5), 
+            col="darkorchid1", main="MFCC5")
+plot_smooth(mDmfcc, view="time", cond=list("label"="N", mfccNum=5), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mDmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=5), main="MFCC5")
+
+plot_smooth(mDmfcc, view="time", cond=list("label"="I", mfccNum=6), 
+            col="darkorchid1", main="MFCC6")
+plot_smooth(mDmfcc, view="time", cond=list("label"="N", mfccNum=6), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mDmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=6), main="MFCC6")
+
+plot_smooth(mDmfcc, view="time", cond=list("label"="I", mfccNum=7), 
+            col="darkorchid1", main="MFCC7")
+plot_smooth(mDmfcc, view="time", cond=list("label"="N", mfccNum=7), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mDmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=7), main="MFCC7")
+
+plot_smooth(mDmfcc, view="time", cond=list("label"="I", mfccNum=8), 
+            col="darkorchid1", main="MFCC8")
+plot_smooth(mDmfcc, view="time", cond=list("label"="N", mfccNum=8), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mDmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=8), main="MFCC8")
+
+plot_smooth(mDmfcc, view="time", cond=list("label"="I", mfccNum=9), 
+            col="darkorchid1", main="MFCC9")
+plot_smooth(mDmfcc, view="time", cond=list("label"="N", mfccNum=9), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mDmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=9), main="MFCC9")
+
+plot_smooth(mDmfcc, view="time", cond=list("label"="I", mfccNum=10), 
+            col="darkorchid1", main="MFCC10")
+plot_smooth(mDmfcc, view="time", cond=list("label"="N", mfccNum=10), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mDmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=10), main="MFCC10")
+
+plot_smooth(mDmfcc, view="time", cond=list("label"="I", mfccNum=11), 
+            col="darkorchid1", main="MFCC11")
+plot_smooth(mDmfcc, view="time", cond=list("label"="N", mfccNum=11), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mDmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=11), main="MFCC11")
+
+plot_smooth(mDmfcc, view="time", cond=list("label"="I", mfccNum=12), 
+            col="darkorchid1", main="MFCC12")
+plot_smooth(mDmfcc, view="time", cond=list("label"="N", mfccNum=12), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mDmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=12), main="MFCC12")
+
+plot_smooth(mDmfcc, view="time", cond=list("label"="I", mfccNum=13), 
+            col="darkorchid1", main="MFCC13")
+plot_smooth(mDmfcc, view="time", cond=list("label"="N", mfccNum=13), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mDmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=13), main="MFCC13")
+```
+
+
+```{r}
+summary(mDmfcc)
+```
+
+Speaker E
+```{r}
+mEmfcc=bam(mfcc ~ label + te(time, mfccNum, by=label), data=Emfcc)
+mEmfccViz = getViz(mEmfcc)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mEmfccViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mEmfcc, view="mfccNum", shade=TRUE, comp=list(label=c("I", "N")))
+plot_diff(mEmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+par(mfrow=c(1, 1))
+par(mar=c(5, 5, 3, 8))
+plot_diff2(mEmfcc, view=c("time", "mfccNum"), comp=list(label=c("I", "N")), 
+           main="Difference by label")
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
+par(mfrow=c(2, 2))
+plot.new
+plot_smooth(mEmfcc, view="time", cond=list("label"="I", mfccNum=1), 
+            col="darkorchid1", main="MFCC1")
+plot_smooth(mEmfcc, view="time", cond=list("label"="N", mfccNum=1), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mEmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=1), main="MFCC1")
+
+plot_smooth(mEmfcc, view="time", cond=list("label"="I", mfccNum=2), 
+            col="darkorchid1", main="MFCC2")
+plot_smooth(mEmfcc, view="time", cond=list("label"="N", mfccNum=2), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mEmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=2), main="MFCC2")
+
+plot_smooth(mEmfcc, view="time", cond=list("label"="I", mfccNum=3), 
+            col="darkorchid1", main="MFCC3")
+plot_smooth(mEmfcc, view="time", cond=list("label"="N", mfccNum=3), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mEmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=3), main="MFCC3")
+
+plot_smooth(mEmfcc, view="time", cond=list("label"="I", mfccNum=4), 
+            col="darkorchid1", main="MFCC4")
+plot_smooth(mEmfcc, view="time", cond=list("label"="N", mfccNum=4), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mEmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=4), main="MFCC4")
+
+plot_smooth(mEmfcc, view="time", cond=list("label"="I", mfccNum=5), 
+            col="darkorchid1", main="MFCC5")
+plot_smooth(mEmfcc, view="time", cond=list("label"="N", mfccNum=5), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mEmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=5), main="MFCC5")
+
+plot_smooth(mEmfcc, view="time", cond=list("label"="I", mfccNum=6), 
+            col="darkorchid1", main="MFCC6")
+plot_smooth(mEmfcc, view="time", cond=list("label"="N", mfccNum=6), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mEmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=6), main="MFCC6")
+
+plot_smooth(mEmfcc, view="time", cond=list("label"="I", mfccNum=7), 
+            col="darkorchid1", main="MFCC7")
+plot_smooth(mEmfcc, view="time", cond=list("label"="N", mfccNum=7), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mEmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=7), main="MFCC7")
+
+plot_smooth(mEmfcc, view="time", cond=list("label"="I", mfccNum=8), 
+            col="darkorchid1", main="MFCC8")
+plot_smooth(mEmfcc, view="time", cond=list("label"="N", mfccNum=8), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mEmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=8), main="MFCC8")
+
+plot_smooth(mEmfcc, view="time", cond=list("label"="I", mfccNum=9), 
+            col="darkorchid1", main="MFCC9")
+plot_smooth(mEmfcc, view="time", cond=list("label"="N", mfccNum=9), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mEmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=9), main="MFCC9")
+
+plot_smooth(mEmfcc, view="time", cond=list("label"="I", mfccNum=10), 
+            col="darkorchid1", main="MFCC10")
+plot_smooth(mEmfcc, view="time", cond=list("label"="N", mfccNum=10), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mEmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=10), main="MFCC10")
+
+plot_smooth(mEmfcc, view="time", cond=list("label"="I", mfccNum=11), 
+            col="darkorchid1", main="MFCC11")
+plot_smooth(mEmfcc, view="time", cond=list("label"="N", mfccNum=11), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mEmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=11), main="MFCC11")
+
+plot_smooth(mEmfcc, view="time", cond=list("label"="I", mfccNum=12), 
+            col="darkorchid1", main="MFCC12")
+plot_smooth(mEmfcc, view="time", cond=list("label"="N", mfccNum=12), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mEmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=12), main="MFCC12")
+
+plot_smooth(mEmfcc, view="time", cond=list("label"="I", mfccNum=13), 
+            col="darkorchid1", main="MFCC13")
+plot_smooth(mEmfcc, view="time", cond=list("label"="N", mfccNum=13), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mEmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=13), main="MFCC13")
+```
+
+
+```{r}
+summary(mEmfcc)
+```
+
+Speaker J
+```{r}
+mJmfcc=bam(mfcc ~ label + te(time, mfccNum, by=label), data=Jmfcc)
+mJmfccViz = getViz(mJmfcc)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mJmfccViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mJmfcc, view="mfccNum", shade=TRUE, comp=list(label=c("I", "N")))
+plot_diff(mJmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+par(mfrow=c(1, 1))
+par(mar=c(5, 5, 3, 8))
+plot_diff2(mJmfcc, view=c("time", "mfccNum"), comp=list(label=c("I", "N")), 
+           main="Difference by label")
+```
+
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
+par(mfrow=c(2, 2))
+plot.new
+plot_smooth(mJmfcc, view="time", cond=list("label"="I", mfccNum=1), 
+            col="darkorchid1", main="MFCC1")
+plot_smooth(mJmfcc, view="time", cond=list("label"="N", mfccNum=1), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mJmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=1), main="MFCC1")
+
+plot_smooth(mJmfcc, view="time", cond=list("label"="I", mfccNum=2), 
+            col="darkorchid1", main="MFCC2")
+plot_smooth(mJmfcc, view="time", cond=list("label"="N", mfccNum=2), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mJmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=2), main="MFCC2")
+
+plot_smooth(mJmfcc, view="time", cond=list("label"="I", mfccNum=3), 
+            col="darkorchid1", main="MFCC3")
+plot_smooth(mJmfcc, view="time", cond=list("label"="N", mfccNum=3), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mJmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=3), main="MFCC3")
+
+plot_smooth(mJmfcc, view="time", cond=list("label"="I", mfccNum=4), 
+            col="darkorchid1", main="MFCC4")
+plot_smooth(mJmfcc, view="time", cond=list("label"="N", mfccNum=4), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mJmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=4), main="MFCC4")
+
+plot_smooth(mJmfcc, view="time", cond=list("label"="I", mfccNum=5), 
+            col="darkorchid1", main="MFCC5")
+plot_smooth(mJmfcc, view="time", cond=list("label"="N", mfccNum=5), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mJmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=5), main="MFCC5")
+
+plot_smooth(mJmfcc, view="time", cond=list("label"="I", mfccNum=6), 
+            col="darkorchid1", main="MFCC6")
+plot_smooth(mJmfcc, view="time", cond=list("label"="N", mfccNum=6), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mJmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=6), main="MFCC6")
+
+plot_smooth(mJmfcc, view="time", cond=list("label"="I", mfccNum=7), 
+            col="darkorchid1", main="MFCC7")
+plot_smooth(mJmfcc, view="time", cond=list("label"="N", mfccNum=7), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mJmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=7), main="MFCC7")
+
+plot_smooth(mJmfcc, view="time", cond=list("label"="I", mfccNum=8), 
+            col="darkorchid1", main="MFCC8")
+plot_smooth(mJmfcc, view="time", cond=list("label"="N", mfccNum=8), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mJmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=8), main="MFCC8")
+
+plot_smooth(mJmfcc, view="time", cond=list("label"="I", mfccNum=9), 
+            col="darkorchid1", main="MFCC9")
+plot_smooth(mJmfcc, view="time", cond=list("label"="N", mfccNum=9), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mJmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=9), main="MFCC9")
+
+plot_smooth(mJmfcc, view="time", cond=list("label"="I", mfccNum=10), 
+            col="darkorchid1", main="MFCC10")
+plot_smooth(mJmfcc, view="time", cond=list("label"="N", mfccNum=10), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mJmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=10), main="MFCC10")
+
+plot_smooth(mJmfcc, view="time", cond=list("label"="I", mfccNum=11), 
+            col="darkorchid1", main="MFCC11")
+plot_smooth(mJmfcc, view="time", cond=list("label"="N", mfccNum=11), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mJmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=11), main="MFCC11")
+
+plot_smooth(mJmfcc, view="time", cond=list("label"="I", mfccNum=12), 
+            col="darkorchid1", main="MFCC12")
+plot_smooth(mJmfcc, view="time", cond=list("label"="N", mfccNum=12), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mJmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=12), main="MFCC12")
+
+plot_smooth(mJmfcc, view="time", cond=list("label"="I", mfccNum=13), 
+            col="darkorchid1", main="MFCC13")
+plot_smooth(mJmfcc, view="time", cond=list("label"="N", mfccNum=13), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mJmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=13), main="MFCC13")
+```
+
+
+```{r}
+summary(mJmfcc)
+```
+
+Speaker O
+```{r}
+mOmfcc=bam(mfcc ~ label + te(time, mfccNum, by=label), data=Omfcc)
+mOmfccViz = getViz(mOmfcc)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mOmfccViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mOmfcc, view="mfccNum", shade=TRUE, comp=list(label=c("I", "N")))
+plot_diff(mOmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+par(mfrow=c(1, 1))
+par(mar=c(5, 5, 3, 8))
+plot_diff2(mOmfcc, view=c("time", "mfccNum"), comp=list(label=c("I", "N")), main="Difference by label")
+```
+
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
+par(mfrow=c(2, 2))
+plot.new
+plot_smooth(mOmfcc, view="time", cond=list("label"="I", mfccNum=1), 
+            col="darkorchid1", main="MFCC1")
+plot_smooth(mOmfcc, view="time", cond=list("label"="N", mfccNum=1), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mOmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=1), main="MFCC1")
+
+plot_smooth(mOmfcc, view="time", cond=list("label"="I", mfccNum=2), 
+            col="darkorchid1", main="MFCC2")
+plot_smooth(mOmfcc, view="time", cond=list("label"="N", mfccNum=2), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mOmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=2), main="MFCC2")
+
+plot_smooth(mOmfcc, view="time", cond=list("label"="I", mfccNum=3), 
+            col="darkorchid1", main="MFCC3")
+plot_smooth(mOmfcc, view="time", cond=list("label"="N", mfccNum=3), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mOmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=3), main="MFCC3")
+
+plot_smooth(mOmfcc, view="time", cond=list("label"="I", mfccNum=4), 
+            col="darkorchid1", main="MFCC4")
+plot_smooth(mOmfcc, view="time", cond=list("label"="N", mfccNum=4), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mOmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=4), main="MFCC4")
+
+plot_smooth(mOmfcc, view="time", cond=list("label"="I", mfccNum=5), 
+            col="darkorchid1", main="MFCC5")
+plot_smooth(mOmfcc, view="time", cond=list("label"="N", mfccNum=5), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mOmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=5), main="MFCC5")
+
+plot_smooth(mOmfcc, view="time", cond=list("label"="I", mfccNum=6), 
+            col="darkorchid1", main="MFCC6")
+plot_smooth(mOmfcc, view="time", cond=list("label"="N", mfccNum=6), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mOmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=6), main="MFCC6")
+
+plot_smooth(mOmfcc, view="time", cond=list("label"="I", mfccNum=7), 
+            col="darkorchid1", main="MFCC7")
+plot_smooth(mOmfcc, view="time", cond=list("label"="N", mfccNum=7), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mOmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=7), main="MFCC7")
+
+plot_smooth(mOmfcc, view="time", cond=list("label"="I", mfccNum=8), 
+            col="darkorchid1", main="MFCC8")
+plot_smooth(mOmfcc, view="time", cond=list("label"="N", mfccNum=8),
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mOmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=8), main="MFCC8")
+
+plot_smooth(mOmfcc, view="time", cond=list("label"="I", mfccNum=9), 
+            col="darkorchid1", main="MFCC9")
+plot_smooth(mOmfcc, view="time", cond=list("label"="N", mfccNum=9), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mOmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=9), main="MFCC9")
+
+plot_smooth(mOmfcc, view="time", cond=list("label"="I", mfccNum=10), 
+            col="darkorchid1", main="MFCC10")
+plot_smooth(mOmfcc, view="time", cond=list("label"="N", mfccNum=10), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mOmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=10), main="MFCC10")
+
+plot_smooth(mOmfcc, view="time", cond=list("label"="I", mfccNum=11), 
+            col="darkorchid1", main="MFCC11")
+plot_smooth(mOmfcc, view="time", cond=list("label"="N", mfccNum=11), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mOmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=11), main="MFCC11")
+
+plot_smooth(mOmfcc, view="time", cond=list("label"="I", mfccNum=12), 
+            col="darkorchid1", main="MFCC12")
+plot_smooth(mOmfcc, view="time", cond=list("label"="N", mfccNum=12), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mOmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=12), main="MFCC12")
+
+plot_smooth(mOmfcc, view="time", cond=list("label"="I", mfccNum=13), 
+            col="darkorchid1", main="MFCC13")
+plot_smooth(mOmfcc, view="time", cond=list("label"="N", mfccNum=13), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mOmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=13), main="MFCC13")
+```
+
+
+```{r}
+summary(mOmfcc)
+```
+
+
+Speaker S
+```{r}
+mSmfcc=bam(mfcc ~ label + te(time, mfccNum, by=label), data=Smfcc)
+mSmfccViz = getViz(mSmfcc)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mSmfccViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mSmfcc, view="mfccNum", shade=TRUE, comp=list(label=c("I", "N")))
+plot_diff(mSmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+par(mfrow=c(1, 1))
+par(mar=c(5, 5, 3, 8))
+plot_diff2(mSmfcc, view=c("time", "mfccNum"), comp=list(label=c("I", "N")), main="Difference by label")
+```
+
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
+par(mfrow=c(2, 2))
+plot.new
+plot_smooth(mSmfcc, view="time", cond=list("label"="I", mfccNum=1), 
+            col="darkorchid1", main="MFCC1")
+plot_smooth(mSmfcc, view="time", cond=list("label"="N", mfccNum=1), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mSmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=1), main="MFCC1")
+
+plot_smooth(mSmfcc, view="time", cond=list("label"="I", mfccNum=2), 
+            col="darkorchid1", main="MFCC2")
+plot_smooth(mSmfcc, view="time", cond=list("label"="N", mfccNum=2), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mSmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=2), main="MFCC2")
+
+plot_smooth(mSmfcc, view="time", cond=list("label"="I", mfccNum=3), 
+            col="darkorchid1", main="MFCC3")
+plot_smooth(mSmfcc, view="time", cond=list("label"="N", mfccNum=3), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mSmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=3), main="MFCC3")
+
+plot_smooth(mSmfcc, view="time", cond=list("label"="I", mfccNum=4), 
+            col="darkorchid1", main="MFCC4")
+plot_smooth(mSmfcc, view="time", cond=list("label"="N", mfccNum=4), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mSmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=4), main="MFCC4")
+
+plot_smooth(mSmfcc, view="time", cond=list("label"="I", mfccNum=5), 
+            col="darkorchid1", main="MFCC5")
+plot_smooth(mSmfcc, view="time", cond=list("label"="N", mfccNum=5), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mSmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=5), main="MFCC5")
+
+plot_smooth(mSmfcc, view="time", cond=list("label"="I", mfccNum=6), 
+            col="darkorchid1", main="MFCC6")
+plot_smooth(mSmfcc, view="time", cond=list("label"="N", mfccNum=6), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mSmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=6), main="MFCC6")
+
+plot_smooth(mSmfcc, view="time", cond=list("label"="I", mfccNum=7), 
+            col="darkorchid1", main="MFCC7")
+plot_smooth(mSmfcc, view="time", cond=list("label"="N", mfccNum=7), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mSmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=7), main="MFCC7")
+
+plot_smooth(mSmfcc, view="time", cond=list("label"="I", mfccNum=8), 
+            col="darkorchid1", main="MFCC8")
+plot_smooth(mSmfcc, view="time", cond=list("label"="N", mfccNum=8),
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mSmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=8), main="MFCC8")
+
+plot_smooth(mSmfcc, view="time", cond=list("label"="I", mfccNum=9), 
+            col="darkorchid1", main="MFCC9")
+plot_smooth(mSmfcc, view="time", cond=list("label"="N", mfccNum=9), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mSmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=9), main="MFCC9")
+
+plot_smooth(mSmfcc, view="time", cond=list("label"="I", mfccNum=10), 
+            col="darkorchid1", main="MFCC10")
+plot_smooth(mSmfcc, view="time", cond=list("label"="N", mfccNum=10), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mSmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=10), main="MFCC10")
+
+plot_smooth(mSmfcc, view="time", cond=list("label"="I", mfccNum=11), 
+            col="darkorchid1", main="MFCC11")
+plot_smooth(mSmfcc, view="time", cond=list("label"="N", mfccNum=11), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mSmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=11), main="MFCC11")
+
+plot_smooth(mSmfcc, view="time", cond=list("label"="I", mfccNum=12), 
+            col="darkorchid1", main="MFCC12")
+plot_smooth(mSmfcc, view="time", cond=list("label"="N", mfccNum=12), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mSmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=12), main="MFCC12")
+
+plot_smooth(mSmfcc, view="time", cond=list("label"="I", mfccNum=13), 
+            col="darkorchid1", main="MFCC13")
+plot_smooth(mSmfcc, view="time", cond=list("label"="N", mfccNum=13), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mSmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=13), main="MFCC13")
+```
+
+
+```{r}
+summary(mSmfcc)
+```
+
+
+Speaker T
+```{r}
+mTmfcc=bam(mfcc ~ label + te(time, mfccNum, by=label), data=Tmfcc)
+mTmfccViz = getViz(mTmfcc)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mTmfccViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mTmfcc, view="mfccNum", shade=TRUE, comp=list(label=c("I", "N")))
+plot_diff(mTmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+par(mfrow=c(1, 1))
+par(mar=c(5, 5, 3, 8))
+plot_diff2(mTmfcc, view=c("time", "mfccNum"), comp=list(label=c("I", "N")), main="Difference by label")
+```
+
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
+par(mfrow=c(2, 2))
+plot.new
+plot_smooth(mTmfcc, view="time", cond=list("label"="I", mfccNum=1), 
+            col="darkorchid1", main="MFCC1")
+plot_smooth(mTmfcc, view="time", cond=list("label"="N", mfccNum=1), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mTmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=1), main="MFCC1")
+
+plot_smooth(mTmfcc, view="time", cond=list("label"="I", mfccNum=2), 
+            col="darkorchid1", main="MFCC2")
+plot_smooth(mTmfcc, view="time", cond=list("label"="N", mfccNum=2), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mTmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=2), main="MFCC2")
+
+plot_smooth(mTmfcc, view="time", cond=list("label"="I", mfccNum=3), 
+            col="darkorchid1", main="MFCC3")
+plot_smooth(mTmfcc, view="time", cond=list("label"="N", mfccNum=3), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mTmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=3), main="MFCC3")
+
+plot_smooth(mTmfcc, view="time", cond=list("label"="I", mfccNum=4), 
+            col="darkorchid1", main="MFCC4")
+plot_smooth(mTmfcc, view="time", cond=list("label"="N", mfccNum=4), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mTmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=4), main="MFCC4")
+
+plot_smooth(mTmfcc, view="time", cond=list("label"="I", mfccNum=5), 
+            col="darkorchid1", main="MFCC5")
+plot_smooth(mTmfcc, view="time", cond=list("label"="N", mfccNum=5), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mTmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=5), main="MFCC5")
+
+plot_smooth(mTmfcc, view="time", cond=list("label"="I", mfccNum=6), 
+            col="darkorchid1", main="MFCC6")
+plot_smooth(mTmfcc, view="time", cond=list("label"="N", mfccNum=6), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mTmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=6), main="MFCC6")
+
+plot_smooth(mTmfcc, view="time", cond=list("label"="I", mfccNum=7), 
+            col="darkorchid1", main="MFCC7")
+plot_smooth(mTmfcc, view="time", cond=list("label"="N", mfccNum=7), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mTmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=7), main="MFCC7")
+
+plot_smooth(mTmfcc, view="time", cond=list("label"="I", mfccNum=8), 
+            col="darkorchid1", main="MFCC8")
+plot_smooth(mTmfcc, view="time", cond=list("label"="N", mfccNum=8),
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mTmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=8), main="MFCC8")
+
+plot_smooth(mTmfcc, view="time", cond=list("label"="I", mfccNum=9), 
+            col="darkorchid1", main="MFCC9")
+plot_smooth(mTmfcc, view="time", cond=list("label"="N", mfccNum=9), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mTmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=9), main="MFCC9")
+
+plot_smooth(mTmfcc, view="time", cond=list("label"="I", mfccNum=10), 
+            col="darkorchid1", main="MFCC10")
+plot_smooth(mTmfcc, view="time", cond=list("label"="N", mfccNum=10), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mTmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=10), main="MFCC10")
+
+plot_smooth(mTmfcc, view="time", cond=list("label"="I", mfccNum=11), 
+            col="darkorchid1", main="MFCC11")
+plot_smooth(mTmfcc, view="time", cond=list("label"="N", mfccNum=11), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mTmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=11), main="MFCC11")
+
+plot_smooth(mTmfcc, view="time", cond=list("label"="I", mfccNum=12), 
+            col="darkorchid1", main="MFCC12")
+plot_smooth(mTmfcc, view="time", cond=list("label"="N", mfccNum=12), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mTmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=12), main="MFCC12")
+
+plot_smooth(mTmfcc, view="time", cond=list("label"="I", mfccNum=13), 
+            col="darkorchid1", main="MFCC13")
+plot_smooth(mTmfcc, view="time", cond=list("label"="N", mfccNum=13), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mTmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=13), main="MFCC13")
+```
+
+
+```{r}
+summary(mTmfcc)
+```
+
+
+Speaker U
+```{r}
+mUmfcc=bam(mfcc ~ label + te(time, mfccNum, by=label), data=Umfcc)
+mUmfccViz = getViz(mUmfcc)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
+print(plot(mUmfccViz, allTerms=T), pages=2)
+```
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
+par(mfrow=c(1, 2))
+plot_diff(mUmfcc, view="mfccNum", shade=TRUE, comp=list(label=c("I", "N")))
+plot_diff(mUmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+par(mfrow=c(1, 1))
+par(mar=c(5, 5, 3, 8))
+plot_diff2(mUmfcc, view=c("time", "mfccNum"), comp=list(label=c("I", "N")), main="Difference by label")
+```
+
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
+par(mfrow=c(2, 2))
+plot.new
+plot_smooth(mUmfcc, view="time", cond=list("label"="I", mfccNum=1), 
+            col="darkorchid1", main="MFCC1")
+plot_smooth(mUmfcc, view="time", cond=list("label"="N", mfccNum=1), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mUmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=1), main="MFCC1")
+
+plot_smooth(mUmfcc, view="time", cond=list("label"="I", mfccNum=2), 
+            col="darkorchid1", main="MFCC2")
+plot_smooth(mUmfcc, view="time", cond=list("label"="N", mfccNum=2), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mUmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=2), main="MFCC2")
+
+plot_smooth(mUmfcc, view="time", cond=list("label"="I", mfccNum=3), 
+            col="darkorchid1", main="MFCC3")
+plot_smooth(mUmfcc, view="time", cond=list("label"="N", mfccNum=3), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mUmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=3), main="MFCC3")
+
+plot_smooth(mUmfcc, view="time", cond=list("label"="I", mfccNum=4), 
+            col="darkorchid1", main="MFCC4")
+plot_smooth(mUmfcc, view="time", cond=list("label"="N", mfccNum=4), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mUmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=4), main="MFCC4")
+
+plot_smooth(mUmfcc, view="time", cond=list("label"="I", mfccNum=5), 
+            col="darkorchid1", main="MFCC5")
+plot_smooth(mUmfcc, view="time", cond=list("label"="N", mfccNum=5), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mUmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=5), main="MFCC5")
+
+plot_smooth(mUmfcc, view="time", cond=list("label"="I", mfccNum=6), 
+            col="darkorchid1", main="MFCC6")
+plot_smooth(mUmfcc, view="time", cond=list("label"="N", mfccNum=6), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mUmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=6), main="MFCC6")
+
+plot_smooth(mUmfcc, view="time", cond=list("label"="I", mfccNum=7), 
+            col="darkorchid1", main="MFCC7")
+plot_smooth(mUmfcc, view="time", cond=list("label"="N", mfccNum=7), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mUmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=7), main="MFCC7")
+
+plot_smooth(mUmfcc, view="time", cond=list("label"="I", mfccNum=8), 
+            col="darkorchid1", main="MFCC8")
+plot_smooth(mUmfcc, view="time", cond=list("label"="N", mfccNum=8),
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mUmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=8), main="MFCC8")
+
+plot_smooth(mUmfcc, view="time", cond=list("label"="I", mfccNum=9), 
+            col="darkorchid1", main="MFCC9")
+plot_smooth(mUmfcc, view="time", cond=list("label"="N", mfccNum=9), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mUmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=9), main="MFCC9")
+
+plot_smooth(mUmfcc, view="time", cond=list("label"="I", mfccNum=10), 
+            col="darkorchid1", main="MFCC10")
+plot_smooth(mUmfcc, view="time", cond=list("label"="N", mfccNum=10), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mUmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=10), main="MFCC10")
+
+plot_smooth(mUmfcc, view="time", cond=list("label"="I", mfccNum=11), 
+            col="darkorchid1", main="MFCC11")
+plot_smooth(mUmfcc, view="time", cond=list("label"="N", mfccNum=11), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mUmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=11), main="MFCC11")
+
+plot_smooth(mUmfcc, view="time", cond=list("label"="I", mfccNum=12), 
+            col="darkorchid1", main="MFCC12")
+plot_smooth(mUmfcc, view="time", cond=list("label"="N", mfccNum=12), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mUmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=12), main="MFCC12")
+
+plot_smooth(mUmfcc, view="time", cond=list("label"="I", mfccNum=13), 
+            col="darkorchid1", main="MFCC13")
+plot_smooth(mUmfcc, view="time", cond=list("label"="N", mfccNum=13), 
+            col="springgreen3", main="", add=TRUE)
+plot_diff(mUmfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          cond=list(mfccNum=13), main="MFCC13")
+```
+
+
+```{r}
+summary(mUmfcc)
+```
