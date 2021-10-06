@@ -10,7 +10,7 @@ from glob import glob
 from speaker import Speaker
 from numpy import genfromtxt
 import matplotlib.pyplot as plt
-#from f0_parseltongue import smooth
+from parselmouth.praat import call
 from scipy.io import wavfile as wave
 from preProcessing.silence import highPass, validateTs
 # from reaper_f0extractor import f0VecTime
@@ -31,17 +31,15 @@ class Extractor:
         self.ampData = self.wav.getData()
         self.fs = self.wav.getSamplingRate()
         self.dur = self.wav.getDuration()
-        self.f0Data = self.getF0Contour()
+        self.f0Data, self.energyData = self.getF0Contour()
    
 
     #Speaker features
     def getSpeaker(self):
         return self.speaker.getSpeaker()
 
-
     def getGender(self):
         return self.speaker.getGender()
-
 
     #F0 features
     def getF0Contour(self):
@@ -49,6 +47,7 @@ class Extractor:
         lowerLimit = self.speaker.getLowerLimit()
         
         f0_array = list()
+        energy_array = list()
 
         #This is the code to get the Parselmouth f0 contour
         pitch = self.sound.to_pitch_cc(pitch_floor=lowerLimit, pitch_ceiling=upperLimit)
@@ -59,30 +58,32 @@ class Extractor:
         while end <= self.wav.getDuration():
 
             t = pitch.get_value_at_time(start)
+            r = call(self.sound, "Get root-mean-square", start, end)
             if np.isnan(t):
                 t = 0
                 
             f0_array.append(t)
+            energy_array.append(r)
             start += self.winSize/1000
             end += self.winSize/1000
 
-        return f0_array
+        return f0_array, energy_array
     
         #This is the code to get the reaper f0 contour
         # f0Contour = f0VecTime(self.text, lowerLimit, upperLimit, ms=self.winSize)
 
-
     def getMeanf0(self):
-        return giveMean(self.getF0Contour()) 
+        return giveMean(self.f0Data) 
 
+    def getSDf0(self):
+        return giveSD(self.f0Data)
 
-    def getSDF0(self):
-        return giveSD(self.getF0Contour())
+    def getRangef0(self):
+        return (np.max(self.f0Data) - np.min(self.f0Data))
 
-
-    def getMedianF0(self):
-        f0 = self.getF0Contour()
-        mid = int(len(f0))
+    def getMedianf0(self):
+        f0 = self.f0Data
+        mid = int(len(f0) / 2)
         return f0[mid]
 
     #Timing features
@@ -100,7 +101,6 @@ class Extractor:
         silences = validateTs(silences[0])
         return silences, w
     
-
     def getTimingStats(self):
         silence, win_size = self.findSilences()
 
@@ -135,19 +135,15 @@ class Extractor:
     #HNR
     def getHNR(self):
         harmonicity = self.sound.to_harmonicity_cc()
-        hnr = [value[0] if value != -200 else 0 for value in harmonicity.values.transpose()]
-        return hnr
+        self.hnr = [value[0] if value != -200 else 0 for value in harmonicity.values.transpose()]
+        return self.hnr
 
+    def getHNRstats(self):
+        hnrMean = giveMean(self.hnr)
+        hnrSD = giveSD(self.hnr)
+        hnrRange = np.max(self.hnr) - np.min(self.hnr)
 
-    #Jitter and Shimmer
-    #TODO
-    def getJitter(self):
-        jitter = 0
-        return jitter
-
-    def getShimmer(self):
-        shimmer = 0
-        return shimmer
+        return hnrMean, hnrRange, hnrSD
 
     #First 13 MFCCs
     def getMFCCs(self):
@@ -169,6 +165,13 @@ class Extractor:
         amsFile = "../../Data/AcousticData/ams_untransposed/{}.csv".format(n)
         ams = genfromtxt(amsFile, delimiter=',')
         return ams
+
+    #Amplitude Features
+    def getEnergyStats(self):
+        energyRange = np.max(self.energyData) - np.min(self.energyData)
+        energySD = giveSD(self.energyData)
+
+        return energyRange, energySD
 
     #Relative spectral transform
     #TODO

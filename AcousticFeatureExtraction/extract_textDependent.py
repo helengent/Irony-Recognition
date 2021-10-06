@@ -5,7 +5,7 @@ import sys
 import numpy as np
 import pandas as pd
 from glob import glob
-from extractor_textDependent import Extractor
+from extractor_textDependent_new import Extractor
 
 
 def main(wavPath, tg_mod, saveWhole = False):
@@ -15,7 +15,11 @@ def main(wavPath, tg_mod, saveWhole = False):
     if saveWhole:
         lorgeDF = pd.DataFrame()
         labs, speakers, fNames = list(), list(), list()
-        durs, f0globalMeans, f0globalSDs, sound2sil, totalPauses = list(), list(), list(), list(), list()
+        f0globalMeans, f0globalRanges, f0globalSDs, f0globalMedians, = list(), list(), list(), list()
+        hnrglobalMeans, hnrglobalRanges, hnrglobalSDs = list(), list(), list()
+        energyRanges, energySDs = list(), list()
+        durs, sound2sil, totalPauses = list(), list(), list()
+
 
     for f in fileList:
         tg = "../../Data/TextData/{}_{}/{}.TextGrid".format(wavPath, tg_mod, os.path.basename(f).split(".")[0])
@@ -29,8 +33,6 @@ def main(wavPath, tg_mod, saveWhole = False):
 
         df = pd.DataFrame([m], columns = ml)
 
-        sys.exit()
-
         df.to_csv("../../Data/AcousticData/text_feats/{}/{}.csv".format(tg_mod, os.path.basename(f).split(".")[0]), index=False)
 
         if saveWhole:
@@ -43,7 +45,14 @@ def main(wavPath, tg_mod, saveWhole = False):
                 globAcoustic = pd.read_csv("../../Data/AcousticData/globalVector/{}.csv".format(os.path.basename(f).split(".")[0]))
                 durs.append(globAcoustic["duration"].item())
                 f0globalMeans.append(globAcoustic["f0globalMean"].item())
+                f0globalRanges.append(globAcoustic["f0globalRange"].item())
                 f0globalSDs.append(globAcoustic["f0globalSD"].item())
+                f0globalMedians.append(globAcoustic["f0globalMedian"].item())
+                hnrglobalMeans.append(globAcoustic["hnrglobalMean"].item())
+                hnrglobalRanges.append(globAcoustic["hnrglobalRange"].item())
+                hnrglobalSDs.append(globAcoustic["hnrglobalSD"].item())
+                energyRanges.append(globAcoustic["energyRange"].item())
+                energySDs.append(globAcoustic["energySD"].item())
                 sound2sil.append(globAcoustic["sound2silenceRatio"].item())
                 totalPauses.append(globAcoustic["totalPauses"].item())
             except:
@@ -60,12 +69,19 @@ def main(wavPath, tg_mod, saveWhole = False):
         lorgeDF["label"] = labs
         lorgeDF["duration"] = durs
         lorgeDF["f0globalMean"] = f0globalMeans
-        lorgeDF["f0globalSDs"] = f0globalSDs
+        lorgeDF["f0globalRange"] = f0globalRanges
+        lorgeDF["f0globalSD"] = f0globalSDs
+        lorgeDF["f0globalMedian"] = f0globalMedians
         lorgeDF["sound2silenceRatio"] = sound2sil
         lorgeDF["totalPauses"] = totalPauses
+        lorgeDF["hnrglobalMean"] = hnrglobalMeans
+        lorgeDF["hnrglobalRange"] = hnrglobalRanges
+        lorgeDF["hnrglobalSD"] = hnrglobalSDs
+        lorgeDF["energyRange"] = energyRanges
+        lorgeDF["energySD"] = energySDs
 
         cols = lorgeDF.columns.tolist()
-        cols = cols[-8:] + cols[:-8]
+        cols = cols[-15:] + cols[:-15]
         lorgeDF = lorgeDF[cols]
 
         lorgeDF.to_csv("../../Data/AcousticData/text_feats/{}_{}_text_feats.csv".format(wavPath, tg_mod))

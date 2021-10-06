@@ -35,7 +35,7 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
         print("Oh no.")
 
     extractor = Extractor(wav, speaker, irony, winSize=int(winSize))
-    f0 = extractor.getF0Contour()
+    f0, _ = extractor.getF0Contour()
     if len(list(set(f0))) == 1:
         print("Bad file: {}".format(wavfile))
         return
@@ -43,8 +43,12 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
         mfccs = extractor.getMFCCs()
         dur = extractor.dur
         hnr = extractor.getHNR()
+        hnrMean, hnrRange, hnrSD = extractor.getHNRstats()
         meanF0 = extractor.getMeanf0()
-        F0sd = extractor.getSDF0()
+        F0sd = extractor.getSDf0()
+        rangeF0 = extractor.getRangef0()
+        medianF0 = extractor.getMedianf0()
+        energyRange, energySD = extractor.getEnergyStats()
         apl, s2s, tp = extractor.getTimingStats()
         ams = extractor.getAMS()
         plp = extractor.getPLP()
@@ -58,10 +62,17 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
         GLOBALDICT['gender'].append(speaker.getGender())
         GLOBALDICT['duration'].append(dur)
         GLOBALDICT['f0globalMean'].append(meanF0)
+        GLOBALDICT['f0globalRange'].append(rangeF0)
         GLOBALDICT['f0globalSD'].append(F0sd)
+        GLOBALDICT["f0globalMedian"].append(medianF0)
         GLOBALDICT['avgPauseLength'].append(apl)
         GLOBALDICT['sound2silenceRatio'].append(s2s)
         GLOBALDICT['totalPauses'].append(tp)
+        GLOBALDICT['hnrglobalMean'].append(hnrMean)
+        GLOBALDICT['hnrglobalRange'].append(hnrRange)
+        GLOBALDICT['hnrglobalSD'].append(hnrSD)
+        GLOBALDICT['energyRange'].append(energyRange)
+        GLOBALDICT['energySD'].append(energySD)
 
         #Append sequential information
         SEQUENTIALDICT['filename'].append(fileID)
@@ -100,8 +111,10 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
             plp = pd.DataFrame(np.transpose(plp))
             plp.to_csv("../../Data/AcousticData/plp/{}.csv".format(fileID), index=False)
 
-            smolDict = {'duration': [dur], 'f0globalMean': [meanF0], 'f0globalSD': [F0sd], 
-                        'avgPauseLength': [apl], 'sound2silenceRatio': [s2s], 'totalPauses': [tp]}
+            smolDict = {'f0globalMean': [meanF0], 'f0globalRange': [rangeF0], 'f0globalSD': [F0sd], 'f0globalMedian': [medianF0], 
+                        'hnrglobalMean': [hnrMean], 'hnrglobalRange': [hnrRange], 'hnrglobalSD': [hnrSD], 
+                        'energyRange': [energyRange], 'energySD': [energySD], 
+                        'duration': [dur], 'avgPauseLength': [apl], 'sound2silenceRatio': [s2s], 'totalPauses': [tp]}
             smolDict = pd.DataFrame(smolDict)
             smolDict.to_csv("../../Data/AcousticData/globalVector/{}.csv".format(fileID), index=False)
 
@@ -116,8 +129,9 @@ def makeSpeakerList(s):
 def main(wavPath, speakerList, output, winSize="10"):
 
     global GLOBALDICT
-    GLOBALDICT = {"filename": [], "label": [], "speaker": [], "gender": [], "duration": [], "f0globalMean": [], 
-                  "f0globalSD": [], "avgPauseLength": [], "sound2silenceRatio": [], "totalPauses": []}
+    GLOBALDICT = {"filename": [], "label": [], "speaker": [], "gender": [], "duration": [], "f0globalMean": [], "f0globalRange": [],
+                  "f0globalSD": [], "f0globalMedian": [], "avgPauseLength": [], "sound2silenceRatio": [], "totalPauses": [], 
+                  "hnrglobalMean": [], "hnrglobalRange": [], "hnrglobalSD": [], "energyRange": [], "energySD": []}
 
     global SEQUENTIALDICT
     SEQUENTIALDICT = {"filename": [], "label": []}

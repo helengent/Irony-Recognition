@@ -139,35 +139,35 @@ if __name__=="__main__":
     fileList = glob("../../../AudioData/GatedPruned3/*.wav")
 
     #Select a smaller number of files to get equal samples per speaker, ironic and non-ironic
-    speakers = [os.path.basename(item).split("_")[1][0] for item in fileList]
-    labels = [os.path.basename(item).split("-")[1][0] for item in fileList]
+    # speakers = [os.path.basename(item).split("_")[1][0] for item in fileList]
+    # labels = [os.path.basename(item).split("-")[1][0] for item in fileList]
 
-    df = pd.DataFrame({"fileName": fileList, "speaker": speakers, "label": labels})
-    print(df.shape)
+    # df = pd.DataFrame({"fileName": fileList, "speaker": speakers, "label": labels})
+    # print(df.shape)
 
-    counts = list()
-    for s in list(set(speakers)):
-        subset = df[df["speaker"] == s]
+    # counts = list()
+    # for s in list(set(speakers)):
+    #     subset = df[df["speaker"] == s]
 
-        counts.append(subset["label"].tolist().count("I"))
-        counts.append(subset["label"].tolist().count("N"))
+    #     counts.append(subset["label"].tolist().count("I"))
+    #     counts.append(subset["label"].tolist().count("N"))
 
-    smallest = np.min(counts)
+    # smallest = np.min(counts)
 
-    print("Selecting {} ironic and non-ironic samples per speakers".format(smallest))
+    # print("Selecting {} ironic and non-ironic samples per speakers".format(smallest))
 
-    newDF = pd.DataFrame()
-    for s in list(set(speakers)):
-        subset = df[df["speaker"] == s]
-        subI = subset[subset["label"] == "I"]
-        subN = subset[subset["label"] == "N"]
+    # newDF = pd.DataFrame()
+    # for s in list(set(speakers)):
+    #     subset = df[df["speaker"] == s]
+    #     subI = subset[subset["label"] == "I"]
+    #     subN = subset[subset["label"] == "N"]
 
-        newDF = newDF.append(subI.sample(n=smallest))
-        newDF = newDF.append(subN.sample(n=smallest))
+    #     newDF = newDF.append(subI.sample(n=smallest))
+    #     newDF = newDF.append(subN.sample(n=smallest))
 
-    print(newDF.shape)
+    # print(newDF.shape)
 
-    fileList = newDF["fileName"].tolist()
+    # fileList = newDF["fileName"].tolist()
 
     t0 = time.time()
     for measure in measures:

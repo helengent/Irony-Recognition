@@ -5,7 +5,7 @@ import sys
 import time
 import subprocess
 import numpy as np
-from preProcessing import preProcessAudio, asrFA, limitsUpperLower, getSpeakerDurationData
+from preProcessing import preProcessAudio, asrFA, limitsUpperLower, getSpeakerDurationData, getSpeakerSegmentalData
 
 import extract
 import extract_textDependent
@@ -22,7 +22,7 @@ def preProcess(wavPath, speakerList, winSize=10, needAMS=False, needPLP=False, h
     # Generates ASR transcriptions for all audio files
     # Runs forced alignment for ASR transcriptions
     # If manual transcriptsions are available, runs forced alignment on them as well
-    # asrFA.main(wavPath, haveManualT=haveManualT)
+    asrFA.main(wavPath, haveManualT=haveManualT)
 
 
     # Finds and records upper and lower limits on F0 for each speaker, as well as mean and sd
@@ -46,9 +46,11 @@ def extractFeats(wavPath, speakerList, outputType, winSize=10, tg_mod="asr", sav
 
     #Extract acoustic features
 
-    extract.main(wavPath, speakerList, outputType, winSize=winSize)
+    # extract.main(wavPath, speakerList, outputType, winSize=winSize)
 
-    extract_textDependent.main(wavPath, tg_mod, saveWhole=saveWhole)
+    # extract_textDependent.main(wavPath, tg_mod, saveWhole=saveWhole)
+
+    # getSpeakerSegmentalData.speakerSegmentalData("../../Data/AcousticData/text_feats/{}_{}_text_feats.csv".format(wavPath, tg_mod))
 
 
 if __name__=="__main__":
@@ -61,6 +63,6 @@ if __name__=="__main__":
     saveWhole = True
 
     t0 = time.time()
-    preProcess(wavPath, speakerList, haveManualT=False)
-    # extractFeats(wavPath, speakerList, outputList, tg_mod=tg_mod, saveWhole=saveWhole)
+    # preProcess(wavPath, speakerList, haveManualT=False)
+    extractFeats(wavPath, speakerList, outputList, tg_mod=tg_mod, saveWhole=saveWhole)
     print("All processes completed in {} minutes".format(np.round((time.time() - t0) / 60), 2))

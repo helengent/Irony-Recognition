@@ -48,8 +48,6 @@ class Extractor:
 
         self.matrix, self.matrix_labels = self.getMatrix()
 
-        self.sequentialArray = self.getSequential()
-
 
     # Landing space for extracting all values and placing them into an NxM matrix
     def getMatrix(self):
@@ -70,14 +68,20 @@ class Extractor:
         except:
             consonantVowelRatio = 0.0
 
-        matrixList = [averageWordDuration, averageSilenceDuration, dynamicRange, energy, intensity, zcr, rms, spl, consonantVowelRatio]
+        try:
+            SyllPerSecond = vowelCount / self.dur
+        except:
+            #This shouldn't happen
+            SyllPerSecond = 0.0
+
+        matrixList = [averageWordDuration, averageSilenceDuration, dynamicRange, energy, intensity, zcr, rms, spl, consonantVowelRatio, SyllPerSecond]
         for c in consonantalArray:
             matrixList.append(c)
         for v in vocalicArray:
             matrixList.append(v)
 
         matrixLabelsList = ['Avg. Word Dur.', 'Avg. Sil. Dur.', 'Dynamic Range', 'Energy',
-                            'Intensity', 'ZCR', 'Root Mean Square', 'Sound Pressure Level', 'Consonant Vowel Ratio']
+                            'Intensity', 'ZCR', 'Root Mean Square', 'Sound Pressure Level', 'Consonant Vowel Ratio', 'SyllPerSecond']
 
         # Consonants
         for arpaC in self.arpabetConsonantalList:
@@ -272,7 +276,6 @@ class Extractor:
                 for i in information:
                     vocalicArray.append(i)
             else:
-                #TODO
                 for _ in range(20):
                     vocalicArray.append(np.nan)
 
@@ -286,13 +289,20 @@ class Extractor:
         for start, end in v:
             vowelCount += 1
             part = self.sound.extract_part(from_time = start, to_time = end, preserve_times = True)
-            pitch = part.to_pitch_cc()
-            spaces = np.linspace(start, end, num = 7)
-            pitches = [pitch.get_value_at_time(i) for i in spaces[1:-1]]
 
-            # Prep for Formant extraction
-            burg = part.to_formant_burg()
-            formants = np.array([self.getVocalicFormants(burg, i) for i in spaces[1:-1]]).flatten().tolist()
+            try:
+                pitch = part.to_pitch_cc()
+                spaces = np.linspace(start, end, num = 7)
+                pitches = [pitch.get_value_at_time(i) for i in spaces[1:-1]]
+
+                # Prep for Formant extraction
+                burg = part.to_formant_burg()
+                formants = np.array([self.getVocalicFormants(burg, i) for i in spaces[1:-1]]).flatten().tolist()
+
+            except:
+                spaces = np.linspace(start, end, num = 7)
+                pitches = [np.nan for i in range(10)]
+                formants = [np.nan for i in range(10)]
             
             # Save out this observation
             tempArray.append(pitches + formants)
