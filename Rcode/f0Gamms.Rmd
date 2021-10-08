@@ -1,0 +1,329 @@
+---
+title: "f0Gamms"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE}
+require(tidyverse)
+require(mgcv)
+require(mgcViz)
+require(itsadug)
+```
+
+Load prepared f0 data
+```{r}
+
+setwd(choose.dir())
+
+f0Data = read.csv("f0_ready_for_gamms.csv")
+Cf0 = filter(f0Data, f0Data$speaker=="c")
+Df0 = filter(f0Data, f0Data$speaker=="d")
+Ef0 = filter(f0Data, f0Data$speaker=="e")
+Hf0 = filter(f0Data, f0Data$speaker=="h")
+Jf0 = filter(f0Data, f0Data$speaker=="j")
+Kf0 = filter(f0Data, f0Data$speaker=="k")
+Of0 = filter(f0Data, f0Data$speaker=="o")
+Sf0 = filter(f0Data, f0Data$speaker=="s")
+Tf0 = filter(f0Data, f0Data$speaker=="t")
+Uf0 = filter(f0Data, f0Data$speaker=="u")
+
+f0Data$speaker = as.factor(f0Data$speaker)
+f0Data$label = as.factor(f0Data$label)
+
+Cf0$speaker = as.factor(Cf0$speaker)
+Cf0$label = as.factor(Cf0$label)
+Df0$speaker = as.factor(Df0$speaker)
+Df0$label = as.factor(Df0$label)
+Ef0$speaker = as.factor(Ef0$speaker)
+Ef0$label = as.factor(Ef0$label)
+Hf0$speaker = as.factor(Hf0$speaker)
+Hf0$label = as.factor(Hf0$label)
+Jf0$speaker = as.factor(Jf0$speaker)
+Jf0$label = as.factor(Jf0$label)
+Kf0$speaker = as.factor(Kf0$speaker)
+Kf0$label = as.factor(Kf0$label)
+Of0$speaker = as.factor(Of0$speaker)
+Of0$label = as.factor(Of0$label)
+Sf0$speaker = as.factor(Sf0$speaker)
+Sf0$label = as.factor(Sf0$label)
+Tf0$speaker = as.factor(Tf0$speaker)
+Tf0$label = as.factor(Tf0$label)
+Uf0$speaker = as.factor(Uf0$speaker)
+Uf0$label = as.factor(Uf0$label)
+```
+
+GAM for f0
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+m1F0=bam(f0 ~ label + te(time, by=label) + s(speaker, bs="re") 
+         + s(time, speaker, bs="fs", m=1), data=f0Data)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(m1F0, select=1, main = "All Speakers: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(m1F0, select=2, main = "All Speakers: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(m1F0, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "All Speakers: Both Curves");
+par(new=TRUE);
+plot(m1F0, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(m1F0, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+```
+
+```{r}
+summary(m1F0)
+```
+
+
+Individual Speakers
+Speaker C
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mCf0=bam(f0 ~ label + te(time, by=label), data=Cf0)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mCf0, select=1, main = "Speaker C: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mCf0, select=2, main = "Speaker C: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mCf0, select=1, ylab="te(time):lab", xlab="time (percent)",
+     main = "Speaker C: Both Curves");
+par(new=TRUE);
+plot(mCf0, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mCf0, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+```
+
+```{r}
+summary(mCf0)
+```
+
+
+Speaker D
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mDf0=bam(f0 ~ label + te(time, by=label), data=Df0)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mDf0, select=1, main = "Speaker D: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mDf0, select=2, main = "Speaker D: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mDf0, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker D: Both Curves");
+par(new=TRUE);
+plot(mDf0, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mDf0, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+```
+
+```{r}
+summary(mDf0)
+```
+
+
+Speaker E
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mEf0=bam(f0 ~ label + te(time, by=label), data=Ef0)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mEf0, select=1, main = "Speaker E: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mEf0, select=2, main = "Speaker E: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mEf0, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker E: Both Curves");
+par(new=TRUE);
+plot(mEf0, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mEf0, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+```
+
+```{r}
+summary(mEf0)
+```
+
+
+Speaker H
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mHf0=bam(f0 ~ label + te(time, by=label), data=Hf0)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mHf0, select=1, main = "Speaker H: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mHf0, select=2, main = "Speaker H: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mHf0, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker H: Both Curves");
+par(new=TRUE);
+plot(mHf0, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mHf0, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+```
+
+```{r}
+summary(mHf0)
+```
+
+
+Speaker J
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mJf0=bam(f0 ~ label + te(time, by=label), data=Jf0)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mJf0, select=1, main = "Speaker J: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mJf0, select=2, main = "Speaker J: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mJf0, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker J: Both Curves");
+par(new=TRUE);
+plot(mJf0, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mJf0, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+```
+
+```{r}
+summary(mJf0)
+```
+
+Speaker K
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mKf0=bam(f0 ~ label + te(time, by=label), data=Kf0)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mKf0, select=1, main = "Speaker K: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mKf0, select=2, main = "Speaker K: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mKf0, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker K: Both Curves");
+par(new=TRUE);
+plot(mKf0, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mKf0, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+```
+
+```{r}
+summary(mKf0)
+```
+
+
+Speaker O
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mOf0=bam(f0 ~ label + te(time, by=label), data=Of0)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mOf0, select=1, main = "Speaker O: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mOf0, select=2, main = "Speaker O: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mOf0, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker O: Both Curves");
+par(new=TRUE);
+plot(mOf0, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mOf0, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+```
+
+```{r}
+summary(mOf0)
+```
+
+
+Speaker S
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mSf0=bam(f0 ~ label + te(time, by=label), data=Sf0)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mSf0, select=1, main = "Speaker S: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mSf0, select=2, main = "Speaker S: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mSf0, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker S: Both Curves");
+par(new=TRUE);
+plot(mSf0, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mSf0, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+```
+
+```{r}
+summary(mSf0)
+```
+
+
+Speaker T
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mTf0=bam(f0 ~ label + te(time, by=label), data=Tf0)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mTf0, select=1, main = "Speaker T: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mTf0, select=2, main = "Speaker T: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mTf0, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker T: Both Curves");
+par(new=TRUE);
+plot(mTf0, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mTf0, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+```
+
+```{r}
+summary(mTf0)
+```
+
+
+Speaker U
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mUf0=bam(f0 ~ label + te(time, by=label), data=Uf0)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mUf0, select=1, main = "Speaker U: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mUf0, select=2, main = "Speaker U: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mUf0, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker U: Both Curves");
+par(new=TRUE);
+plot(mUf0, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mUf0, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+```
+
+```{r}
+summary(mUf0)
+```

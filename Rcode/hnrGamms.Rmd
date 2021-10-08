@@ -1,0 +1,330 @@
+---
+title: "hnrGamms"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE}
+require(tidyverse)
+require(mgcv)
+require(mgcViz)
+require(itsadug)
+```
+
+Load prepared hnr data
+```{r}
+
+setwd(choose.dir())
+
+hnrData = read.csv("hnr_ready_for_gamms.csv")
+Chnr = filter(hnrData, hnrData$speaker=="c")
+Dhnr = filter(hnrData, hnrData$speaker=="d")
+Ehnr = filter(hnrData, hnrData$speaker=="e")
+Hhnr = filter(hnrData, hnrData$speaker=="h")
+Jhnr = filter(hnrData, hnrData$speaker=="j")
+Khnr = filter(hnrData, hnrData$speaker=="k")
+Ohnr = filter(hnrData, hnrData$speaker=="o")
+Shnr = filter(hnrData, hnrData$speaker=="s")
+Thnr = filter(hnrData, hnrData$speaker=="t")
+Uhnr = filter(hnrData, hnrData$speaker=="u")
+
+hnrData$speaker = as.factor(hnrData$speaker)
+hnrData$label = as.factor(hnrData$label)
+
+Chnr$speaker = as.factor(Chnr$speaker)
+Chnr$label = as.factor(Chnr$label)
+Dhnr$speaker = as.factor(Dhnr$speaker)
+Dhnr$label = as.factor(Dhnr$label)
+Ehnr$speaker = as.factor(Ehnr$speaker)
+Ehnr$label = as.factor(Ehnr$label)
+Hhnr$speaker = as.factor(Hhnr$speaker)
+Hhnr$label = as.factor(Hhnr$label)
+Jhnr$speaker = as.factor(Jhnr$speaker)
+Jhnr$label = as.factor(Jhnr$label)
+
+Khnr$speaker = as.factor(Khnr$speaker)
+Khnr$label = as.factor(Khnr$label)
+Ohnr$speaker = as.factor(Ohnr$speaker)
+Ohnr$label = as.factor(Ohnr$label)
+Shnr$speaker = as.factor(Shnr$speaker)
+Shnr$label = as.factor(Shnr$label)
+Thnr$speaker = as.factor(Thnr$speaker)
+Thnr$label = as.factor(Thnr$label)
+Uhnr$speaker = as.factor(Uhnr$speaker)
+Uhnr$label = as.factor(Uhnr$label)
+```
+
+GAM for hnr
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+m1hnr=bam(hnr ~ label + te(time, by=label) + s(speaker, bs="re") 
+         + s(time, speaker, bs="fs", m=1), data=hnrData)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(m1hnr, select=1, main = "All Speakers: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(m1hnr, select=2, main = "All Speakers: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(m1hnr, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "All Speakers: Both Curves");
+par(new=TRUE);
+plot(m1hnr, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(m1hnr, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+```
+
+```{r}
+summary(m1hnr)
+```
+
+
+Individual Speakers
+Speaker C
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mChnr=bam(hnr ~ label + te(time, by=label), data=Chnr)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mChnr, select=1, main = "Speaker C: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mChnr, select=2, main = "Speaker C: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mChnr, select=1, ylab="te(time):lab", xlab="time (percent)",
+     main = "Speaker C: Both Curves");
+par(new=TRUE);
+plot(mChnr, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mChnr, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+```
+
+```{r}
+summary(mChnr)
+```
+
+
+Speaker D
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mDhnr=bam(hnr ~ label + te(time, by=label), data=Dhnr)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mDhnr, select=1, main = "Speaker D: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mDhnr, select=2, main = "Speaker D: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mDhnr, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker D: Both Curves");
+par(new=TRUE);
+plot(mDhnr, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mDhnr, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+```
+
+```{r}
+summary(mDhnr)
+```
+
+
+Speaker E
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mEhnr=bam(hnr ~ label + te(time, by=label), data=Ehnr)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mEhnr, select=1, main = "Speaker E: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mEhnr, select=2, main = "Speaker E: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mEhnr, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker E: Both Curves");
+par(new=TRUE);
+plot(mEhnr, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mEhnr, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+```
+
+```{r}
+summary(mEhnr)
+```
+
+Speaker H
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mHhnr=bam(hnr ~ label + te(time, by=label), data=Hhnr)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mHhnr, select=1, main = "Speaker H: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mHhnr, select=2, main = "Speaker H: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mHhnr, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker H: Both Curves");
+par(new=TRUE);
+plot(mHhnr, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mHhnr, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+```
+
+```{r}
+summary(mHhnr)
+```
+
+
+Speaker J
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mJhnr=bam(hnr ~ label + te(time, by=label), data=Jhnr)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mJhnr, select=1, main = "Speaker J: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mJhnr, select=2, main = "Speaker J: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mJhnr, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker J: Both Curves");
+par(new=TRUE);
+plot(mJhnr, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mJhnr, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+```
+
+```{r}
+summary(mJhnr)
+```
+
+Speaker K
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mKhnr=bam(hnr ~ label + te(time, by=label), data=Khnr)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mKhnr, select=1, main = "Speaker K: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mKhnr, select=2, main = "Speaker K: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mKhnr, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker K: Both Curves");
+par(new=TRUE);
+plot(mKhnr, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mJhnr, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+
+```
+
+```{r}
+summary(mKhnr)
+```
+
+
+Speaker O
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mOhnr=bam(hnr ~ label + te(time, by=label), data=Ohnr)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mOhnr, select=1, main = "Speaker O: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mOhnr, select=2, main = "Speaker O: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mOhnr, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker O: Both Curves");
+par(new=TRUE);
+plot(mOhnr, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mOhnr, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+```
+
+```{r}
+summary(mOhnr)
+```
+
+
+Speaker S
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mShnr=bam(hnr ~ label + te(time, by=label), data=Shnr)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mShnr, select=1, main = "Speaker S: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mShnr, select=2, main = "Speaker S: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mShnr, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker S: Both Curves");
+par(new=TRUE);
+plot(mShnr, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mShnr, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+```
+
+```{r}
+summary(mShnr)
+```
+
+
+Speaker T
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mThnr=bam(hnr ~ label + te(time, by=label), data=Thnr)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mThnr, select=1, main = "Speaker T: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mThnr, select=2, main = "Speaker T: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mThnr, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker T: Both Curves");
+par(new=TRUE);
+plot(mThnr, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mThnr, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+```
+
+```{r}
+summary(mThnr)
+```
+
+
+Speaker U
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+mUhnr=bam(hnr ~ label + te(time, by=label), data=Uhnr)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+par(mfrow=c(2,2))
+plot(mUhnr, select=1, main = "Speaker U: Ironic", shade=TRUE, 
+     shade.col = "seagreen2")
+plot(mUhnr, select=2, main = "Speaker U: Non-Ironic", shade=TRUE, 
+     shade.col = "wheat")
+plot(mUhnr, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "Speaker U: Both Curves");
+par(new=TRUE);
+plot(mUhnr, select=2, ylab="", xlab="", main="", col="indianred4")
+plot_diff(mUhnr, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+```
+
+```{r}
+summary(mUhnr)
+```
+

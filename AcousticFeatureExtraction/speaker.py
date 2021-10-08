@@ -4,7 +4,7 @@ import sys
 import pandas as pd
 
 class Speaker:
-    def __init__(self, speaker, f0_txt, dur_txt=None):
+    def __init__(self, speaker, f0_txt, dur_txt=None, seg_txt=None):
 
         genders = pd.read_csv("~/Data/AcousticData/SpeakerMetaData/speakersGenders.txt")
         if speaker in genders["speaker"].tolist():
@@ -37,6 +37,25 @@ class Speaker:
             for i in range(6, len(self.dur_txt)):
                 if self.dur_txt[i][0] != 'sp' and self.dur_txt[i][0] != "{LG}":
                     self.avgPhoneDurs[self.dur_txt[i][0]] = self.dur_txt[i][1]
+
+        if seg_txt:
+            self.g = open(seg_txt, 'r')
+            self.seg_txt = self.g.readlines()
+            for i, line in enumerate(self.seg_txt):
+                self.seg_txt[i] = line.split()
+            self.seg_info = dict()
+            for i in range(1, len(self.seg_txt)):
+                if "-" in self.seg_txt[i][0]:
+                    phone = self.seg_txt[i][0].split("-")[0]
+                    measure = self.seg_txt[i][0].split("-")[1]
+                else:
+                    phone = self.seg_txt[i][0].split("_")[0]
+                    measure = self.seg_txt[i][0].split("_")[1]   
+                value = self.seg_txt[i][1]
+                if phone not in self.seg_info.keys():
+                    self.seg_info[phone] = dict()
+                self.seg_info[phone][measure] = value
+
 
     def getSpeaker(self):
         return self.speaker
