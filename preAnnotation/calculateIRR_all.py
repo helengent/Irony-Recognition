@@ -165,7 +165,7 @@ if __name__=="__main__":
     annPairList = list()
     ##Pairwise scores
 
-    focus = ["ANwk"]
+    focus = ["ANmj"]
     current = ["ANwk", "ANkr", "ANmj", "ANdd", "ANam", "ANbc", "ANgm", "ANsa", "ANpn"]
 
     for k, a in zip(kPairs, annPairs):

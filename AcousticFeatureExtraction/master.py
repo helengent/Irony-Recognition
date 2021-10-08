@@ -16,14 +16,14 @@ def preProcess(wavPath, speakerList, winSize=10, needAMS=False, needPLP=False, h
     if not os.path.isdir("../AudioData/Gated{}".format(wavPath)):
         # Downsample to 16000 Hz and convert to mono
         # Normalize rms and trim leading and trailing silence
+        print("Beginning Initial Preprocessing")
         preProcessAudio.preMain(wavPath)
-
 
     # Generates ASR transcriptions for all audio files
     # Runs forced alignment for ASR transcriptions
     # If manual transcriptsions are available, runs forced alignment on them as well
-    # asrFA.main(wavPath, haveManualT=haveManualT)
-
+    print("Performing ASR and Forced Alignment")
+    asrFA.main(wavPath, haveManualT=haveManualT)
 
     # Finds and records upper and lower limits on F0 for each speaker, as well as mean and sd
     limitsUpperLower.main(wavPath, winSize, speakerList)
@@ -53,8 +53,9 @@ def extractFeats(wavPath, speakerList, outputType, winSize=10, tg_mod="asr", sav
 
 if __name__=="__main__":
 
-    wavPath = "Pruned3"
-    speakerList = ["C", "D", "E", "H", "J", "K", "O", "S", "T", "U"]
+    # wavPath = "Pruned3"
+    wavPath = "tmp"
+    speakerList = ["C", "D", "E", "F", "H", "J", "K", "O", "Q", "S", "T", "U"]
     outputList = ['individual', 'global']
 
     tg_mod = "asr"

@@ -1,16 +1,9 @@
 Read 76 physical / 76 logical HMMs
 Label file will be used to align each file
 Aligning File: ./tmp/tmp.plp
-Created lattice with 19 nodes / 18 arcs from label file
- WARNING [-8221]  InitPronHolders: Total of 2 duplicate pronunciations removed in HVite
+Created lattice with 7 nodes / 6 arcs from label file
  WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
  WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
  WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
  WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
- WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
- WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
- WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
- WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
- WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
- WARNING [-8232]  ExpandWordNet: Pronunciation 1 of sp is 'tee' word in HVite
-sp AND sp I sp SHOOK sp HIS sp HAND sp AND sp THEN sp I sp SAID sp  ==  [220 frames] 18.6578 [Ac=4104.7 LM=0.0] (Act=67.0)
+sp THEY sp KNOW sp NOW sp  ==  [79 frames] 13.8756 [Ac=1096.2 LM=0.0] (Act=16.0)
