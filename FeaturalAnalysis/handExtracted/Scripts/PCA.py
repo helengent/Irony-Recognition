@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
 
 from sklearn.decomposition import PCA
 from sklearn.impute import SimpleImputer
@@ -73,7 +74,9 @@ if __name__=="__main__":
 
     # df = pd.read_csv("~/Data/AcousticData/text_feats/Pruned3_asr_text_feats.csv")
     df = pd.read_csv("../Data/all_narrowed.csv")
-    numComps = [30]
+    print(df)
+    print(df.shape)
+    numComps = [6]
 
     for n in numComps:
         main(df, n)

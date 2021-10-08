@@ -37,7 +37,8 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
     extractor = Extractor(wav, speaker, irony, winSize=int(winSize))
     f0, _ = extractor.getF0Contour()
     if len(list(set(f0))) == 1:
-        print("Bad file: {}".format(wavfile))
+        with open("bad_files.txt", "w+") as f:
+            f.write("Bad file: {}".format(wavfile))
         return
     else:
         mfccs = extractor.getMFCCs()

@@ -46,15 +46,15 @@ def extractFeats(wavPath, speakerList, outputType, winSize=10, tg_mod="asr", sav
 
     # extract.main(wavPath, speakerList, outputType, winSize=winSize)
 
-    # extract_textDependent.main(wavPath, tg_mod, saveWhole=saveWhole)
+    extract_textDependent.main(wavPath, tg_mod, saveWhole=saveWhole)
 
-    # getSpeakerSegmentalData.speakerSegmentalData("../../Data/AcousticData/text_feats/{}_{}_text_feats.csv".format(wavPath, tg_mod))
+    getSpeakerSegmentalData.speakerSegmentalData("../../Data/AcousticData/text_feats/{}_{}_text_feats.csv".format(wavPath, tg_mod))
 
 
 if __name__=="__main__":
 
-    # wavPath = "Pruned3"
-    wavPath = "tmp"
+    wavPath = "Pruned3"
+    # wavPath = "tmp"
     speakerList = ["C", "D", "E", "F", "H", "J", "K", "O", "Q", "S", "T", "U"]
     outputList = ['individual', 'global']
 

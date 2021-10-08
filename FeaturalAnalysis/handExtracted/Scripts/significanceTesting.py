@@ -167,8 +167,8 @@ def main(df, name):
 if __name__=="__main__":
 
     # names = ["prevAttested", "stressGrouped", "all"]
-    # names = ["all_narrowed"]
-    names = ["30factorPCA"]
+    names = ["all_narrowed"]
+    # names = ["30factorPCA"]
     for name in names:
         df = "../Data/{}.csv".format(name)
         df = pd.read_csv(df)
