@@ -1,0 +1,94 @@
+
+**********************************************************
+Full Corpus Statistics
+**********************************************************
+
+Total Samples: 9422
+	Ironic Samples: 2912
+	Non-Ironic Samples: 6510
+
+Total audio length of corpus: 9.15 hours
+
+Duration Statistics (in seconds)
+
+   mean   sd  min  5th percentile  1st quartile  median  3rd quartile	95th percentile    max
+    3.5  3.5  0.2            0.69          1.41    2.48          4.39				9.34  50.09          
+
+**********************************************************
+Pruned Dataset Statistics
+**********************************************************
+
+Total Samples: 5812
+	Ironic Samples: 2906
+	Non-Ironic Samples: 2906
+
+Total audio length of pruned dataset: 4.68 hours
+
+Duration Statistics (in seconds)
+
+   mean    sd  min  5th percentile  1st quartile  median  3rd quartile	95th percentile    max
+    2.9  2.12  0.2            0.69          1.37    2.27          3.85				7.3  13.25              
+
+Speaker class distributions:
+Speaker d	total samples: 2496
+		Ironic Samples: 1495
+		Non-Ironic Samples: 1001
+Total audio length for speaker d:	114.45 minutes
+
+Speaker s	total samples: 184
+		Ironic Samples: 76
+		Non-Ironic Samples: 108
+Total audio length for speaker s:	9.51 minutes
+
+Speaker t	total samples: 58
+		Ironic Samples: 37
+		Non-Ironic Samples: 21
+Total audio length for speaker t:	2.73 minutes
+
+Speaker o	total samples: 251
+		Ironic Samples: 86
+		Non-Ironic Samples: 165
+Total audio length for speaker o:	12.05 minutes
+
+Speaker j	total samples: 190
+		Ironic Samples: 115
+		Non-Ironic Samples: 75
+Total audio length for speaker j:	8.09 minutes
+
+Speaker e	total samples: 77
+		Ironic Samples: 24
+		Non-Ironic Samples: 53
+Total audio length for speaker e:	3.98 minutes
+
+Speaker k	total samples: 91
+		Ironic Samples: 55
+		Non-Ironic Samples: 36
+Total audio length for speaker k:	3.64 minutes
+
+Speaker c	total samples: 2147
+		Ironic Samples: 957
+		Non-Ironic Samples: 1190
+Total audio length for speaker c:	111.94 minutes
+
+Speaker u	total samples: 51
+		Ironic Samples: 9
+		Non-Ironic Samples: 42
+Total audio length for speaker u:	2.64 minutes
+
+Speaker h	total samples: 40
+		Ironic Samples: 6
+		Non-Ironic Samples: 34
+Total audio length for speaker h:	2.0 minutes
+
+Speaker q	total samples: 83
+		Ironic Samples: 20
+		Non-Ironic Samples: 63
+Total audio length for speaker q:	2.97 minutes
+
+Speaker f	total samples: 144
+		Ironic Samples: 26
+		Non-Ironic Samples: 118
+Total audio length for speaker f:	6.92 minutes
+
+Mean variance from duration mean for ironic samples	1.14
+Mean variance from duration mean for non-ironic samples	2.0
