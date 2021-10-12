@@ -13,6 +13,18 @@ seed(42)
 
 #Thank you Chase Adams for this code <3
 
+def removeOutliers(vec):
+
+    m = np.nanmean(vec)
+    sd = np.nanstd(vec)
+    upperLimit = m + (2.5 * sd)
+    lowerLimit = m - (2.5 * sd)
+
+    new = [item if item <= upperLimit and item >= lowerLimit else np.nan for item in vec]
+
+    return new
+
+
 def multiProcStandardtTest(i):
 
     ir, ni, feature = i
@@ -36,6 +48,7 @@ def standardtTestInd(df, levene):
     X = Parallel(n_jobs=mp.cpu_count())(delayed(multiProcStandardtTest)(([item for item in iDF[feature].tolist() if np.isnan(item) == False], [item for item in nDF[feature].tolist() if np.isnan(item) == False], feature)) for feature in df.columns[3:])
     featureList, stdTstatList, stdPValueList = map(list, zip(*X))
     df = pd.DataFrame(list(zip(featureList, stdTstatList, stdPValueList)), columns = ['Feature', 'T Test Statistic', 'p-Value'])
+    
     return df
 
 
@@ -138,6 +151,7 @@ def tTestInd(df):
     X = Parallel(n_jobs=mp.cpu_count())(delayed(multiProctTest)(([item for item in iDF[feature].tolist() if np.isnan(item) == False], [item for item in nDF[feature].tolist() if np.isnan(item) == False], feature)) for feature in df.columns[3:])
     featureList, welchStatisticList, welchPValueList = map(list, zip(*X))
     df = pd.DataFrame(list(zip(featureList, welchStatisticList, welchPValueList)), columns = ['Feature', 'Welch Test Statistic', 'Welch p-Value'])
+
     return df
 
 
@@ -161,7 +175,7 @@ def main(df, name):
     # anova = anovaCall(df, output['Levene p-Value'].to_list())
 
     # Save something out for each of the three
-    output.to_csv('../Output/{}.csv'.format(name), index = False)
+    output.to_csv('../Output/{}_outliersRemoved.csv'.format(name), index = False)
 
 
 if __name__=="__main__":
@@ -173,6 +187,13 @@ if __name__=="__main__":
         df = "../Data/{}.csv".format(name)
         df = pd.read_csv(df)
         print(df.shape)
+
+        counter = 0
+        for i, col in df.iteritems():
+            if counter >= 3:
+                newCol = removeOutliers(col.tolist())
+                df[i] = newCol
+            counter += 1
 
         iDF = df[df['label'] == 'I']
         nDF = df[df['label'] == 'N']
