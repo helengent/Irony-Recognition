@@ -64,9 +64,9 @@ def plotPCs3D(finalDF):
     ax.set_title('3 component PCA - Non-Ironic', fontsize = 15)
 
     indicesToKeep = finalDF['label'] == 'N'
-    ax.scatter3D(finalDF.loc[indicesToKeep, 'PC1']
+    ax.scatter3D(finalDF.loc[indicesToKeep, 'PC0']
+            , finalDF.loc[indicesToKeep, 'PC1']
             , finalDF.loc[indicesToKeep, 'PC2']
-            , finalDF.loc[indicesToKeep, 'PC3']
             , alpha = 0.5
             , c = 'b'
             , s = 50)
@@ -103,8 +103,8 @@ def plotPCs(finalDF):
     ax.set_title('2 component PCA - Ironic', fontsize = 20)
     
     indicesToKeep = finalDF['label'] == 'I'
-    ax.scatter(finalDF.loc[indicesToKeep, 'PC1']
-            , finalDF.loc[indicesToKeep, 'PC2']
+    ax.scatter(finalDF.loc[indicesToKeep, 'PC0']
+            , finalDF.loc[indicesToKeep, 'PC1']
             , c = 'g'
             , s = 50)
     ax.legend(targets)
