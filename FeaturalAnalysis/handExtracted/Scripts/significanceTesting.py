@@ -29,7 +29,7 @@ def multiProcStandardtTest(i):
 
     ir, ni, feature = i
     statistic, pvalue = stats.ttest_ind(ir, ni, equal_var = True, nan_policy = 'raise')
-    return feature, statistic, pvalue
+    return feature, statistic, pvalue, (np.mean(ir) - np.mean(ni))
 
 
 # In the event that leveneHOV returns that a given feature has homogeneity of variance, perform a t-test with that assumption
@@ -46,8 +46,8 @@ def standardtTestInd(df, levene):
     nDF = df[df['label'] == 'N']
 
     X = Parallel(n_jobs=mp.cpu_count())(delayed(multiProcStandardtTest)(([item for item in iDF[feature].tolist() if np.isnan(item) == False], [item for item in nDF[feature].tolist() if np.isnan(item) == False], feature)) for feature in df.columns[3:])
-    featureList, stdTstatList, stdPValueList = map(list, zip(*X))
-    df = pd.DataFrame(list(zip(featureList, stdTstatList, stdPValueList)), columns = ['Feature', 'T Test Statistic', 'p-Value'])
+    featureList, stdTstatList, stdPValueList, meanDiff = map(list, zip(*X))
+    df = pd.DataFrame(list(zip(featureList, stdTstatList, stdPValueList, meanDiff)), columns = ['Feature', 'T Test Statistic', 'p-Value', 'Mean Diff.'])
     
     return df
 
@@ -138,7 +138,7 @@ def multiProctTest(i):
 
     ir, ni, feature = i
     statistic, pvalue = stats.ttest_ind(ir, ni, equal_var = False, nan_policy = 'raise') # Equal_var means Welch, not student's t-test
-    return feature, statistic, pvalue
+    return feature, statistic, pvalue, (np.mean(ir) - np.mean(ni))
 
 
 # Since we cannot guarantee that the size of the arrays will be equal (we have balanced participants here, but not 
@@ -149,8 +149,8 @@ def tTestInd(df):
     nDF = df[df['label'] == 'N']
 
     X = Parallel(n_jobs=mp.cpu_count())(delayed(multiProctTest)(([item for item in iDF[feature].tolist() if np.isnan(item) == False], [item for item in nDF[feature].tolist() if np.isnan(item) == False], feature)) for feature in df.columns[3:])
-    featureList, welchStatisticList, welchPValueList = map(list, zip(*X))
-    df = pd.DataFrame(list(zip(featureList, welchStatisticList, welchPValueList)), columns = ['Feature', 'Welch Test Statistic', 'Welch p-Value'])
+    featureList, welchStatisticList, welchPValueList, meanDiff = map(list, zip(*X))
+    df = pd.DataFrame(list(zip(featureList, welchStatisticList, welchPValueList, meanDiff)), columns = ['Feature', 'Welch Test Statistic', 'Welch p-Value', 'Welch Mean Diff.'])
 
     return df
 
@@ -198,7 +198,7 @@ if __name__=="__main__":
         iDF = df[df['label'] == 'I']
         nDF = df[df['label'] == 'N']
 
-        dropList = list()
+        dropList = ["ZCR"]
 
         for i, col in iDF.items():
             try:
