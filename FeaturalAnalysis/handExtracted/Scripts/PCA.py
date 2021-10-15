@@ -14,18 +14,6 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 
 
-def removeOutliers(vec):
-
-    m = np.nanmean(vec)
-    sd = np.nanstd(vec)
-    upperLimit = m + (2.5 * sd)
-    lowerLimit = m - (2.5 * sd)
-
-    new = [item if item <= upperLimit and item >= lowerLimit else np.nan for item in vec]
-
-    return new
-
-
 #https://stackoverflow.com/questions/22867620/putting-arrowheads-on-vectors-in-matplotlibs-3d-plot
 class Arrow3D(FancyArrowPatch):
     def __init__(self, xs, ys, zs, *args, **kwargs):
@@ -75,11 +63,11 @@ def plotCorrelation(df, finalDF, pca, features):
             # #Slightly adjust text location to avoid overlapping text
             for h in range(3):
                 if h == 0:
-                    adjustment = 0.015
+                    adjustment = 0.0
                 elif h == 1:
-                    adjustment = 0.015
+                    adjustment = 0.01
                 elif h == 2:
-                    adjustment = 0.015
+                    adjustment = 0.01
                 j = [t for t in textLocations if t[h] > textLocation[h] - adjustment and t[h] < textLocation[h] + adjustment]
                 while len(j) > 0:
                     textLocation[h] += adjustment
@@ -289,13 +277,6 @@ if __name__=="__main__":
     df.drop(columns=["ZCR"])
     print(df)
     print(df.shape)
-
-    counter = 0
-    for i, col in df.iteritems():
-        if counter >= 3:
-            newCol = removeOutliers(col.tolist())
-            df[i] = newCol
-        counter += 1
 
     numComps = [6]
 
