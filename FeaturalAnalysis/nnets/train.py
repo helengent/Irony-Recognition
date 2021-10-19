@@ -10,6 +10,7 @@ from keras import models
 
 sys.path.append(os.path.join('/'.join(sys.path[1].split("/")[:-3]), 'Models'))
 from LSTM_acousticOnly import acousticOnlyLSTM
+from FeedForward import FeedForwardNN
 
 
 def performanceReport(train_stats_all, test_stats_all, speakerList, fileMod, speakerSplit="independent"):
@@ -81,7 +82,7 @@ def transformLabs(x):
         raise Exception
 
 
-def main(fileMod, speakerList, csv_path, checkpoint_path, speakerSplit="independent"):
+def main(fileMod, speakerList, csv_path, checkpoint_path, dataPath, modelType, speakerSplit="independent"):
 
     train_performance_list, test_performance_list = list(), list()
 
@@ -91,23 +92,24 @@ def main(fileMod, speakerList, csv_path, checkpoint_path, speakerSplit="independ
         for speaker in speakerList:
 
             #Load data with this speaker as the test data only
-            X_train = np.load("../Data/{}_{}LeftOut_train_acoustic.npy".format(fileMod, speaker))
-            X_dev = np.load("../Data/{}_{}LeftOut_dev_acoustic.npy".format(fileMod, speaker))
-            X_test = np.load("../Data/{}_{}LeftOut_test_acoustic.npy".format(fileMod, speaker))
+            X_train = np.load("{}/{}_{}LeftOut_train_acoustic.npy".format(dataPath, fileMod, speaker))
+            X_dev = np.load("{}/{}_{}LeftOut_dev_acoustic.npy".format(dataPath, fileMod, speaker))
+            X_test = np.load("{}/{}_{}LeftOut_test_acoustic.npy".format(dataPath, fileMod, speaker))
 
-            y_train = np.load("../Data/{}_{}LeftOut_train_labels.npy".format(fileMod, speaker))
-            y_dev = np.load("../Data/{}_{}LeftOut_dev_labels.npy".format(fileMod, speaker))
-            y_test = np.load("../Data/{}_{}LeftOut_test_labels.npy".format(fileMod, speaker))
+            y_train = np.load("{}/{}_{}LeftOut_train_labels.npy".format(dataPath, fileMod, speaker))
+            y_dev = np.load("{}/{}_{}LeftOut_dev_labels.npy".format(dataPath, fileMod, speaker))
+            y_test = np.load("{}/{}_{}LeftOut_test_labels.npy".format(dataPath, fileMod, speaker))
 
             y_train = np.array([transformLabs(x) for x in y_train])
             y_dev = np.array([transformLabs(x) for x in y_dev])
             y_test = np.array([transformLabs(x) for x in y_test])
 
-            lstm = acousticOnlyLSTM(X_train, X_dev, X_test, y_train, y_dev, y_test, csv_path, checkpoint_path, class_weights, speaker=speaker)
+            if modelType == "acousticOnlyLSTM":
+                model = acousticOnlyLSTM(X_train, X_dev, X_test, y_train, y_dev, y_test, csv_path, checkpoint_path, class_weights, speaker=speaker)
 
-            lstm.train()
+            model.train()
 
-            train_stats, test_stats = lstm.test()
+            train_stats, test_stats = model.test()
 
             train_performance_list.append(train_stats)
             test_performance_list.append(test_stats)
@@ -115,27 +117,27 @@ def main(fileMod, speakerList, csv_path, checkpoint_path, speakerSplit="independ
     else:
 
         #Load data
-        X_train = np.load("../Data/{}_train_acoustic.npy".format(fileMod))
-        X_dev = np.load("../Data/{}_dev_acoustic.npy".format(fileMod))
-        X_test = np.load("../Data/{}_test_acoustic.npy".format(fileMod))
+        X_train = np.load("{}/{}_train_acoustic.npy".format(dataPath, fileMod))
+        X_dev = np.load("{}/{}_dev_acoustic.npy".format(dataPath, fileMod))
+        X_test = np.load("{}/{}_test_acoustic.npy".format(dataPath, fileMod))
 
-        y_train = np.load("../Data/{}_train_labels.npy".format(fileMod))
-        y_dev = np.load("../Data/{}_dev_labels.npy".format(fileMod))
-        y_test = np.load("../Data/{}_test_labels.npy".format(fileMod))
+        y_train = np.load("{}/{}_train_labels.npy".format(dataPath, fileMod))
+        y_dev = np.load("{}/{}_dev_labels.npy".format(dataPath, fileMod))
+        y_test = np.load("{}/{}_test_labels.npy".format(dataPath, fileMod))
 
         y_train = np.array([transformLabs(x) for x in y_train])
         y_dev = np.array([transformLabs(x) for x in y_dev])
         y_test = np.array([transformLabs(x) for x in y_test])
 
-        lstm = acousticOnlyLSTM(X_train, X_dev, X_test, y_train, y_dev, y_test, csv_path, checkpoint_path, class_weights, speaker=None)
+        if modelType == "acousticOnlyLSTM":
+            model = acousticOnlyLSTM(X_train, X_dev, X_test, y_train, y_dev, y_test, csv_path, checkpoint_path, class_weights, speaker=None)
 
-        lstm.train()
+        model.train()
 
-        train_stats, test_stats = lstm.test()
+        train_stats, test_stats = model.test()
 
         train_performance_list.append(train_stats)
         test_performance_list.append(test_stats)
-
 
     performanceReport(train_performance_list, test_performance_list, speakerList, fileMod, speakerSplit=speakerSplit)
 
@@ -148,6 +150,9 @@ if __name__=="__main__":
     fileMod = "Pruned3"
     speakerList = ["c", "d", "e", "f", "h", "j", "k", "o", "q", "s", "t", "u"]
     speakerSplits = ["dependent", "independent"]
+
+    dataPaths = []
+    modelTypes = ["acousticOnlyLSTM"]
 
     for speakerSplit in speakerSplits:
 

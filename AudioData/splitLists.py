@@ -50,4 +50,4 @@ if __name__=="__main__":
 
     input_dir = "GatedPruned3"
 
-    main(input_dir, speakerSplit="independent")
+    main(input_dir, speakerSplit="dependent")

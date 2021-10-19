@@ -37,12 +37,11 @@ def normF0(f0, speaker, normType="m"):
     return np.array(normedVec)
 
 
-def scaleIt(bigList):
+def scaleIt(bigList, scaler):
 
     chunkSize = np.shape(bigList[0])[0]
 
     biggestFriend = np.zeros((len(bigList), chunkSize, np.shape(bigList[0])[1]))
-    print(np.shape(biggestFriend))
 
     longLad = list()
 
@@ -51,10 +50,8 @@ def scaleIt(bigList):
             longLad.append(chunk)
     
     longLad = np.array(longLad)
-    print(longLad.shape)
 
-    scaler = StandardScaler()
-    scaled = scaler.fit_transform(longLad)
+    scaled = scaler.transform(longLad)
 
     start = 0
     stop = chunkSize
@@ -68,6 +65,25 @@ def scaleIt(bigList):
         stop += chunkSize
 
     return biggestFriend
+
+
+def makeScaler(nList):
+    chunkSize = np.shape(nList[0])[0]
+
+    biggestFriend = np.zeros((len(nList), chunkSize, np.shape(nList[0])[1]))
+
+    longLad = list()
+
+    for utt in nList:
+        for chunk in utt:
+            longLad.append(chunk)
+    
+    longLad = np.array(longLad)
+
+    scaler = StandardScaler()
+    scaler.fit(longLad)
+
+    return(scaler)
 
 
 def chunkStats(x, percentage):
@@ -87,11 +103,8 @@ def chunkStats(x, percentage):
 
         chunkMean = np.mean(chunk)
         chunkSD = sd(chunk, chunkMean)
-        # chunkDeltaList = [chunk[x] - chunk[x-1] for x in range(1, len(chunk))]
-        # chunkDelta = np.mean(chunkDeltaList)
-        # chunkDubDelta = np.mean([chunkDeltaList[x] - chunkDeltaList[x-1] for x in range(1, len(chunkDeltaList))])
 
-        stats.append([chunkMean, chunkSD])#, chunkDelta, chunkDubDelta])
+        stats.append([chunkMean, chunkSD])
 
         start += chunkSize
 
@@ -104,10 +117,11 @@ def chunkStats(x, percentage):
 #       x = frame_max (the number of frames padded/truncated to per file)
 #       y = the number of acoustic measures (possibly multiple per item in measureList e.g. ams=375)
 #   the speaker variable is the speaker left OUT of the training and dev data
-def assembleArray(listMod, fileList, measureList, fileMod, speaker=None, f0Normed=False, percentage=10):
+def assembleArray(listMod, fileList, measureList, fileMod, outDir, speaker=None, f0Normed=False, percentage=10):
 
     outLabels = list()
     bigFriend = list()
+    nfriend = list()
 
     print("{}\t{} left out\t{}".format(listMod, speaker, fileMod))
 
@@ -161,21 +175,24 @@ def assembleArray(listMod, fileList, measureList, fileMod, speaker=None, f0Norme
 
         bigFriend.append(wholeFriend)
         outLabels.append(label)
+        if label == "N":
+            nfriend.append(wholeFriend)
     
-    biggestFriend = scaleIt(bigFriend)
+    #Make the scaler and fit it on nfriend only
+    scaler = makeScaler(nfriend)
+    biggestFriend = scaleIt(bigFriend, scaler)
     print(np.shape(biggestFriend))
 
     if speaker:
-        with open("../Data/{}_{}LeftOut_{}_acoustic.npy".format(listMod, speaker, fileMod), 'wb') as f:
+        with open("{}/{}_{}LeftOut_{}_acoustic.npy".format(outDir, listMod, speaker, fileMod), 'wb') as f:
             np.save(f, biggestFriend)
-        with open("../Data/{}_{}LeftOut_{}_labels.npy".format(listMod, speaker, fileMod), 'wb') as f:
+        with open("{}/{}_{}LeftOut_{}_labels.npy".format(outDir, listMod, speaker, fileMod), 'wb') as f:
             np.save(f, np.array(outLabels))
     else:
-        with open("../Data/{}_{}_acoustic.npy".format(listMod, fileMod), 'wb') as f:
+        with open("{}/{}_{}_acoustic.npy".format(outDir, listMod, fileMod), 'wb') as f:
             np.save(f, biggestFriend)
-        with open("../Data/{}_{}_labels.npy".format(listMod, fileMod), 'wb') as f:
+        with open("{}/{}_{}_labels.npy".format(outDir, listMod, fileMod), 'wb') as f:
             np.save(f, np.array(outLabels))
-
 
 
 # Returns dictionary of pandas dataframes with lists of files in leave on speaker out splits
@@ -204,7 +221,7 @@ def LOSOLists(listMod, speakerList):
     return LOSOList
 
 
-def main(listMod, speakerList, measureList, speakerSplit="independent", f0Normed=False):
+def main(listMod, speakerList, measureList, outDir, speakerSplit="independent", f0Normed=False):
 
     if speakerSplit == "independent":
         LOSOList = LOSOLists(listMod, speakerList)
@@ -212,7 +229,7 @@ def main(listMod, speakerList, measureList, speakerSplit="independent", f0Normed
         for i, speaker in enumerate(LOSOList["left_out"]):
 
             for item in ["dev", "train", "test"]:
-                assembleArray(listMod, LOSOList[item][i], measureList, item, speaker=speaker, f0Normed=f0Normed)
+                assembleArray(listMod, LOSOList[item][i], measureList, item, outDir, speaker=speaker, f0Normed=f0Normed)
 
     else:
         train = pd.read_csv("../../../AudioData/splitLists/Gated{}_train.csv".format(listMod))
@@ -220,17 +237,18 @@ def main(listMod, speakerList, measureList, speakerSplit="independent", f0Normed
         test = pd.read_csv("../../../AudioData/splitLists/Gated{}_test.csv".format(listMod))
 
         for item, mod in zip([dev, train, test], ["dev", "train", "test"]):
-            assembleArray(listMod, item, measureList, mod, speaker=False, f0Normed=f0Normed)
+            assembleArray(listMod, item, measureList, mod, outDir, speaker=False, f0Normed=f0Normed)
 
 
 if __name__=="__main__":
 
-    # measureList = ["ams", "f0", "hnr", "mfcc", "plp"]
-    measureList = ["f0", "hnr"]
-    speakerList = ["c", "d", "e", "j", "o", "s", "t", "u"]
+    measureList = ["f0", "hnr", "mfcc", "plp"]
+    speakerList = ["c", "d", "e", "f", "h", "j", "k", "o", "q", "s", "t", "u"]
     listMod = "Pruned3"
     f0Normed = False
     text = "asr"
-    speakerSplit = "independent"
+    speakerSplits = ["dependent", "independent"]
+    outDir = "/home/hmgent2/Data/ModelInputs/percentChunks"
 
-    main(listMod, speakerList, measureList, f0Normed=f0Normed, speakerSplit=speakerSplit)
+    for speakerSplit in speakerSplits:
+        main(listMod, speakerList, measureList, outDir, f0Normed=f0Normed, speakerSplit=speakerSplit)
