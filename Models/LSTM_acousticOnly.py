@@ -18,7 +18,7 @@ from sklearn.metrics import precision_recall_fscore_support
 class acousticOnlyLSTM():
 
 
-    def __init__(self, X_train, X_dev, X_test, y_train, y_dev, y_test, csv_path, checkpoint_path, class_weights, speaker=None):
+    def __init__(self, X_train, X_dev, X_test, y_train, y_dev, y_test, csv_path, checkpoint_path, plot_path, class_weights):
 
         # Load in training, dev, and test data
         self.train_in = X_train
@@ -33,11 +33,7 @@ class acousticOnlyLSTM():
         self.csv_path = csv_path
         self.checkpoint_path = checkpoint_path
         self.class_weights = class_weights
-
-        if speaker:
-            self.plotName = "Speaker_{}_leftOut".format(speaker)
-        else:
-            self.plotName = "SpeakerDependent"
+        self.plotName = plot_path
 
         self.model = models.Sequential()
 
@@ -69,7 +65,7 @@ class acousticOnlyLSTM():
         plt.title("Loss")
         plt.legend()
 
-        plt.savefig("{}.png".format(self.plotName))
+        plt.savefig(self.plotName)
 
 
     def train(self):

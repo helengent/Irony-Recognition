@@ -62,7 +62,7 @@ def main(df, csv_path, checkpoint_path, fileMod):
 
 if __name__ == "__main__":
 
-    fileMod = "Pruned2"
+    fileMod = "Pruned3"
 
     with open("../../../../Data/AcousticData/ComParE/baseline_consolidated_{}.pkl".format(fileMod), "rb") as p:
         bigDF = pd.read_pickle(p)

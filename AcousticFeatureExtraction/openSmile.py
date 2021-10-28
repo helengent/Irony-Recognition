@@ -19,7 +19,7 @@ def main(wav_dir, out_dir):
 
 if __name__=="__main__":
 
-    wav_dir = "../AudioData/GatedPruned2"
-    out_dir = "../../Data/AcousticData/ComParE/baselinePruned2"
+    wav_dir = "../AudioData/GatedPruned3"
+    out_dir = "../../Data/AcousticData/ComParE/baselinePruned3"
 
     main(wav_dir, out_dir)

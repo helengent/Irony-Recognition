@@ -11,7 +11,7 @@ def main(data_dir):
 
     bigDF = pd.DataFrame()
     speakerList, labelList, genderList = list(), list(), list()
-    genders = pd.read_csv("../../../../Data/AcousticData/SpeakerMetaData/speakersGenders.txt")
+    genders = pd.read_csv("/home/hmgent2/Data/AcousticData/SpeakerMetaData/speakersGenders.txt")
     speakerDict = dict()
 
     out_dir = os.path.dirname(data_dir)
@@ -61,12 +61,13 @@ def main(data_dir):
         pass
 
     print(bigDF.shape)
+    print(bigDF)
     
     with open("{}/baseline_consolidated_{}.pkl".format(out_dir, mod), "wb") as p:
         pickle.dump(bigDF, p, protocol=4)
 
 if __name__=="__main__":
 
-    data_dir = "../../../../Data/AcousticData/ComParE/baselinePruned2"
+    data_dir = "../../../../Data/AcousticData/ComParE/baselinePruned3"
 
     main(data_dir)
