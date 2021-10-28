@@ -1,0 +1,172 @@
+---
+title: "PCA glmm"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(stringr)
+require(mgcv)
+require(devtools)
+require(itsadug)
+require(tidyverse)
+require(lme4)
+require(lmerTest)
+require(MuMIn)
+require(sjPlot)
+require(Rcpp)
+library(dplyr)
+library(plot3D)
+```
+
+
+```{r}
+setwd(choose.dir())
+
+pcaData = read.csv("6factorPCA.csv")
+```
+Let's try removing outliers
+```{r}
+PC1mean = mean(pcaData$PC1)
+PC1sd = sd(pcaData$PC1)
+PC2mean = mean(pcaData$PC2)
+PC2sd = sd(pcaData$PC2)
+PC3mean = mean(pcaData$PC3)
+PC3sd = sd(pcaData$PC3)
+
+pcaData = filter(pcaData, PC1 >= PC1mean - (2.5 * PC1sd))
+pcaData = filter(pcaData, PC1 <= PC1mean + (2.5 * PC1sd))
+pcaData = filter(pcaData, PC2 >= PC2mean - (2.5 * PC2sd))
+pcaData = filter(pcaData, PC2 <= PC2mean + (2.5 * PC2sd))
+pcaData = filter(pcaData, PC3 >= PC3mean - (2.5 * PC3sd))
+pcaData = filter(pcaData, PC3 <= PC3mean + (2.5 * PC3sd))
+
+```
+
+
+Shapiro-wilk test won't accept more than 5000 values
+```{r}
+idata = filter(pcaData, label==1)
+ndata = filter(pcaData, label==0)
+
+shapiro.test(idata$PC1)
+shapiro.test(ndata$PC1)
+
+shapiro.test(idata$PC2)
+shapiro.test(ndata$PC2)
+
+shapiro.test(idata$PC3)
+shapiro.test(ndata$PC3)
+```
+
+```{r}
+
+hist(pcaData$PC1)
+hist(idata$PC1)
+hist(ndata$PC1)
+
+hist(pcaData$PC2)
+hist(idata$PC2)
+hist(ndata$PC2)
+
+hist(pcaData$PC3)
+hist(idata$PC3)
+hist(ndata$PC3)
+
+```
+
+
+```{r}
+pcaData$speaker = as.factor(pcaData$speaker)
+
+#all effects with two interaction terms
+m1 = glmer(label ~ PC1 * PC2 * PC3 * label + (1|speaker), data = pcaData, family=binomial)
+
+#all effects with one interaction term
+m2 = glmer(label ~ PC1 * PC2 + PC3 + label + (1|speaker), data = pcaData, family=binomial)
+
+#all effects without interaction term
+m3 = glmer(label ~ PC1 + PC2 + PC3 + label + (1|speaker), data = pcaData, family=binomial)
+
+
+r.squaredGLMM(m1)
+r.squaredGLMM(m2)
+r.squaredGLMM(m3)
+
+
+anova(m1, m2)
+anova(m1, m3)
+anova(m2, m3)
+
+#m1 has the best r-squared and all are significantly different from one another. Going with m1
+```
+
+
+```{r}
+summary(m1)
+```
+```{r}
+pcaData$m1Fit = predict(m1, type="response")
+iData = filter(pcaData, label==1)
+nData = filter(pcaData, label==0)
+```
+
+```{r}
+m1Plot1 = scatter3D(pcaData$PC1, pcaData$PC2, pcaData$PC3, phi = 0, theta = 0, bty="g", 
+                   colvar=pcaData$m1Fit, col=ramp.col(c("gold", "green", "blue")),
+                   main = "Probability of predicting Ironic Label by First Three PCs", 
+                   xlab = "PC1", ylab = "PC2", zlab = "PC3")
+m1plot2 = scatter3D(pcaData$PC1, pcaData$PC2, pcaData$PC3, phi = 0, theta = 60,  bty="g",
+                    colvar=pcaData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+                    main = "Probability of predicting Ironic Label by First Three PCs", 
+                    xlab = "PC1", ylab = "PC2", zlab = "PC3")
+m1Plot3 = scatter3D(pcaData$PC1, pcaData$PC2, pcaData$PC3, phi = 0, theta = 120,  bty="g",
+                    colvar=pcaData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+                    main = "Probability of predicting Ironic Label by First Three PCs", 
+                    xlab = "PC1", ylab = "PC2", zlab = "PC3")
+m1Plot4 = scatter3D(pcaData$PC1, pcaData$PC2, pcaData$PC3, phi = 0, theta = 180,  bty="g",
+                    colvar=pcaData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+                    main = "Probability of predicting Ironic Label by First Three PCs", 
+                    xlab = "PC1", ylab = "PC2", zlab = "PC3")
+
+```
+
+#Plotting only ironic samples
+```{r}
+iPlot1 = scatter3D(iData$PC1, iData$PC2, iData$PC3, phi = 0, theta = 0,  bty="g",
+                   colvar=iData$m1Fit, col=ramp.col(c("gold", "green", "blue")),
+                   main = "Probability of predicting Ironic Label by First Three PCs (Ironic)", 
+                   xlab = "PC1", ylab = "PC2", zlab = "PC3") 
+iPlot2 = scatter3D(iData$PC1, iData$PC2, iData$PC3, phi = 0, theta = 60,  bty="g",
+                    colvar=iData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+                    main = "Probability of predicting Ironic Label by First Three PCs (Ironic)", 
+                    xlab = "PC1", ylab = "PC2", zlab = "PC3")
+iPlot3 = scatter3D(iData$PC1, iData$PC2, iData$PC3, phi = 0, theta = 120,  bty="g",
+                    colvar=iData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+                    main = "Probability of predicting Ironic Label by First Three PCs (Ironic)", 
+                    xlab = "PC1", ylab = "PC2", zlab = "PC3")
+iPlot4 = scatter3D(iData$PC1, iData$PC2, iData$PC3, phi = 0, theta = 180,  bty="g",
+                    colvar=iData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+                    main = "Probability of predicting Ironic Label by First Three PCs (Ironic)", 
+                    xlab = "PC1", ylab = "PC2", zlab = "PC3")
+```
+
+Plotting only non-ironic samples
+```{r}
+nPlot1 = scatter3D(nData$PC1, nData$PC2, nData$PC3, phi = 0, theta = 0,  bty="g",
+                   colvar=nData$m1Fit, col=ramp.col(c("gold", "green", "blue")),
+                   main = "Probability of predicting Ironic Label by First Three PCs (Non-Ironic)", 
+                   xlab = "PC1", ylab = "PC2", zlab = "PC3") 
+nPlot2 = scatter3D(nData$PC1, nData$PC2, nData$PC3, phi = 0, theta = 60,  bty="g",
+                    colvar=nData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+                    main = "Probability of predicting Ironic Label by First Three PCs (Non-Ironic)", 
+                    xlab = "PC1", ylab = "PC2", zlab = "PC3")
+nPlot3 = scatter3D(nData$PC1, nData$PC2, nData$PC3, phi = 0, theta = 120,  bty="g",
+                    colvar=nData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+                    main = "Probability of predicting Ironic Label by First Three PCs (Non-Ironic)", 
+                    xlab = "PC1", ylab = "PC2", zlab = "PC3")
+nPlot4 = scatter3D(nData$PC1, nData$PC2, nData$PC3, phi = 0, theta = 180,  bty="g",
+                    colvar=nData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+                    main = "Probability of predicting Ironic Label by First Three PCs (Non-Ironic)", 
+                    xlab = "PC1", ylab = "PC2", zlab = "PC3")
+```

@@ -1,0 +1,89 @@
+---
+title: "hnrGamms"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE}
+require(tidyverse)
+require(mgcv)
+require(mgcViz)
+require(itsadug)
+```
+
+Load prepared hnr data
+```{r}
+
+setwd(choose.dir())
+
+hnrData = read.csv("hnr_ready_for_gamms.csv")
+
+hnrData$speaker = as.factor(hnrData$speaker)
+hnrData$label = as.factor(hnrData$label)
+
+```
+
+GAM for hnr
+```{r, warning=FALSE,message=FALSE,error=FALSE}
+m1hnr=bam(hnr ~ label + te(time, by=label) + s(speaker, bs="re") 
+         + s(time, speaker, bs="fs", m=1), data=hnrData)
+```
+
+```{r}
+summary(m1hnr)
+```
+
+summary and plots
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+cbPalette = c("#88CCEE", "#CC6677","#DDCC77","#117733","#332288","#AA4499","#44AA99","#999933","#882255","#661100","#6699CC","#888888")
+
+par(mfrow=c(2,2))
+plot(m1hnr, select=1, main = "All Speakers: Ironic", shade=TRUE, 
+     shade.col = cbPalette[1])
+plot(m1hnr, select=2, main = "All Speakers: Non-Ironic", shade=TRUE, 
+     shade.col = cbPalette[2])
+plot(m1hnr, select=1, ylab="te(time):lab", xlab="time (percent)", 
+     main = "All Speakers: Both Curves");
+par(new=TRUE);
+plot(m1hnr, select=2, ylab="", xlab="", main="", col=cbPalette[4])
+plot_diff(m1hnr, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+```
+
+
+```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
+hnrData$pred = predict(m1F0)
+```
+
+
+```{r}
+
+par(mfrow=c(1, 2))
+
+plot_smooth(m1hnr, view="time", cond=list("label"="I"), plot_all=c("speaker"), main = "All Speakers (Ironic)", col = cbPalette[1:12], rm.ranef=FALSE)
+plot_smooth(m1hnr, view="time", cond=list("label"="N"), plot_all=c("speaker"), main = "All Speakers (Non-Ironic)", col = cbPalette[1:12], rm.ranef=FALSE)
+
+```
+
+```{r}
+par(mfrow=c(2, 2))
+plot_diff(m1hnr, view="time", shade=TRUE, cond=list(speaker="c"), comp=list(label=c("I", "N")), rm.ranef = FALSE)
+plot_diff(m1hnr, view="time", shade=TRUE, cond=list(speaker="d"), comp=list(label=c("I", "N")), rm.ranef = FALSE)
+plot_diff(m1hnr, view="time", shade=TRUE, cond=list(label="I"), comp=list(speaker=c("c", "d")), rm.ranef = FALSE)
+plot_diff(m1hnr, view="time", shade=TRUE, cond=list(label="N"), comp=list(speaker=c("c", "d")), rm.ranef = FALSE)
+```
+
+
+
+```{r}
+ggplot(data = f0Data, aes(time, pred, col=speaker)) +
+  geom_smooth() + 
+  facet_wrap(vars(label))
+```
+
+
+
