@@ -37,6 +37,9 @@ class ModelTrainer:
         self.measureList = measureList
         self.frameMax = frameMax
 
+        if self.glob_acoustic:
+            self.glob_file = pd.read_csv("{}/{}/all_inputs.csv".format(self.dataPath, self.glob_acoustic))
+
         self.prefix = "speaker-{}_".format(self.speakerSplit)
         if self.glob_acoustic:
             self.prefix = self.prefix + "{}-globAcoustic_".format(inputType[0])
@@ -290,10 +293,13 @@ class ModelTrainer:
             seq_scaler = None
 
         #create scaler for global data
-        if self.glob_acoustic == "PCs":
-            pass
-        elif self.glob_acoustic == "raw":
-            pass
+        if self.glob_acoustic:
+            nData = self.glob_file[self.glob_file["label"] == "N"]
+            nData.pop("fileName")
+            nData.pop("speaker")
+            nData.pop("label")
+            glob_scaler = StandardScaler()
+            glob_scaler.fit(nData)
         else:
             glob_scaler = None
 
@@ -434,6 +440,54 @@ class ModelTrainer:
                         np.save(f, y_test)
 
 
+            if self.glob_acoustic:
+
+                if not os.path.exists("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
+                    X_train = self.glob_file[self.glob_file["fileName"] in X_train]
+                    X_train.pop("fileName")
+                    X_train.pop("speaker")
+                    X_train.pop("label")
+                    X_train = self.glob_scaler.transform(X_train)
+                    X_train = np.array(X_train)
+                    with open("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
+                        np.save(f, X_train)
+
+                if not os.path.exists("{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
+                    y_train = np.array(self.transformLabs(y_train))
+                    with open("{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
+                        np.save(f, y_train)
+
+                if not os.path.exists("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
+                    X_dev = self.glob_file[self.glob_file["fileName"] in X_dev]
+                    X_dev.pop("fileName")
+                    X_dev.pop("speaker")
+                    X_dev.pop("label")
+                    X_dev = self.glob_scaler.transform(X_dev)
+                    X_dev = np.array(X_dev)
+                    with open("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
+                        np.save(f, X_dev)
+
+                if not os.path.exists("{}/{}/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
+                    y_dev = np.array(self.transformLabs(y_dev))
+                    with open("{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
+                        np.save(f, y_dev)
+
+                if not os.path.exists("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
+                    X_test = self.glob_file[self.glob_file["fileName"] in X_test]
+                    X_test.pop("fileName")
+                    X_test.pop("speaker")
+                    X_test.pop("label")
+                    X_test = self.glob_scaler.transform(X_test)
+                    X_test = np.array(X_test)
+                    with open("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
+                        np.save(f, X_test)
+
+                if not os.path.exists("{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
+                    y_test = np.array(self.transformLabs(y_test))
+                    with open("{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
+                        np.save(f, y_test)
+
+
     def trainModel(self):
 
         for train, dev, test in zip(self.train_list, self.dev_list, self.test_list):
@@ -454,6 +508,19 @@ class ModelTrainer:
                 test_labs = np.load("{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter))
 
                 self.model = acousticOnlyLSTM(train_data, dev_data, test_data, train_labs, dev_labs, test_labs, "{}_{}".format(self.csv_path, counter), "{}_{}".format(self.checkpoint_path, counter), self.plot_paths[counter], self.class_weights)
+
+            elif self.glob_acoustic and not self.seq_acoustic and not self.text:
+
+                train_data = np.load("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter))
+                train_labs = np.load("{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter))
+
+                dev_data = np.load("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter))
+                dev_labs = np.load("{}/{}/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter))
+
+                test_data = np.load("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter))
+                test_labs = np.load("{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter))
+
+                self.model = FeedForwardNN(train_data, dev_data, test_data, train_labs, dev_labs, test_labs, "{}_{}".format(self.csv_path, counter), "{}_{}".format(self.checkpoint_path, counter), self.plot_paths[counter], self.class_weights)
 
             self.model.train()
 
@@ -477,7 +544,8 @@ if __name__=="__main__":
     # seq_acoustic = [False, "percentChunks", "rawSequential"]
     # text = [False, "bert", "w2v"]
 
-    inputTypes = [(False, "percentChunks", False), (False, "rawSequential", False)]
+    # inputTypes = [(False, "percentChunks", False), (False, "rawSequential", False)]
+    inputTypes = [("ComParE", False, False), ("rawGlobal", False, False), ("PCs", False, False)]
     measureList = ["f0", "hnr", "mfcc", "plp"]
     f0Normed=False
     percentage=10

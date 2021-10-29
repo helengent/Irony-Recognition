@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from keras import layers
 from keras import models
+import matplotlib.pyplot as plt
 from sklearn.metrics import precision_recall_fscore_support
 
 
@@ -12,7 +13,7 @@ from sklearn.metrics import precision_recall_fscore_support
 class FeedForwardNN():
 
 
-    def __init__(self, X_train, X_dev, X_test, y_train, y_dev, y_test, csv_path, checkpoint_path, class_weights):
+    def __init__(self, X_train, X_dev, X_test, y_train, y_dev, y_test, csv_path, checkpoint_path, plot_path, class_weights):
 
         # Load in training, dev, and test data
         self.train_in = X_train
@@ -26,30 +27,45 @@ class FeedForwardNN():
 
         self.csv_path = csv_path
         self.checkpoint_path = checkpoint_path
-
         self.class_weights = class_weights
+        self.plotName = plot_path
 
         input_dim = np.shape(self.train_in)[-1]
 
         self.model = models.Sequential()
-        self.model.add(layers.Dense(42, input_dim=input_dim, activation='relu'))
-        self.model.add(layers.Dense(38, activation='relu'))
+        self.model.add(layers.Dense(24, input_dim=input_dim, activation='relu'))
+        self.model.add(layers.Dense(12, activation='relu'))
         self.model.add(layers.Dropout(0.3))
-        self.model.add(layers.Dense(48, activation='relu'))
-        self.model.add(layers.Dense(46, activation='relu'))
+        self.model.add(layers.Dense(6, activation='relu'))
         self.model.add(layers.Dropout(0.2))
-        self.model.add(layers.Dense(44, activation='relu'))
-        self.model.add(layers.Dense(56, activation='relu'))
-        self.model.add(layers.Dropout(0.45))
-        self.model.add(layers.Dense(42, activation='relu'))
-        self.model.add(layers.Dropout(0.2))
-        self.model.add(layers.Dense(42, activation='relu'))
-        self.model.add(layers.Dropout(0.45))
-        self.model.add(layers.Dense(38, activation='relu'))
 
         self.model.add(layers.Dense(2, activation='softmax'))
 
         self.model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+    def plotHist(self):
+
+        trainAcc = self.history.history['accuracy']
+        testAcc = self.history.history['val_accuracy']
+        trainLoss = self.history.history['loss']
+        testLoss = self.history.history['val_loss']
+
+        epochs = range(1, len(trainAcc) + 1)
+
+        plt.figure()
+        plt.subplot(1, 2, 1)
+        plt.plot(epochs, trainAcc, 'g', label="Train Accuracy")
+        plt.plot(epochs, testAcc, 'r', label="Dev Accuracy")
+        plt.title("Accuracy")
+        plt.legend()
+
+        plt.subplot(1, 2, 2)
+        plt.plot(epochs, trainLoss, 'g', label="Train Loss")
+        plt.plot(epochs, testLoss, 'r', label="Dev Loss")
+        plt.title("Loss")
+        plt.legend()
+
+        plt.savefig(self.plotName)
 
 
     def train(self):

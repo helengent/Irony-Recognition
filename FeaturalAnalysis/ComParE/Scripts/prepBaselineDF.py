@@ -10,50 +10,32 @@ from glob import glob
 def main(data_dir):
 
     bigDF = pd.DataFrame()
-    speakerList, labelList, genderList = list(), list(), list()
-    genders = pd.read_csv("/home/hmgent2/Data/AcousticData/SpeakerMetaData/speakersGenders.txt")
-    speakerDict = dict()
+    fileNameList, speakerList, labelList = list(), list(), list()
 
     out_dir = os.path.dirname(data_dir)
     mod = data_dir.split("/")[-1].strip("baseline")
 
-    speakerCounter = 0
     for f in glob("{}/*.csv".format(data_dir)):
 
         #Set speaker
         speaker = os.path.basename(f).split("_")[1][0]
 
-        if speaker in speakerDict.keys():
-            gender = speakerDict[speaker][1]
-            speaker = speakerDict[speaker][0]
-        else:
-            gender = genders[genders["speaker"] == speaker.upper()]["gender"].tolist()[0]
-            if gender == "m":
-                gender = 0
-            elif gender == "f":
-                gender = 1
-            else:
-                gender = 2
-            speakerDict[speaker] = (speakerCounter, gender)
-            speaker = speakerCounter 
-            speakerCounter += 1
-
         #Set irony label
         if f[-5] == "I":
-            irony = 0
+            irony = "I"
         else:
-            irony = 1
+            irony = "N"
 
+        fileNameList.append(os.path.basename(f)[:-4])
         speakerList.append(speaker)
         labelList.append(irony)
-        genderList.append(gender)
 
         row = pd.read_csv(f)
         bigDF = bigDF.append(row, ignore_index=True)
         print(bigDF.shape)
 
+    bigDF["fileName"] = fileNameList
     bigDF['speaker'] = speakerList
-    bigDF['gender'] = genderList
     bigDF['label'] = labelList
     try:
         bigDF.pop('name')
@@ -62,9 +44,11 @@ def main(data_dir):
 
     print(bigDF.shape)
     print(bigDF)
+
+    bigDF.to_csv("/home/hmgent2/Data/ModelInputs/ComParE/all_inputs.csv".format(out_dir))
     
-    with open("{}/baseline_consolidated_{}.pkl".format(out_dir, mod), "wb") as p:
-        pickle.dump(bigDF, p, protocol=4)
+    # with open("{}/baseline_consolidated_{}.pkl".format(out_dir, mod), "wb") as p:
+    #     pickle.dump(bigDF, p, protocol=4)
 
 if __name__=="__main__":
 
