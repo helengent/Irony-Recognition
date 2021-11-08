@@ -286,7 +286,7 @@ if __name__=="__main__":
 
     # df = pd.read_csv("~/Data/AcousticData/text_feats/Pruned3_asr_text_feats.csv")
     df = pd.read_csv("../Data/all_narrowed.csv")
-    df.drop(columns=["ZCR"])
+    # df = df.drop(columns=["index"])
 
     numComps = [6]
 

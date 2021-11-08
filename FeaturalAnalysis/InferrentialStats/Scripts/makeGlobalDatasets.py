@@ -63,7 +63,7 @@ def normSegs(df):
         counter = 0
         speaker = speakers[row["speaker"]]
         for j, item in row.iteritems():
-            if counter > 24 and j != "Avg. Cons. Dur." and j != "Avg. Voca. Dur.":
+            if counter > 20 and j != "Avg. Cons. Dur." and j != "Avg. Voca. Dur.":
                 if "-" in j:
                     segment = j.split("-")[0]
                     measure = j.split("-")[1]
@@ -131,6 +131,8 @@ def narrow(normed_df):
     for key in avgLists.keys():
         for measure in avgLists[key]:
             subset = normed_df[avgLists[key][measure]]
+            if measure == "VOT":
+                measure = "duration"
             newDF["{}_{}".format(key, measure)] = subset.mean(axis = 1)
 
     return newDF
@@ -140,7 +142,7 @@ def main(df):
 
     df = pd.read_csv(df, index_col=0)
     df = df.reset_index()
-    df = df.drop(columns=["index"])
+    df = df.drop(columns=["index", "Sound Pressure Level", "Energy", "Root Mean Square", "ZCR"])
 
     #Features previously attested by other studies as being significantly different between ironic and non-ironic speech
     #   f0 - mean, range, sd (median wasn't included, but it'd be fine to do so)
@@ -150,7 +152,7 @@ def main(df):
 
     #still need syllables per second
     prevAttested = df[["fileName", "speaker", "label", "f0globalMean", "f0globalRange", "f0globalSD", "f0globalMedian",
-                        "energyRange", "energySD", "hnrglobalMean", "hnrglobalRange", "hnrglobalSD", 
+                        "rmsRange", "rmsSD", "hnrglobalMean", "hnrglobalRange", "hnrglobalSD", 
                         "duration", "sound2silenceRatio", "totalPauses", "Avg. Word Dur.", "Avg. Sil. Dur.", "SyllPerSecond"]]
 
 
@@ -158,11 +160,11 @@ def main(df):
 
     df = combine_formantTimes(df)
 
-    df_normed = normSegs(df)
+    # df_normed = normSegs(df)
 
-    df_normed.to_csv("../Data/all_Normed.csv", index=False)
+    # df_normed.to_csv("../Data/all_Normed.csv", index=False)
 
-    # df_normed = pd.read_csv("../Data/all_Normed.csv")
+    df_normed = pd.read_csv("../Data/all_Normed.csv")
 
     df_narrowed = narrow(df_normed)
 

@@ -33,13 +33,25 @@ class FeedForwardNN():
         input_dim = np.shape(self.train_in)[-1]
 
         self.model = models.Sequential()
-        self.model.add(layers.Dense(24, input_dim=input_dim, activation='relu'))
-        self.model.add(layers.Dense(12, activation='relu'))
-        self.model.add(layers.Dropout(0.3))
-        self.model.add(layers.Dense(6, activation='relu'))
+        self.model.add(layers.Dense(52, input_dim=input_dim, activation='relu'))
         self.model.add(layers.Dropout(0.2))
 
-        self.model.add(layers.Dense(2, activation='softmax'))
+        self.model.add(layers.Dense(16, activation='relu'))
+        self.model.add(layers.Dropout(0.1))
+
+        self.model.add(layers.Dense(26, activation='relu'))
+        self.model.add(layers.Dropout(0.25))
+
+        self.model.add(layers.Dense(60, activation='relu'))
+        self.model.add(layers.Dropout(0.2))
+
+        self.model.add(layers.Dense(48, activation='relu'))
+        self.model.add(layers.Dropout(0.3))
+
+        self.model.add(layers.Dense(56, activation="relu"))
+        self.model.add(layers.Dropout(0.2))
+
+        self.model.add(layers.Dense(1, activation='sigmoid'))
 
         self.model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
@@ -80,6 +92,7 @@ class FeedForwardNN():
 
         # Fit the model
         self.history = self.model.fit(self.train_in, self.train_out, epochs = 150, batch_size = 64, validation_data = (self.dev_in, self.dev_out), callbacks=[es, csv, cp], class_weight = self.class_weights)
+        self.plotHist()
 
 
     def test(self):

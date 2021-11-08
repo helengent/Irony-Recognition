@@ -17,7 +17,7 @@ def main(wavPath, tg_mod, saveWhole = False):
         labs, speakers, fNames = list(), list(), list()
         f0globalMeans, f0globalRanges, f0globalSDs, f0globalMedians, = list(), list(), list(), list()
         hnrglobalMeans, hnrglobalRanges, hnrglobalSDs = list(), list(), list()
-        energyRanges, energySDs = list(), list()
+        rmsRanges, rmsSDs = list(), list()
         durs, sound2sil, totalPauses = list(), list(), list()
 
 
@@ -51,8 +51,8 @@ def main(wavPath, tg_mod, saveWhole = False):
                 hnrglobalMeans.append(globAcoustic["hnrglobalMean"].item())
                 hnrglobalRanges.append(globAcoustic["hnrglobalRange"].item())
                 hnrglobalSDs.append(globAcoustic["hnrglobalSD"].item())
-                energyRanges.append(globAcoustic["energyRange"].item())
-                energySDs.append(globAcoustic["energySD"].item())
+                rmsRanges.append(globAcoustic["energyRange"].item())
+                rmsSDs.append(globAcoustic["energySD"].item())
                 sound2sil.append(globAcoustic["sound2silenceRatio"].item())
                 totalPauses.append(globAcoustic["totalPauses"].item())
             except:
@@ -77,8 +77,8 @@ def main(wavPath, tg_mod, saveWhole = False):
         lorgeDF["hnrglobalMean"] = hnrglobalMeans
         lorgeDF["hnrglobalRange"] = hnrglobalRanges
         lorgeDF["hnrglobalSD"] = hnrglobalSDs
-        lorgeDF["energyRange"] = energyRanges
-        lorgeDF["energySD"] = energySDs
+        lorgeDF["rmsRange"] = rmsRanges
+        lorgeDF["rmsSD"] = rmsSDs
 
         cols = lorgeDF.columns.tolist()
         cols = cols[-15:] + cols[:-15]

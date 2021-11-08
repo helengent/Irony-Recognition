@@ -38,7 +38,11 @@ class ModelTrainer:
         self.frameMax = frameMax
 
         if self.glob_acoustic:
-            self.glob_file = pd.read_csv("{}/{}/all_inputs.csv".format(self.dataPath, self.glob_acoustic))
+            if self.glob_acoustic == "ComParE":
+                self.glob_file = pd.read_csv("{}/{}/all_inputs.csv".format(self.dataPath, self.glob_acoustic), index_col=0)
+            else:
+                self.glob_file = pd.read_csv("{}/{}/all_inputs.csv".format(self.dataPath, self.glob_acoustic))
+
 
         self.prefix = "speaker-{}_".format(self.speakerSplit)
         if self.glob_acoustic:
@@ -293,7 +297,7 @@ class ModelTrainer:
             seq_scaler = None
 
         #create scaler for global data
-        if self.glob_acoustic:
+        if self.glob_acoustic and self.glob_acoustic != "PCs":
             nData = self.glob_file[self.glob_file["label"] == "N"]
             nData.pop("fileName")
             nData.pop("speaker")
@@ -443,13 +447,19 @@ class ModelTrainer:
             if self.glob_acoustic:
 
                 if not os.path.exists("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
-                    X_train = self.glob_file[self.glob_file["fileName"] in X_train]
+                    desiredIndices = list()
+                    for i, item in enumerate(self.glob_file["fileName"].tolist()): 
+                        if item in X_train: 
+                            desiredIndices.append(i)
+                    X_train = self.glob_file.iloc[desiredIndices]
                     X_train.pop("fileName")
                     X_train.pop("speaker")
                     X_train.pop("label")
-                    X_train = self.glob_scaler.transform(X_train)
+                    
+                    if self.glob_acoustic != "PCs":
+                        X_train = self.glob_scaler.transform(X_train)
                     X_train = np.array(X_train)
-                    with open("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
+                    with open("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
                         np.save(f, X_train)
 
                 if not os.path.exists("{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
@@ -458,33 +468,45 @@ class ModelTrainer:
                         np.save(f, y_train)
 
                 if not os.path.exists("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
-                    X_dev = self.glob_file[self.glob_file["fileName"] in X_dev]
+                    desiredIndices = list()
+                    for i, item in enumerate(self.glob_file["fileName"].tolist()): 
+                        if item in X_dev: 
+                            desiredIndices.append(i)
+                    X_dev = self.glob_file.iloc[desiredIndices]
                     X_dev.pop("fileName")
                     X_dev.pop("speaker")
                     X_dev.pop("label")
-                    X_dev = self.glob_scaler.transform(X_dev)
+
+                    if self.glob_acoustic != "PCs":
+                        X_dev = self.glob_scaler.transform(X_dev)
                     X_dev = np.array(X_dev)
-                    with open("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
+                    with open("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
                         np.save(f, X_dev)
 
                 if not os.path.exists("{}/{}/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
                     y_dev = np.array(self.transformLabs(y_dev))
-                    with open("{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/{}/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
                         np.save(f, y_dev)
 
                 if not os.path.exists("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
-                    X_test = self.glob_file[self.glob_file["fileName"] in X_test]
+                    desiredIndices = list()
+                    for i, item in enumerate(self.glob_file["fileName"].tolist()): 
+                        if item in X_test: 
+                            desiredIndices.append(i)
+                    X_test = self.glob_file.iloc[desiredIndices]                    
                     X_test.pop("fileName")
                     X_test.pop("speaker")
                     X_test.pop("label")
-                    X_test = self.glob_scaler.transform(X_test)
+
+                    if self.glob_acoustic != "PCs":
+                        X_test = self.glob_scaler.transform(X_test)
                     X_test = np.array(X_test)
-                    with open("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
+                    with open("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
                         np.save(f, X_test)
 
                 if not os.path.exists("{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
                     y_test = np.array(self.transformLabs(y_test))
-                    with open("{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
                         np.save(f, y_test)
 
 
@@ -544,8 +566,8 @@ if __name__=="__main__":
     # seq_acoustic = [False, "percentChunks", "rawSequential"]
     # text = [False, "bert", "w2v"]
 
-    # inputTypes = [(False, "percentChunks", False), (False, "rawSequential", False)]
-    inputTypes = [("ComParE", False, False), ("rawGlobal", False, False), ("PCs", False, False)]
+    # inputTypes = [(False, "percentChunks", False), (False, "rawSequential", False), ("ComParE", False, False), ("rawGlobal", False, False), ("PCs", False, False)]
+    inputTypes = [("PCs", False, False)]
     measureList = ["f0", "hnr", "mfcc", "plp"]
     f0Normed=False
     percentage=10
