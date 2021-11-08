@@ -175,7 +175,7 @@ def main(df, name):
     # anova = anovaCall(df, output['Levene p-Value'].to_list())
 
     # Save something out for each of the three
-    output.to_csv('../Output/{}_outliersRemoved.csv'.format(name), index = False)
+    output.to_csv('../Output/{}_significanceTested.csv'.format(name), index = False)
 
 
 if __name__=="__main__":
@@ -198,7 +198,7 @@ if __name__=="__main__":
         iDF = df[df['label'] == 'I']
         nDF = df[df['label'] == 'N']
 
-        dropList = ["ZCR"]
+        dropList = []
 
         for i, col in iDF.items():
             try:
