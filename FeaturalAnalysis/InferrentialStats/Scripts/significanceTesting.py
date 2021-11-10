@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from sklearn.preprocessing import StandardScaler
+
 from joblib import Parallel, delayed
 from numpy.random import seed
 import multiprocessing as mp
@@ -218,5 +220,19 @@ if __name__=="__main__":
         print(len(dropList))
         df = df.drop(columns=dropList)
         print(df.shape)
+
+        features = df.columns[3:].tolist()
+        n = df[df["label"] == "N"]
+        n = n.loc[:, features].values
+
+        x = df.loc[:, features].values
+        y = df.loc[:, ["label"]].values
+
+        #Scale data and impute missing values
+        scaler = StandardScaler()
+        scaler.fit(n)
+        x = scaler.transform(x)
+
+        df.loc[:, 3:] = x
 
         main(df, name)
