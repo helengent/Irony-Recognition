@@ -567,7 +567,7 @@ if __name__=="__main__":
     # text = [False, "bert", "w2v"]
 
     # inputTypes = [(False, "percentChunks", False), (False, "rawSequential", False), ("ComParE", False, False), ("rawGlobal", False, False), ("PCs", False, False)]
-    inputTypes = [("PCs", False, False)]
+    inputTypes = [("PCs", False, False), ("ComParE", False, False), ("rawGlobal", False, False)]
     measureList = ["f0", "hnr", "mfcc", "plp"]
     f0Normed=False
     percentage=10

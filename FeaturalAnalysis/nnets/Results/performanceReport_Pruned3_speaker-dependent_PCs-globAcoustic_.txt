@@ -1,0 +1,71 @@
+Model 0
+
+Training performance
+Precision:	[0.50401867 0.54740061]
+Recall:	[0.9292543  0.08556405]
+F1:	[0.65355522 0.14799504]
+
+Test performance
+Precision:	[0.5065666  0.57731959]
+Recall:	[0.92943201 0.09621993]
+F1:	[0.6557377  0.16494845]
+
+Model 1
+
+Training performance
+Precision:	[0.54294804 0.51249614]
+Recall:	[0.24474187 0.79397706]
+F1:	[0.33739703 0.62291393]
+
+Test performance
+Precision:	[0.515625   0.50385888]
+Recall:	[0.22680412 0.78657487]
+F1:	[0.3150358  0.61424731]
+
+Model 2
+
+Training performance
+Precision:	[0.50190377 0.50462963]
+Recall:	[0.69311663 0.31247014]
+F1:	[0.58221241 0.38595456]
+
+Test performance
+Precision:	[0.54545455 0.60167131]
+Recall:	[0.75387263 0.37177281]
+F1:	[0.63294798 0.45957447]
+
+Model 3
+
+Training performance
+Precision:	[0.5721831 0.5114736]
+Recall:	[0.15535373 0.88389871]
+F1:	[0.2443609  0.64798599]
+
+Test performance
+Precision:	[0.3625     0.47804391]
+Recall:	[0.09982788 0.82444062]
+F1:	[0.15654521 0.60518004]
+
+Model 4
+
+Training performance
+Precision:	[0.50331451 0.625     ]
+Recall:	[0.97992352 0.03344482]
+F1:	[0.66504461 0.06349206]
+
+Test performance
+Precision:	[0.49825175 0.38888889]
+Recall:	[0.98106713 0.01204819]
+F1:	[0.66086957 0.02337229]
+
+Cross-Validated Average Performance
+
+Train performance
+Precision:	[0.52487362 0.5402    ]
+Recall:	[0.60047801 0.42187095]
+F1:	[0.49651403 0.37366832]
+
+Test performance
+Precision:	[0.48567958 0.50995651]
+Recall:	[0.59820076 0.41821128]
+F1:	[0.48422725 0.37346451]
