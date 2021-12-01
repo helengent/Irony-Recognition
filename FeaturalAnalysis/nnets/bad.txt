@@ -1,0 +1,3 @@
+('rawGlobal', 'rawSequential', True)	independent
+Input contains NaN, infinity or a value too large for dtype('float32').
+

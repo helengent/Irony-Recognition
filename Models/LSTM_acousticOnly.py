@@ -85,10 +85,7 @@ class acousticOnlyLSTM():
 
     def test(self):
 
-        train_preds = self.model.predict(self.train_in).argmax(axis=1)
-        test_preds = self.model.predict(self.test_in).argmax(axis=1)
+        train_preds = self.model.predict(self.train_in)
+        test_preds = self.model.predict(self.test_in)
 
-        train_performance = precision_recall_fscore_support(self.train_out, train_preds)
-        test_performance = precision_recall_fscore_support(self.test_out, test_preds)
-
-        return(train_performance, test_performance)            
+        return(train_preds, test_preds)            

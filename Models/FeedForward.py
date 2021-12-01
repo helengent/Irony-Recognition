@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import tensorflow as tf
 import keras
 import numpy as np
 import pandas as pd
@@ -33,18 +34,19 @@ class FeedForwardNN():
         input_dim = np.shape(self.train_in)[-1]
 
         self.model = models.Sequential()
-        self.model.add(layers.Dense(16, input_dim=input_dim, activation='relu'))
-        self.model.add(layers.Dropout(0.2))
+        self.model.add(layers.Dense(32, input_dim=input_dim, activation='relu'))
+
+        self.model.add(layers.Dense(16, activation='relu'))
+        self.model.add(layers.Dropout(0.4))
 
         self.model.add(layers.Dense(8, activation='relu'))
-        self.model.add(layers.Dropout(0.25))
-
-        self.model.add(layers.Dense(4, activation='relu'))
-        self.model.add(layers.Dropout(0.2))
+        self.model.add(layers.Dropout(0.4))
 
         self.model.add(layers.Dense(2, activation='sigmoid'))
 
         self.model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        # self.model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer='adam', metrics=['binary_accuracy'])
+
 
     def plotHist(self):
 
@@ -88,13 +90,10 @@ class FeedForwardNN():
 
     def test(self):
 
-        train_preds = self.model.predict(self.train_in).argmax(axis = 1)
-        test_preds = self.model.predict(self.test_in).argmax(axis = 1)
+        train_preds = self.model.predict(self.train_in)
+        test_preds = self.model.predict(self.test_in)
 
-        train_performance = precision_recall_fscore_support(self.train_out, train_preds)
-        test_performance = precision_recall_fscore_support(self.test_out, test_preds)
-
-        return(train_performance, test_performance)
+        return(train_preds, test_preds)
 
 
             

@@ -1,71 +1,72 @@
 Model 0
 
-Training performance
-Precision:	[0.90602285 0.84632418]
-Recall:	[0.83413002 0.91347992]
-F1:	[0.86859134 0.87862069]
+Confusion Matrix
+
+[[129 453]
+ [124 457]]
 
 Test performance
-Precision:	[0.52110092 0.51941748]
-Recall:	[0.48881239 0.55154639]
-F1:	[0.5044405 0.535    ]
+Precision:	[0.50988142 0.5021978 ]
+Recall:	[0.22164948 0.78657487]
+F1:	[0.30898204 0.6130114 ]
+Accuracy:	0.5038693035253654
 
 Model 1
 
-Training performance
-Precision:	[0.99621451 0.80261639]
-Recall:	[0.75478011 0.99713193]
-F1:	[0.85885233 0.88936261]
+Confusion Matrix
+
+[[197 384]
+ [190 392]]
 
 Test performance
-Precision:	[0.47865169 0.48607242]
-Recall:	[0.36597938 0.60068847]
-F1:	[0.41480039 0.53733641]
+Precision:	[0.50904393 0.50515464]
+Recall:	[0.33907057 0.67353952]
+F1:	[0.40702479 0.57731959]
+Accuracy:	0.5064488392089423
 
 Model 2
 
-Training performance
-Precision:	[0.58143659 0.84413965]
-Recall:	[0.94024857 0.32345915]
-F1:	[0.71853881 0.46770294]
+Confusion Matrix
+
+[[287 294]
+ [287 294]]
 
 Test performance
-Precision:	[0.49841939 0.49295775]
-Recall:	[0.8141136  0.18072289]
-F1:	[0.61830065 0.26448363]
+Precision:	[0.5 0.5]
+Recall:	[0.4939759 0.5060241]
+F1:	[0.4969697  0.50299401]
+Accuracy:	0.5
 
 Model 3
 
-Training performance
-Precision:	[0.57142857 0.5314325 ]
-Recall:	[0.34799235 0.73913043]
-F1:	[0.4325609  0.61830536]
+Confusion Matrix
+
+[[403 178]
+ [362 219]]
 
 Test performance
-Precision:	[0.46849315 0.48557089]
-Recall:	[0.29432014 0.66609294]
-F1:	[0.3615222 0.5616836]
+Precision:	[0.52679739 0.55163728]
+Recall:	[0.69363167 0.37693632]
+F1:	[0.59881129 0.44785276]
+Accuracy:	0.5352839931153184
 
 Model 4
 
-Training performance
-Precision:	[0.72717733 0.99019608]
-Recall:	[0.99378585 0.62732919]
-F1:	[0.83983034 0.76806084]
+Confusion Matrix
+
+[[456 125]
+ [468 113]]
 
 Test performance
-Precision:	[0.49451888 0.48680352]
-Recall:	[0.69879518 0.28571429]
-F1:	[0.57917261 0.36008677]
+Precision:	[0.49350649 0.47478992]
+Recall:	[0.7848537  0.19449225]
+F1:	[0.60598007 0.27594628]
+Accuracy:	0.48967297762478484
 
 Cross-Validated Average Performance
 
-Train performance
-Precision:	[0.75645597 0.80294176]
-Recall:	[0.77418738 0.72010613]
-F1:	[0.74367474 0.72441049]
-
 Test performance
-Precision:	[0.4922368  0.49416441]
-Recall:	[0.53240414 0.456953  ]
-F1:	[0.49564727 0.45171808]
+Precision:	[0.50784585 0.50675593]
+Recall:	[0.50663627 0.50751341]
+F1:	[0.48355358 0.48342481]
+Accuracy:	0.5070550226948822

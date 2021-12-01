@@ -1,0 +1,7 @@
+,PC1,PC1,PC2,PC2,PC3,PC3
+,Features,Correlation,Features,Correlation,Features,Correlation
+0,logHNR_sma_de_linregc1,7.193832158903859e-07,audSpec_Rfilt_sma[24]_lpc0,0.02640541825520074,shimmerLocal_sma_de_qregc1,0.012019754363411185
+1,logHNR_sma_kurtosis,1.4918057676841965e-06,audSpec_Rfilt_sma[23]_lpc0,0.02642101340719429,jitterDDP_sma_qregc3,-0.019181521356976653
+2,logHNR_sma_de_qregc1,-6.767655240197473e-06,jitterDDP_sma_qregerrQ,0.32990634735191765,F0final_sma_de_qregc1,-0.013874259386622541
+3,F0final_sma_qregc3,-9.022088375295e-05,audspecRasta_lengthL1norm_sma_lpc0,0.026431677610256398,F0final_sma_de_qregc2,0.018206263786219683
+4,F0final_sma_qregerrQ,0.9999999958962146,audspecRasta_lengthL1norm_sma_upleveltime50,0.026777438683312595,jitterDDP_sma_qregerrQ,0.9415431654623754

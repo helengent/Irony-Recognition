@@ -1,0 +1,163 @@
+Speaker c left out
+
+Confusion Matrix
+
+[[805 385]
+ [282 675]]
+
+Test performance
+Precision:	[0.74057038 0.63679245]
+Recall:	[0.67647059 0.70532915]
+F1:	[0.70707071 0.66931086]
+Accuracy:	0.6893339543549138
+
+Speaker j left out
+
+Confusion Matrix
+
+[[66  9]
+ [90 25]]
+
+Test performance
+Precision:	[0.42307692 0.73529412]
+Recall:	[0.88      0.2173913]
+F1:	[0.57142857 0.33557047]
+Accuracy:	0.4789473684210526
+
+Speaker d left out
+
+Confusion Matrix
+
+[[676 325]
+ [530 965]]
+
+Test performance
+Precision:	[0.56053068 0.74806202]
+Recall:	[0.67532468 0.64548495]
+F1:	[0.61259628 0.6929982 ]
+Accuracy:	0.6574519230769231
+
+Speaker t left out
+
+Confusion Matrix
+
+[[17  4]
+ [16 21]]
+
+Test performance
+Precision:	[0.51515152 0.84      ]
+Recall:	[0.80952381 0.56756757]
+F1:	[0.62962963 0.67741935]
+Accuracy:	0.6551724137931034
+
+Speaker u left out
+
+Confusion Matrix
+
+[[33  9]
+ [ 2  7]]
+
+Test performance
+Precision:	[0.94285714 0.4375    ]
+Recall:	[0.78571429 0.77777778]
+F1:	[0.85714286 0.56      ]
+Accuracy:	0.7843137254901961
+
+Speaker o left out
+
+Confusion Matrix
+
+[[91 74]
+ [29 57]]
+
+Test performance
+Precision:	[0.75833333 0.4351145 ]
+Recall:	[0.55151515 0.6627907 ]
+F1:	[0.63859649 0.52534562]
+Accuracy:	0.5896414342629482
+
+Speaker k left out
+
+Confusion Matrix
+
+[[27  9]
+ [27 28]]
+
+Test performance
+Precision:	[0.5        0.75675676]
+Recall:	[0.75       0.50909091]
+F1:	[0.6        0.60869565]
+Accuracy:	0.6043956043956044
+
+Speaker h left out
+
+Confusion Matrix
+
+[[24 10]
+ [ 2  4]]
+
+Test performance
+Precision:	[0.92307692 0.28571429]
+Recall:	[0.70588235 0.66666667]
+F1:	[0.8 0.4]
+Accuracy:	0.7
+
+Speaker q left out
+
+Confusion Matrix
+
+[[39 24]
+ [12  8]]
+
+Test performance
+Precision:	[0.76470588 0.25      ]
+Recall:	[0.61904762 0.4       ]
+F1:	[0.68421053 0.30769231]
+Accuracy:	0.5662650602409639
+
+Speaker s left out
+
+Confusion Matrix
+
+[[83 25]
+ [41 35]]
+
+Test performance
+Precision:	[0.66935484 0.58333333]
+Recall:	[0.76851852 0.46052632]
+F1:	[0.71551724 0.51470588]
+Accuracy:	0.6413043478260869
+
+Speaker e left out
+
+Confusion Matrix
+
+[[48  5]
+ [18  6]]
+
+Test performance
+Precision:	[0.72727273 0.54545455]
+Recall:	[0.90566038 0.25      ]
+F1:	[0.80672269 0.34285714]
+Accuracy:	0.7012987012987013
+
+Speaker f left out
+
+Confusion Matrix
+
+[[86 32]
+ [11 15]]
+
+Test performance
+Precision:	[0.88659794 0.31914894]
+Recall:	[0.72881356 0.57692308]
+F1:	[0.8       0.4109589]
+Accuracy:	0.7013888888888888
+
+Cross-Speaker Average Performance
+
+Test performance
+Precision:	[0.70096069 0.54776425]
+Recall:	[0.73803924 0.53662903]
+F1:	[0.70190958 0.5037962 ]
+Accuracy:	0.6474594518374485
