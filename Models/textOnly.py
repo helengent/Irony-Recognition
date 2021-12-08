@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from typing import Text
 import tensorflow as tf
 import keras
 import numpy as np
@@ -18,9 +19,9 @@ class textOnlyNN():
     def __init__(self, X_train, X_dev, X_test, y_train, y_dev, y_test, tokenizer, csv_path, checkpoint_path, plot_path, class_weights):
 
         # Load in training, dev, and test data
-        self.train_in = X_train
-        self.dev_in = X_dev
-        self.test_in = X_test
+        self.train_in = [X_train]
+        self.dev_in = [X_dev]
+        self.test_in = [X_test]
 
         # Load in training, dev, and test labels
         self.train_out = y_train
@@ -42,19 +43,34 @@ class textOnlyNN():
             if word in w2v:
                 embeddings[i] = w2v[word]
 
-        self.model = models.Sequential()
-        self.model.add(layers.Embedding(input_dim=embeddings.shape[0], output_dim=embeddings.shape[1], input_length=input_dim, weights=[embeddings], trainable=False))
-        
-        self.model.add(layers.Conv1D(128, 3, activation='relu'))
-        self.model.add(layers.GlobalAveragePooling1D())
-        
-        self.model.add(layers.Dropout(0.5))
+        text = layers.Input(shape=(input_dim))
+        embedded = layers.Embedding(input_dim=embeddings.shape[0], output_dim=embeddings.shape[1], input_length=input_dim, weights=[embeddings], trainable=False)(text)
 
-        self.model.add(layers.Dense(16, activation='relu'))
-        self.model.add(layers.Dense(2, activation='softmax'))
+        embedded = layers.Conv1D(128, 3, activation='relu')(embedded)
+        embedded = layers.GlobalMaxPooling1D()(embedded)
 
+        dropout = layers.Dropout(0.5)(embedded)
+        x = keras.Model(inputs=[text], outputs=dropout)
+            
+        z = layers.Dense(16, activation='relu')(x.output)
+        z = layers.Dense(2, activation='sigmoid')(z)
+
+        self.model = keras.Model(inputs=x.input, outputs=z)
         self.model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-        # self.model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer='adam', metrics=['binary_accuracy'])
+
+        # self.model = models.Sequential()
+        # self.model.add(layers.Embedding(input_dim=embeddings.shape[0], output_dim=embeddings.shape[1], input_length=input_dim, weights=[embeddings], trainable=False))
+        
+        # self.model.add(layers.Conv1D(128, 3, activation='relu'))
+        # self.model.add(layers.GlobalAveragePooling1D())
+        
+        # self.model.add(layers.Dropout(0.5))
+
+        # self.model.add(layers.Dense(16, activation='relu'))
+        # self.model.add(layers.Dense(2, activation='softmax'))
+
+        # self.model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+        # # self.model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer='adam', metrics=['binary_accuracy'])
 
 
     def plotHist(self):
@@ -97,12 +113,14 @@ class textOnlyNN():
         self.plotHist()
 
 
-    def test(self):
+    def test(self, inputs = None):
 
-        train_preds = self.model.predict(self.train_in)
-        test_preds = self.model.predict(self.test_in)
+        if inputs == None:
+            test_preds = self.model.predict(self.test_in)
+        else:
+            test_preds = self.model.predict(inputs)
 
-        return(train_preds, test_preds)
+        return test_preds
 
 
             

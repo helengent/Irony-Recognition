@@ -21,9 +21,9 @@ class acousticOnlyLSTM():
     def __init__(self, X_train, X_dev, X_test, y_train, y_dev, y_test, csv_path, checkpoint_path, plot_path, class_weights):
 
         # Load in training, dev, and test data
-        self.train_in = X_train
-        self.dev_in = X_dev
-        self.test_in = X_test
+        self.train_in = [X_train]
+        self.dev_in = [X_dev]
+        self.test_in = [X_test]
 
         # Load in training, dev, and test labels
         self.train_out = y_train
@@ -35,12 +35,27 @@ class acousticOnlyLSTM():
         self.class_weights = class_weights
         self.plotName = plot_path
 
-        self.model = models.Sequential()
+        acoustic = layers.Input(shape=(X_train.shape[1], X_train.shape[2]))
 
-        self.model.add(layers.LSTM(24, activation="relu", dropout=0.05, recurrent_dropout=0.2))
-        self.model.add(layers.Dense(2, activation='sigmoid'))
+        lstm = layers.LSTM(24, activation='relu', dropout=0.05, recurrent_dropout=0.2)(acoustic)
+        lstm = layers.Dense(2, activation='sigmoid')(lstm)
 
+        # dropout = layers.Dropout(0.5)(lstm)
+        # x = keras.Model(inputs=[acoustic], outputs=dropout)
+            
+        # z = layers.Dense(16, activation='relu')(x.output)
+        # z = layers.Dense(2, activation='sigmoid')(z)
+
+        # self.model = keras.Model(inputs=x.input, outputs=z)
+        self.model = keras.Model(inputs=[acoustic], outputs = lstm)
         self.model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+        # self.model = models.Sequential()
+
+        # self.model.add(layers.LSTM(24, activation="relu", dropout=0.05, recurrent_dropout=0.2))
+        # self.model.add(layers.Dense(2, activation='sigmoid'))
+
+        # self.model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 
     def plotHist(self):
@@ -83,9 +98,11 @@ class acousticOnlyLSTM():
         self.plotHist()
 
 
-    def test(self):
+    def test(self, inputs = None):
 
-        train_preds = self.model.predict(self.train_in)
-        test_preds = self.model.predict(self.test_in)
+        if inputs == None:
+            test_preds = self.model.predict(self.test_in)
+        else:
+            test_preds = self.model.predict(inputs)
 
-        return(train_preds, test_preds)            
+        return test_preds        

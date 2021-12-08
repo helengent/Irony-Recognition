@@ -94,9 +94,11 @@ class acousticLSTM_FFNN():
         self.plotHist()
 
 
-    def test(self):
+    def test(self, inputs = None):
 
-        train_preds = self.model.predict(self.train_input)
-        test_preds = self.model.predict(self.test_input)
+        if inputs == None:
+            test_preds = self.model.predict(self.test_input)
+        else:
+            test_preds = self.model.predict(inputs)
 
-        return(train_preds, test_preds)            
+        return test_preds         

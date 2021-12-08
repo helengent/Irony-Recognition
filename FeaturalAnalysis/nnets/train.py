@@ -55,12 +55,11 @@ class ModelTrainer:
             else:
                 self.glob_file = pd.read_csv("{}/{}/all_inputs.csv".format(self.dataPath, self.glob_acoustic))
 
-
         self.prefix = "speaker-{}_".format(self.speakerSplit)
         if self.glob_acoustic:
-            self.prefix = self.prefix + "{}-globAcoustic_".format(inputType[0])
+            self.prefix = self.prefix + "{}_".format(inputType[0])
         if self.seq_acoustic:
-            self.prefix = self.prefix + "{}-seqAcoustic_".format(inputType[1])
+            self.prefix = self.prefix + "{}_".format(inputType[1])
         if self.text:
             self.prefix = self.prefix + "text_"
 
@@ -77,7 +76,7 @@ class ModelTrainer:
         self.class_weights = {0.0: 1.0, 1.0: 1.0}
     
         self.train_list, self.dev_list, self.test_list = self.trainTestSplit()
-        self.glob_scaler, self.seq_scaler = self.createScalers()
+        self.glob_scaler, self.seq_scaler, self.glob_imputer, self.seq_imputer = self.createScalers()
         self.tokenizer = self.makeTokenizer()
 
         self.prepareData()
@@ -155,6 +154,8 @@ class ModelTrainer:
                 longLad.append(chunk)
         
         longLad = np.array(longLad)
+        if np.isnan(np.sum(longLad)):
+            longLad = self.seq_imputer.transform(longLad)
         scaled = self.seq_scaler.transform(longLad)
 
         start = 0
@@ -180,6 +181,20 @@ class ModelTrainer:
         scaler.fit(longLad)
         
         return scaler
+
+
+    def makeImputer(self, nList):
+        longLad = list()
+        
+        for utt in nList:
+            for chunk in utt:
+                longLad.append(chunk)
+        
+        longLad = np.array(longLad)
+        imputer = SimpleImputer()
+        imputer.fit(longLad)
+        
+        return imputer
 
 
     def chunkStats(self, x):
@@ -321,8 +336,19 @@ class ModelTrainer:
             else:
                 with open("{}/{}/scaler.pkl".format(dataPath, self.seq_acoustic), "rb") as f:
                     seq_scaler = pickle.load(f)
+
+            if not os.path.exists("{}/{}/imputer.pkl".format(self.dataPath, self.seq_acoustic)):
+                ndata = [item for item in self.fileList if item[-1] == "N"]
+                ndata = self.assembleArray(ndata)
+                seq_imputer = self.makeImputer(ndata)
+                with open("{}/{}/imputer.pkl".format(dataPath, self.seq_acoustic), "wb") as f:
+                    pickle.dump(seq_imputer, f)
+            else:
+                with open("{}/{}/imputer.pkl".format(dataPath, self.seq_acoustic), "rb") as f:
+                    seq_imputer = pickle.load(f)
         else:
             seq_scaler = None
+            seq_imputer = None
 
         #create scaler for global data
         if self.glob_acoustic and "PCs" not in self.glob_acoustic:
@@ -331,11 +357,14 @@ class ModelTrainer:
             nData.pop("speaker")
             nData.pop("label")
             glob_scaler = StandardScaler()
+            glob_imputer = SimpleImputer()
             glob_scaler.fit(nData)
+            glob_imputer.fit(nData)
         else:
             glob_scaler = None
+            glob_imputer = None
 
-        return glob_scaler, seq_scaler
+        return glob_scaler, seq_scaler, glob_imputer, seq_imputer
 
 
     def performanceReport(self):
@@ -406,31 +435,39 @@ class ModelTrainer:
         fpr, tpr, thresholds = roc_curve(trueLabs, Ipreds, pos_label=1)
         auc = roc_auc_score(trueLabs, Ipreds)
 
-        return (fpr, tpr, thresholds, auc)
+        fnr = 1 - tpr
+        eer_threshold = thresholds[np.nanargmin(np.absolute((fnr - fpr)))]
+        eer = fpr[np.nanargmin(np.absolute((fnr - fpr)))]
+
+        return (fpr, tpr, thresholds, auc, eer)
 
 
     def ROCcurve(self):
 
         tprs = list()
         aucs = list()
+        eers = list()
 
         mean_fpr = np.linspace(0, 1, 100)
         fig, ax = plt.subplots()
 
         for stats in self.rocStats:
-            fpr, tpr, thresholds, auc = stats
+            fpr, tpr, thresholds, auc, eer = stats
             interp_tpr = np.interp(mean_fpr, fpr, tpr)
             interp_tpr[0] = 0.0
             tprs.append(interp_tpr)
             aucs.append(auc)
+            eers.append(eer)
 
         ax.plot([0, 1], [0, 1], linestyle='--', lw=2, color="r", label="Chance", alpha=0.8)
         mean_tpr = np.mean(tprs, axis=0)
         mean_tpr[-1] = 1
         mean_auc = np.mean(aucs)
         std_auc = np.std(aucs)
+        mean_eer = np.mean(eers)
+        std_eer = np.std(eers)
         ax.plot(mean_fpr, mean_tpr, color="b", 
-                label = "Mean ROC (AUC: {} std: {}".format(np.round(mean_auc, 2), np.round(std_auc, 2)), 
+                label = "Mean ROC AUC: {} AUC std: {}\nEER: {} EER std: {}".format(np.round(mean_auc, 2), np.round(std_auc, 2), np.round(mean_eer, 2), np.round(std_eer, 2)), 
                 lw=2, alpha=0.8)
 
         std_tpr = np.std(tprs, axis=0)
@@ -508,11 +545,15 @@ class ModelTrainer:
                         if item in X_train: 
                             desiredIndices.append(i)
                     X_train = self.glob_file.iloc[desiredIndices]
-                    X_train.pop("fileName")
-                    X_train.pop("speaker")
-                    X_train.pop("label")
+                    train_meta = pd.DataFrame()
+                    train_meta["fileName"] = X_train.pop("fileName")
+                    train_meta["speaker"] = X_train.pop("speaker")
+                    train_meta["label"] = X_train.pop("label")
+                    train_meta.to_csv("{}/speaker-{}_train_{}.meta".format(self.dataPath, self.speakerSplit, counter))
                     
                     if "PCs" not in self.glob_acoustic:
+                        if True in np.isnan(np.sum(X_train)).tolist():
+                            X_train = self.glob_imputer.transform(X_train)
                         X_train = self.glob_scaler.transform(X_train)
                     X_train = np.array(X_train)
                     with open("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
@@ -529,11 +570,16 @@ class ModelTrainer:
                         if item in X_dev: 
                             desiredIndices.append(i)
                     X_dev = self.glob_file.iloc[desiredIndices]
-                    X_dev.pop("fileName")
-                    X_dev.pop("speaker")
-                    X_dev.pop("label")
+                    dev_meta = pd.DataFrame()
+                    dev_meta["fileName"] = X_dev.pop("fileName")
+                    dev_meta["speaker"] = X_dev.pop("speaker")
+                    dev_meta["label"] = X_dev.pop("label")
+                    dev_meta.to_csv("{}/speaker-{}_dev_{}.meta".format(self.dataPath, self.speakerSplit, counter))
+
 
                     if "PCs" not in self.glob_acoustic:
+                        if np.isnan(np.sum(X_dev)):
+                            X_train = self.glob_imputer.transform(X_dev)
                         X_dev = self.glob_scaler.transform(X_dev)
                     X_dev = np.array(X_dev)
                     with open("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
@@ -550,11 +596,16 @@ class ModelTrainer:
                         if item in X_test: 
                             desiredIndices.append(i)
                     X_test = self.glob_file.iloc[desiredIndices]                    
-                    X_test.pop("fileName")
-                    X_test.pop("speaker")
-                    X_test.pop("label")
+                    test_meta = pd.DataFrame()
+                    test_meta["fileName"] = X_test.pop("fileName")
+                    test_meta["speaker"] = X_test.pop("speaker")
+                    test_meta["label"] = X_test.pop("label")
+                    test_meta.to_csv("{}/speaker-{}_test_{}.meta".format(self.dataPath, self.speakerSplit, counter))
+
 
                     if "PCs" not in self.glob_acoustic:
+                        if np.isnan(np.sum(X_test)):
+                            X_train = self.glob_imputer.transform(X_test)
                         X_test = self.glob_scaler.transform(X_test)
                     X_test = np.array(X_test)
                     with open("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
@@ -675,12 +726,6 @@ class ModelTrainer:
                                         self.plot_paths[counter], self.class_weights)
 
             elif self.text and self.seq_acoustic and not self.glob_acoustic:
-                # self.model = acousticTextLSTM(seq_acoustic_train_data, seq_acoustic_dev_data, seq_acoustic_test_data, 
-                #                                 text_train_data, text_dev_data, text_test_data, 
-                #                                 train_labs, dev_labs, test_labs, self.tokenizer, 
-                #                                 "{}_{}".format(self.csv_path, counter), 
-                #                                 "{}_{}".format(self.checkpoint_path, counter), 
-                #                                 self.plot_paths[counter], self.class_weights)
                 self.model = acousticTextLSTM_CNN(seq_acoustic_train_data, seq_acoustic_dev_data, seq_acoustic_test_data, 
                                                 text_train_data, text_dev_data, text_test_data, 
                                                 train_labs, dev_labs, test_labs, self.tokenizer, 
@@ -719,7 +764,7 @@ class ModelTrainer:
             self.model.train()
             print(self.model.model.summary())
 
-            train_preds, test_preds = self.model.test()
+            test_preds = self.model.test()
 
             test_stats = precision_recall_fscore_support(test_labs, test_preds.argmax(axis=1))
             test_accuracy = accuracy_score(test_labs, test_preds.argmax(axis=1))
@@ -750,13 +795,10 @@ if __name__=="__main__":
     # seq_acoustic = [False, "percentChunks", "rawSequential"]
     # text = [False, True]
 
-    # badList = [("rawGlobal", False, False), (False, "rawSequential", True)]
-
-    # inputTypes = [(False, False, True), (False, "percentChunks", False), (False, "rawSequential", False), 
-    #                 ("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False), 
-    #                 (False, "percentChunks", True)]
-
-    inputTypes = [("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True), ("rawGlobal", False, True), 
+    inputTypes = [(False, False, True), (False, "percentChunks", False), (False, "rawSequential", False), 
+                    ("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False), ("rawGlobal", False, False),
+                    (False, "percentChunks", True), (False, "rawSequential", True), 
+                    ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True), ("rawGlobal", False, True), 
                     ("ComParE", "percentChunks", False), ("PCs", "percentChunks", False), ("PCs_feats", "percentChunks", False),("rawGlobal", "percentChunks", False), 
                     ("ComParE", "rawSequential", False), ("PCs", "rawSequential", False), ("PCs_feats", "rawSequential", False),("rawGlobal", "rawSequential", False), 
                     ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),("rawGlobal", "percentChunks", True),
@@ -766,8 +808,8 @@ if __name__=="__main__":
     f0Normed=False
     percentage=10
 
-    for speakerSplit in speakerSplits:
-        for inputType in inputTypes:
+    for inputType in inputTypes:
+        for speakerSplit in speakerSplits:
 
             try:
                 m = ModelTrainer(fileMod, baseList, speakerList, inputType, dataPath, speakerSplit=speakerSplit, f0Normed=f0Normed, percentage=percentage, measureList = measureList)
