@@ -17,6 +17,9 @@ require(sjPlot)
 require(Rcpp)
 library(dplyr)
 library(plot3D)
+library(pROC)
+
+library(cvms)
 ```
 
 
@@ -44,21 +47,6 @@ pcaData = filter(pcaData, PC3 <= PC3mean + (2.5 * PC3sd))
 ```
 
 
-Shapiro-wilk test won't accept more than 5000 values
-```{r}
-idata = filter(pcaData, label==1)
-ndata = filter(pcaData, label==0)
-
-shapiro.test(idata$PC1)
-shapiro.test(ndata$PC1)
-
-shapiro.test(idata$PC2)
-shapiro.test(ndata$PC2)
-
-shapiro.test(idata$PC3)
-shapiro.test(ndata$PC3)
-```
-
 ```{r}
 
 hist(pcaData$PC1)
@@ -79,53 +67,40 @@ hist(ndata$PC3)
 ```{r}
 pcaData$speaker = as.factor(pcaData$speaker)
 
-#all effects with two interaction terms
-m1 = glmer(label ~ PC1 * PC2 * PC3 * label + (1|speaker), data = pcaData, family=binomial)
+m3 = glmer(label ~ PC1 + PC2 + PC3 + (1|speaker), data = pcaData, family=binomial)
 
-#all effects with one interaction term
-m2 = glmer(label ~ PC1 * PC2 + PC3 + label + (1|speaker), data = pcaData, family=binomial)
-
-#all effects without interaction term
-m3 = glmer(label ~ PC1 + PC2 + PC3 + label + (1|speaker), data = pcaData, family=binomial)
-
-
-r.squaredGLMM(m1)
-r.squaredGLMM(m2)
 r.squaredGLMM(m3)
 
-
-anova(m1, m2)
-anova(m1, m3)
-anova(m2, m3)
-
-#m1 has the best r-squared and all are significantly different from one another. Going with m1
 ```
 
 
 ```{r}
-summary(m1)
+summary(m3)
+coefs = coef(m3)
+coefs
+exp(coefs$speaker)
 ```
 ```{r}
-pcaData$m1Fit = predict(m1, type="response")
+pcaData$m3Fit = predict(m3, type="response")
 iData = filter(pcaData, label==1)
 nData = filter(pcaData, label==0)
 ```
 
 ```{r}
-m1Plot1 = scatter3D(pcaData$PC1, pcaData$PC2, pcaData$PC3, phi = 0, theta = 0, bty="g", 
-                   colvar=pcaData$m1Fit, col=ramp.col(c("gold", "green", "blue")),
+m3Plot1 = scatter3D(pcaData$PC1, pcaData$PC2, pcaData$PC3, phi = 0, theta = 0, bty="g", 
+                   colvar=pcaData$m3Fit, col=ramp.col(c("green", "blue")),
                    main = "Probability of predicting Ironic Label by First Three PCs", 
                    xlab = "PC1", ylab = "PC2", zlab = "PC3")
-m1plot2 = scatter3D(pcaData$PC1, pcaData$PC2, pcaData$PC3, phi = 0, theta = 60,  bty="g",
-                    colvar=pcaData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+m3plot2 = scatter3D(pcaData$PC1, pcaData$PC2, pcaData$PC3, phi = 0, theta = 60,  bty="g",
+                    colvar=pcaData$m3Fit, col=ramp.col(c("green", "blue")), 
                     main = "Probability of predicting Ironic Label by First Three PCs", 
                     xlab = "PC1", ylab = "PC2", zlab = "PC3")
-m1Plot3 = scatter3D(pcaData$PC1, pcaData$PC2, pcaData$PC3, phi = 0, theta = 120,  bty="g",
-                    colvar=pcaData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+m3Plot3 = scatter3D(pcaData$PC1, pcaData$PC2, pcaData$PC3, phi = 0, theta = 120,  bty="g",
+                    colvar=pcaData$m3Fit, col=ramp.col(c("green", "blue")), 
                     main = "Probability of predicting Ironic Label by First Three PCs", 
                     xlab = "PC1", ylab = "PC2", zlab = "PC3")
-m1Plot4 = scatter3D(pcaData$PC1, pcaData$PC2, pcaData$PC3, phi = 0, theta = 180,  bty="g",
-                    colvar=pcaData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+m3Plot4 = scatter3D(pcaData$PC1, pcaData$PC2, pcaData$PC3, phi = 0, theta = 180,  bty="g",
+                    colvar=pcaData$m3Fit, col=ramp.col(c("green", "blue")), 
                     main = "Probability of predicting Ironic Label by First Three PCs", 
                     xlab = "PC1", ylab = "PC2", zlab = "PC3")
 
@@ -134,19 +109,19 @@ m1Plot4 = scatter3D(pcaData$PC1, pcaData$PC2, pcaData$PC3, phi = 0, theta = 180,
 #Plotting only ironic samples
 ```{r}
 iPlot1 = scatter3D(iData$PC1, iData$PC2, iData$PC3, phi = 0, theta = 0,  bty="g",
-                   colvar=iData$m1Fit, col=ramp.col(c("gold", "green", "blue")),
+                   colvar=iData$m3Fit, col=ramp.col(c("green", "blue")),
                    main = "Probability of predicting Ironic Label by First Three PCs (Ironic)", 
                    xlab = "PC1", ylab = "PC2", zlab = "PC3") 
 iPlot2 = scatter3D(iData$PC1, iData$PC2, iData$PC3, phi = 0, theta = 60,  bty="g",
-                    colvar=iData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+                    colvar=iData$m3Fit, col=ramp.col(c("green", "blue")), 
                     main = "Probability of predicting Ironic Label by First Three PCs (Ironic)", 
                     xlab = "PC1", ylab = "PC2", zlab = "PC3")
 iPlot3 = scatter3D(iData$PC1, iData$PC2, iData$PC3, phi = 0, theta = 120,  bty="g",
-                    colvar=iData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+                    colvar=iData$m3Fit, col=ramp.col(c("green", "blue")), 
                     main = "Probability of predicting Ironic Label by First Three PCs (Ironic)", 
                     xlab = "PC1", ylab = "PC2", zlab = "PC3")
 iPlot4 = scatter3D(iData$PC1, iData$PC2, iData$PC3, phi = 0, theta = 180,  bty="g",
-                    colvar=iData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+                    colvar=iData$m3Fit, col=ramp.col(c("green", "blue")), 
                     main = "Probability of predicting Ironic Label by First Three PCs (Ironic)", 
                     xlab = "PC1", ylab = "PC2", zlab = "PC3")
 ```
@@ -154,19 +129,62 @@ iPlot4 = scatter3D(iData$PC1, iData$PC2, iData$PC3, phi = 0, theta = 180,  bty="
 Plotting only non-ironic samples
 ```{r}
 nPlot1 = scatter3D(nData$PC1, nData$PC2, nData$PC3, phi = 0, theta = 0,  bty="g",
-                   colvar=nData$m1Fit, col=ramp.col(c("gold", "green", "blue")),
+                   colvar=nData$m3Fit, col=ramp.col(c("green", "blue")),
                    main = "Probability of predicting Ironic Label by First Three PCs (Non-Ironic)", 
                    xlab = "PC1", ylab = "PC2", zlab = "PC3") 
 nPlot2 = scatter3D(nData$PC1, nData$PC2, nData$PC3, phi = 0, theta = 60,  bty="g",
-                    colvar=nData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+                    colvar=nData$m3Fit, col=ramp.col(c("green", "blue")), 
                     main = "Probability of predicting Ironic Label by First Three PCs (Non-Ironic)", 
                     xlab = "PC1", ylab = "PC2", zlab = "PC3")
 nPlot3 = scatter3D(nData$PC1, nData$PC2, nData$PC3, phi = 0, theta = 120,  bty="g",
-                    colvar=nData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+                    colvar=nData$m3Fit, col=ramp.col(c("green", "blue")), 
                     main = "Probability of predicting Ironic Label by First Three PCs (Non-Ironic)", 
                     xlab = "PC1", ylab = "PC2", zlab = "PC3")
 nPlot4 = scatter3D(nData$PC1, nData$PC2, nData$PC3, phi = 0, theta = 180,  bty="g",
-                    colvar=nData$m1Fit, col=ramp.col(c("gold", "green", "blue")), 
+                    colvar=nData$m3Fit, col=ramp.col(c("green", "blue")), 
                     main = "Probability of predicting Ironic Label by First Three PCs (Non-Ironic)", 
                     xlab = "PC1", ylab = "PC2", zlab = "PC3")
 ```
+
+Fresh model trained on 80% of the data and tested on 20% to get ROC curve
+
+Remove model predictions from original data
+```{r}
+pcaData = select(pcaData, -m3Fit)
+```
+
+Train/test split
+```{r}
+smp_size = floor(0.80 * nrow(pcaData))
+
+set.seed(6)
+train_ind = sample(seq_len(nrow(pcaData)), size = smp_size)
+
+trainData = pcaData[train_ind, ]
+testData = pcaData[-train_ind, ]
+```
+
+Train fresh model on training data
+```{r}
+#all effects without interaction term
+m4 = glmer(label ~ PC1 + PC2 + PC3 + (1|speaker), data = trainData, family=binomial)
+```
+
+Calculate predictions from test data
+```{r}
+testData$m4pred = predict(m4, testData, type="response")
+```
+
+
+```{r}
+test_roc = roc(testData$label ~ testData$m4pred, plot = TRUE, print.auc = TRUE)
+```
+
+```{r}
+eval = evaluate(testData, target_col = "label", prediction_cols = "m4pred", type = "binomial")
+cm = eval$`Confusion Matrix`[[1]]
+
+eval
+plot_confusion_matrix(cm)
+```
+

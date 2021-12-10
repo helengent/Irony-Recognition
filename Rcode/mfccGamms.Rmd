@@ -49,13 +49,13 @@ print(plot(m1mfccViz, allTerms=T), pages=3)
 
 ```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
 par(mfrow=c(1, 2))
-plot_diff(m1mfcc, view="mfccNum", shade=TRUE, comp=list(label=c("I", "N")))
-plot_diff(m1mfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+plot_diff(m1mfcc, view="mfccNum", shade=TRUE, comp=list(label=c("I", "N")), rm.ranef=TRUE)
+plot_diff(m1mfcc, view="time", shade=TRUE, comp=list(label=c("I", "N")), rm.ranef=TRUE)
 
 par(mfrow=c(1, 1))
 par(mar=c(5, 5, 3, 8))
 plot_diff2(m1mfcc, view=c('time', "mfccNum"), comp=list(label=c("I", "N")), 
-           main="Difference by label", xlab="Time", ylab="mfccNum")
+           main="Difference by label", xlab="Time", ylab="mfccNum", rm.ranef=TRUE)
 ```
 
 ```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
