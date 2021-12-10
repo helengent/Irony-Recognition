@@ -125,6 +125,6 @@ def main(allDir, outDir):
 if __name__=="__main__":
 
     allDir = "../../AudioData/All3/good2"
-    outDir = "../../AudioData/tmp"
+    outDir = "../../AudioData/newTest"
 
     main(allDir, outDir)

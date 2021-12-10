@@ -44,7 +44,7 @@ def extractFeats(wavPath, speakerList, outputType, winSize=10, tg_mod="asr", sav
 
     #Extract acoustic features
 
-    # extract.main(wavPath, speakerList, outputType, winSize=winSize)
+    extract.main(wavPath, speakerList, outputType, winSize=winSize)
 
     extract_textDependent.main(wavPath, tg_mod, saveWhole=saveWhole)
 
@@ -53,9 +53,9 @@ def extractFeats(wavPath, speakerList, outputType, winSize=10, tg_mod="asr", sav
 
 if __name__=="__main__":
 
-    wavPath = "Pruned3"
-    # wavPath = "tmp"
-    speakerList = ["C", "D", "E", "F", "H", "J", "K", "O", "Q", "S", "T", "U"]
+    # wavPath = "Pruned3"
+    wavPath = "newTest"
+    speakerList = ["C", "D"]
     outputList = ['individual', 'global']
 
     tg_mod = "asr"
