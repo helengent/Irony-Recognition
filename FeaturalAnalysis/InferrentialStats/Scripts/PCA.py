@@ -8,6 +8,7 @@ from mpl_toolkits import mplot3d
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
+from pandas.core.base import NoNewAttributesMixin
 
 from sklearn.decomposition import PCA
 from sklearn.impute import SimpleImputer
@@ -26,14 +27,14 @@ class Arrow3D(FancyArrowPatch):
         FancyArrowPatch.draw(self, renderer)
 
 
-def plotCorrelation(df, finalDF, pca, features):
+def plotCorrelation(df, finalDF, pca, features, subDir):
 
-    fig = plt.figure(figsize=(15, 15))
+    fig = plt.figure(figsize=(20, 20))
     ax = fig.add_subplot(111, projection='3d')
 
-    ax.set_xlabel('Principal Component 1', fontsize = 10)
-    ax.set_ylabel('Principal Component 2', fontsize = 10)
-    ax.set_zlabel('Principal Component 3', fontsize = 10)
+    ax.set_xlabel('Principal Component 1', fontsize = 20)
+    ax.set_ylabel('Principal Component 2', fontsize = 20)
+    ax.set_zlabel('Principal Component 3', fontsize = 20)
 
     colList = df.columns[:6]
     i = 0
@@ -77,25 +78,35 @@ def plotCorrelation(df, finalDF, pca, features):
 
         i += 2
 
+    PC1mean = [np.mean(finalDF.loc[:, 'PC1'])] * 100
+    PC2mean = [np.mean(finalDF.loc[:, 'PC2'])] * 100
+    PC3mean = [np.mean(finalDF.loc[:, 'PC3'])] * 100
+
+    l = np.linspace(-.5, .5, num=100)
+
+    ax.plot(PC1mean, PC2mean, l, label="PC3", color="black")
+    ax.plot(PC1mean, l, PC3mean, label="PC2", color="black")
+    ax.plot(l, PC2mean, PC3mean, label="PC2", color="black")
+
     ax.set_xlim([-.5, .5])
     ax.set_ylim([-.5, .5])
     ax.set_zlim([-.5, .5])
 
-    plt.title("Top Features Correlated with First 3 PCs")
+    plt.title("Top Features Correlated with First 3 PCs", fontsize = 30)
     plt.draw()
     
-    plt.savefig("../Output/CorrelationCircle.png")
+    plt.savefig("../Output/{}/CorrelationCircle.png".format(subDir))
 
 
-def plotPCs3D(finalDF):
+def plotPCs3D(finalDF, subDir):
 
-    fig = plt.figure()
+    fig = plt.figure(figsize=(20, 20))
     ax = plt.axes(projection='3d')
 
-    ax.set_xlabel('Principal Component 1', fontsize = 10)
-    ax.set_ylabel('Principal Component 2', fontsize = 10)
-    ax.set_zlabel('Principal Component 3', fontsize = 10)
-    ax.set_title('3 component PCA', fontsize = 15)
+    ax.set_xlabel('Principal Component 1', fontsize = 30)
+    ax.set_ylabel('Principal Component 2', fontsize = 30)
+    ax.set_zlabel('Principal Component 3', fontsize = 30)
+    # ax.set_title('3 component PCA', fontsize = 30)
 
     targets = ['I', 'N']
     colors = ['g', 'b']
@@ -107,9 +118,21 @@ def plotPCs3D(finalDF):
                 , alpha = 0.5
                 , c = color
                 , s = 50)
-    ax.legend(targets)
-    #ax.grid()
-    plt.savefig("../Output/3_factorPCA.png")
+    # ax.legend(targets)
+
+    plt.savefig("../Output/{}/3_factorPCA.png".format(subDir))
+
+    for i in range(151, 156):
+        ax.view_init(0, i)
+        plt.savefig("../Output/{}/3Factor/0_{}.png".format(subDir, i))
+
+    angles = [0, 60, 120, 180, 240, 300, 360]
+
+    for angle in angles:
+        for rotation in angles:
+            ax.view_init(angle, rotation)
+            plt.savefig("../Output/{}/3Factor/{}_{}.png".format(subDir, angle, rotation))
+
 
     plt.clf()
     fig = plt.figure()
@@ -128,7 +151,7 @@ def plotPCs3D(finalDF):
             , c = 'g'
             , s = 50)
     ax.legend(targets)
-    plt.savefig("../Output/3_factorPCA_Ironic.png")
+    plt.savefig("../Output/{}/3_factorPCA_Ironic.png".format(subDir))
 
     plt.clf()
     fig = plt.figure()
@@ -147,10 +170,11 @@ def plotPCs3D(finalDF):
             , c = 'b'
             , s = 50)
     ax.legend(targets)
-    plt.savefig("../Output/3_factorPCA_Non-Ironic.png")
+
+    plt.savefig("../Output/{}/3_factorPCA_Non-Ironic.png".format(subDir))
 
 
-def plotPCs(finalDF):
+def plotPCs(finalDF, subDir):
 
     #Plot the first two PCs in different colors for ironic and non-ironic samples
     fig = plt.figure(figsize = (8,8))
@@ -169,7 +193,7 @@ def plotPCs(finalDF):
                 , s = 50)
     ax.legend(targets)
     ax.grid()
-    plt.savefig("../Output/2_factorPCA.png")
+    plt.savefig("../Output/{}/2_factorPCA.png".format(subDir))
 
     plt.clf()
     fig = plt.figure(figsize = (8,8))
@@ -185,7 +209,7 @@ def plotPCs(finalDF):
             , s = 50)
     ax.legend(targets)
     ax.grid()
-    plt.savefig("../Output/2_factorPCA_Ironic.png")
+    plt.savefig("../Output/{}/2_factorPCA_Ironic.png".format(subDir))
 
     plt.clf()
     fig = plt.figure(figsize = (8,8))
@@ -201,10 +225,10 @@ def plotPCs(finalDF):
             , s = 50)
     ax.legend(targets)
     ax.grid()
-    plt.savefig("../Output/2_factorPCA_Non-Ironic.png")
+    plt.savefig("../Output/{}/2_factorPCA_Non-Ironic.png".format(subDir))
 
 
-def plotVariance(v):
+def plotVariance(v, subDir):
 
     #Plot the percentage of variance explained with the addition of PCs
     plt.ylabel("% Variance Explained")
@@ -214,10 +238,10 @@ def plotVariance(v):
     plt.style.context("seaborn-whitegrid")
 
     plt.plot(v)
-    plt.savefig("../Output/PCA_analysis.png")
+    plt.savefig("../Output/{}/PCA_analysis.png".format(subDir))
 
 
-def main(df, numComps):
+def main(df, numComps, subDir):
 
     #Data preparation
     features = df.columns[3:].tolist()
@@ -244,7 +268,7 @@ def main(df, numComps):
     #Data frames with PC values per sample
     principalDF = pd.DataFrame(data = principalComponents, columns = PCnames)
     finalDF = pd.concat([df[['fileName', 'speaker','label']], principalDF], axis = 1)
-    finalDF.to_csv("../Data/{}factorPCA.csv".format(numComps), index = False)
+    finalDF.to_csv("../Output/{}/{}factorPCA.csv".format(subDir, numComps), index = False)
 
     #Compute variance explained by each PC
     variance = pca.explained_variance_ratio_
@@ -256,13 +280,15 @@ def main(df, numComps):
     varDF = pd.DataFrame(index=["Proportion of Variance", "Cumulative Proportion"])
     for n, v, c in zip(PCnames, variance, var):
         varDF[n] = [v, c]
-    varDF.to_csv("../Output/PCA_variance.csv")
+    varDF.to_csv("../Output/{}/PCA_variance.csv".format(subDir))
 
     #Plotting
-    plotVariance(var)
-    plotPCs(finalDF)
-    plotPCs3D(finalDF)
+    plotVariance(var, subDir)
+    plotPCs(finalDF, subDir)
+    plotPCs3D(finalDF, subDir)
 
+
+    outFeats = list()
     #Dataframe of  for top features for each PC
     header = pd.MultiIndex.from_product([PCnames,
                                         ['Features', 'Correlation']])
@@ -273,22 +299,34 @@ def main(df, numComps):
         top_feats = np.array(features)[inds]
         outDF[n, 'Features'] = top_feats
         outDF[n, 'Correlation'] = top_contribs
-    outDF.to_csv("../Output/PCA_top_feats.csv")
+
+        for feat, ind in zip(top_feats, inds):
+            if (feat, ind) not in outFeats:
+                outFeats.append((feat, ind))
+
+    outDF.to_csv("../Output/{}/PCA_top_feats.csv".format(subDir))
 
     print(outDF)
 
     #Plotting
-    plotCorrelation(outDF, finalDF, pca, features)
+    plotCorrelation(outDF, finalDF, pca, features, subDir)
 
+    for f in outFeats:
+        feat, ind = f
+        finalDF[feat] = x[:, ind]
+
+    finalDF.to_csv("../Output/{}/{}Factor_feats.csv".format(subDir, numComps), index=False)
 
 
 if __name__=="__main__":
 
     # df = pd.read_csv("~/Data/AcousticData/text_feats/Pruned3_asr_text_feats.csv")
     df = pd.read_csv("../Data/all_narrowed.csv")
+    # df = pd.read_csv("../Data/ComParE.csv", index_col = 0)
     # df = df.drop(columns=["index"])
 
-    numComps = [6]
+    numComps = [3]
+    subDir = "narrowed"
 
     for n in numComps:
-        main(df, n)
+        main(df, n, subDir)
