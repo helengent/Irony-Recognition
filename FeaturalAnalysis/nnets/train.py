@@ -540,11 +540,16 @@ class ModelTrainer:
             if self.glob_acoustic:
 
                 if not os.path.exists("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
-                    desiredIndices = list()
-                    for i, item in enumerate(self.glob_file["fileName"].tolist()): 
-                        if item in X_train: 
-                            desiredIndices.append(i)
-                    X_train = self.glob_file.iloc[desiredIndices]
+                    # desiredIndices = list()
+                    # for i, item in enumerate(self.glob_file["fileName"].tolist()): 
+                    #     if item in X_train: 
+                            # desiredIndices.append(i)
+                    # X_train = self.glob_file.iloc[desiredIndices]
+                    newX = pd.DataFrame()
+                    for name in X_train:
+                        subset = self.glob_file[self.glob_file["fileName"] == name]
+                        newX = newX.append(subset)
+                    X_train = newX
                     train_meta = pd.DataFrame()
                     train_meta["fileName"] = X_train.pop("fileName")
                     train_meta["speaker"] = X_train.pop("speaker")
@@ -552,8 +557,8 @@ class ModelTrainer:
                     train_meta.to_csv("{}/speaker-{}_train_{}.meta".format(self.dataPath, self.speakerSplit, counter))
                     
                     if "PCs" not in self.glob_acoustic:
-                        if True in np.isnan(np.sum(X_train)).tolist():
-                            X_train = self.glob_imputer.transform(X_train)
+                        # if True in np.isnan(np.sum(X_train)).tolist():
+                        #     X_train = self.glob_imputer.transform(X_train)
                         X_train = self.glob_scaler.transform(X_train)
                     X_train = np.array(X_train)
                     with open("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
@@ -565,11 +570,16 @@ class ModelTrainer:
                         np.save(f, y_train)
 
                 if not os.path.exists("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
-                    desiredIndices = list()
-                    for i, item in enumerate(self.glob_file["fileName"].tolist()): 
-                        if item in X_dev: 
-                            desiredIndices.append(i)
-                    X_dev = self.glob_file.iloc[desiredIndices]
+                    # desiredIndices = list()
+                    # for i, item in enumerate(self.glob_file["fileName"].tolist()): 
+                    #     if item in X_dev: 
+                    #         desiredIndices.append(i)
+                    # X_dev = self.glob_file.iloc[desiredIndices]
+                    newX = pd.DataFrame()
+                    for name in X_dev:
+                        subset = self.glob_file[self.glob_file["fileName"] == name]
+                        newX = newX.append(subset)
+                    X_dev = newX
                     dev_meta = pd.DataFrame()
                     dev_meta["fileName"] = X_dev.pop("fileName")
                     dev_meta["speaker"] = X_dev.pop("speaker")
@@ -578,8 +588,8 @@ class ModelTrainer:
 
 
                     if "PCs" not in self.glob_acoustic:
-                        if np.isnan(np.sum(X_dev)):
-                            X_train = self.glob_imputer.transform(X_dev)
+                        # if np.isnan(np.sum(X_dev)):
+                        #     X_train = self.glob_imputer.transform(X_dev)
                         X_dev = self.glob_scaler.transform(X_dev)
                     X_dev = np.array(X_dev)
                     with open("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
@@ -591,11 +601,16 @@ class ModelTrainer:
                         np.save(f, y_dev)
 
                 if not os.path.exists("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
-                    desiredIndices = list()
-                    for i, item in enumerate(self.glob_file["fileName"].tolist()): 
-                        if item in X_test: 
-                            desiredIndices.append(i)
-                    X_test = self.glob_file.iloc[desiredIndices]                    
+                    # desiredIndices = list()
+                    # for i, item in enumerate(self.glob_file["fileName"].tolist()): 
+                    #     if item in X_test: 
+                    #         desiredIndices.append(i)
+                    # X_test = self.glob_file.iloc[desiredIndices]  
+                    newX = pd.DataFrame()
+                    for name in X_test:
+                        subset = self.glob_file[self.glob_file["fileName"] == name]
+                        newX = newX.append(subset)
+                    X_test = newX    
                     test_meta = pd.DataFrame()
                     test_meta["fileName"] = X_test.pop("fileName")
                     test_meta["speaker"] = X_test.pop("speaker")
@@ -604,8 +619,8 @@ class ModelTrainer:
 
 
                     if "PCs" not in self.glob_acoustic:
-                        if np.isnan(np.sum(X_test)):
-                            X_train = self.glob_imputer.transform(X_test)
+                        # if np.isnan(np.sum(X_test)):
+                        #     X_train = self.glob_imputer.transform(X_test)
                         X_test = self.glob_scaler.transform(X_test)
                     X_test = np.array(X_test)
                     with open("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
@@ -795,10 +810,17 @@ if __name__=="__main__":
     # seq_acoustic = [False, "percentChunks", "rawSequential"]
     # text = [False, True]
 
-    inputTypes = [(False, False, True), (False, "percentChunks", False), (False, "rawSequential", False), 
-                    ("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False), ("rawGlobal", False, False),
-                    (False, "percentChunks", True), (False, "rawSequential", True), 
-                    ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True), ("rawGlobal", False, True), 
+    # inputTypes = [(False, False, True), (False, "percentChunks", False), (False, "rawSequential", False), 
+    #                 ("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False), ("rawGlobal", False, False),
+    #                 (False, "percentChunks", True), (False, "rawSequential", True), 
+    #                 ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True), ("rawGlobal", False, True), 
+    #                 ("ComParE", "percentChunks", False), ("PCs", "percentChunks", False), ("PCs_feats", "percentChunks", False),("rawGlobal", "percentChunks", False), 
+    #                 ("ComParE", "rawSequential", False), ("PCs", "rawSequential", False), ("PCs_feats", "rawSequential", False),("rawGlobal", "rawSequential", False), 
+    #                 ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),("rawGlobal", "percentChunks", True),
+    #                 ("ComParE", "rawSequential", False), ("PCs", "rawSequential", True), ("PCs_feats", "rawSequential", True),("rawGlobal", "rawSequential", True)]
+
+    inputTypes = [("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False), ("rawGlobal", False, False),
+                    (False, "rawSequential", True), ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True), ("rawGlobal", False, True), 
                     ("ComParE", "percentChunks", False), ("PCs", "percentChunks", False), ("PCs_feats", "percentChunks", False),("rawGlobal", "percentChunks", False), 
                     ("ComParE", "rawSequential", False), ("PCs", "rawSequential", False), ("PCs_feats", "rawSequential", False),("rawGlobal", "rawSequential", False), 
                     ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),("rawGlobal", "percentChunks", True),
@@ -815,6 +837,7 @@ if __name__=="__main__":
                 m = ModelTrainer(fileMod, baseList, speakerList, inputType, dataPath, speakerSplit=speakerSplit, f0Normed=f0Normed, percentage=percentage, measureList = measureList)
 
                 m.trainModel()
+
             except Exception as e:
                 with open("bad.txt", "a+") as f:
                     f.write("{}\t{}\n{}\n\n".format(inputType, speakerSplit, e))

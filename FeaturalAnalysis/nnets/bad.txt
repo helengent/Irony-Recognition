@@ -1,20 +1,8 @@
-(False, 'rawSequential', False)	dependent
-Input contains NaN, infinity or a value too large for dtype('float32').
-
-(False, 'rawSequential', False)	independent
-Input contains NaN, infinity or a value too large for dtype('float32').
-
-('ComParE', False, False)	dependent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
-
-('ComParE', False, False)	independent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
-
 ('rawGlobal', False, False)	dependent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Input contains NaN, infinity or a value too large for dtype('float32').
 
 ('rawGlobal', False, False)	independent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Input contains NaN, infinity or a value too large for dtype('float32').
 
 (False, 'rawSequential', True)	dependent
 Input contains NaN, infinity or a value too large for dtype('float32').
@@ -22,35 +10,23 @@ Input contains NaN, infinity or a value too large for dtype('float32').
 (False, 'rawSequential', True)	independent
 Input contains NaN, infinity or a value too large for dtype('float32').
 
-('ComParE', False, True)	dependent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
-
-('ComParE', False, True)	independent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
-
 ('rawGlobal', False, True)	dependent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Input contains NaN, infinity or a value too large for dtype('float32').
 
 ('rawGlobal', False, True)	independent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
-
-('ComParE', 'percentChunks', False)	dependent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
-
-('ComParE', 'percentChunks', False)	independent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Input contains NaN, infinity or a value too large for dtype('float32').
 
 ('rawGlobal', 'percentChunks', False)	dependent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Input contains NaN, infinity or a value too large for dtype('float32').
 
 ('rawGlobal', 'percentChunks', False)	independent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Input contains NaN, infinity or a value too large for dtype('float32').
 
 ('ComParE', 'rawSequential', False)	dependent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Input contains NaN, infinity or a value too large for dtype('float32').
 
 ('ComParE', 'rawSequential', False)	independent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Input contains NaN, infinity or a value too large for dtype('float32').
 
 ('PCs', 'rawSequential', False)	dependent
 Input contains NaN, infinity or a value too large for dtype('float32').
@@ -65,28 +41,22 @@ Input contains NaN, infinity or a value too large for dtype('float32').
 Input contains NaN, infinity or a value too large for dtype('float32').
 
 ('rawGlobal', 'rawSequential', False)	dependent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Input contains NaN, infinity or a value too large for dtype('float32').
 
 ('rawGlobal', 'rawSequential', False)	independent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
-
-('ComParE', 'percentChunks', True)	dependent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
-
-('ComParE', 'percentChunks', True)	independent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Input contains NaN, infinity or a value too large for dtype('float32').
 
 ('rawGlobal', 'percentChunks', True)	dependent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Input contains NaN, infinity or a value too large for dtype('float32').
 
 ('rawGlobal', 'percentChunks', True)	independent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Input contains NaN, infinity or a value too large for dtype('float32').
 
 ('ComParE', 'rawSequential', False)	dependent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Input contains NaN, infinity or a value too large for dtype('float32').
 
 ('ComParE', 'rawSequential', False)	independent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Input contains NaN, infinity or a value too large for dtype('float32').
 
 ('PCs', 'rawSequential', True)	dependent
 Input contains NaN, infinity or a value too large for dtype('float32').
@@ -101,8 +71,8 @@ Input contains NaN, infinity or a value too large for dtype('float32').
 Input contains NaN, infinity or a value too large for dtype('float32').
 
 ('rawGlobal', 'rawSequential', True)	dependent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Input contains NaN, infinity or a value too large for dtype('float32').
 
 ('rawGlobal', 'rawSequential', True)	independent
-The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+Input contains NaN, infinity or a value too large for dtype('float32').
 
