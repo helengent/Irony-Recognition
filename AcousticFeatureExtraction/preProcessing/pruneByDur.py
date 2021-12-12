@@ -63,54 +63,54 @@ def main(allDir, outDir):
     print("{} outliers are labeled non-ironic".format(durDict['label'].tolist().count("N") - subSet['label'].tolist().count("N")))
     print("New class balance:\t{}% ironic\t{}% non-ironic".format(np.round(subSet['label'].tolist().count("I") / subSet.shape[0], 2), np.round(subSet['label'].tolist().count("N") / subSet.shape[0], 2)))
 
-    print("Adjusting for Class Balance")
+    # print("Adjusting for Class Balance")
 
-    speakerList = [item.split("_")[1][0] for item in subSet["filename"].tolist()]
-    subSet["speaker"] = speakerList
+    # speakerList = [item.split("_")[1][0] for item in subSet["filename"].tolist()]
+    # subSet["speaker"] = speakerList
 
-    print("Speaker class distributions:")
-    for s in list(set(speakerList)):
+    # print("Speaker class distributions:")
+    # for s in list(set(speakerList)):
 
-        smallSet = subSet[subSet["speaker"] == s]
-        labs = smallSet["label"].tolist()
+    #     smallSet = subSet[subSet["speaker"] == s]
+    #     labs = smallSet["label"].tolist()
 
-        print("Speaker {}\t{} ironic samples\t{} non-ironic samples".format(s, labs.count("I"), labs.count("N")))
+    #     print("Speaker {}\t{} ironic samples\t{} non-ironic samples".format(s, labs.count("I"), labs.count("N")))
 
-    diff = subSet['label'].tolist().count("N") - subSet['label'].tolist().count("I")
-    print("Removing {} samples to achieve class balance")
+    # diff = subSet['label'].tolist().count("N") - subSet['label'].tolist().count("I")
+    # print("Removing {} samples to achieve class balance")
 
-    subI = subSet[subSet["label"] == "I"]
-    durMeanI, durSDI = getDurationStats(subI["duration"].tolist())
-    durDiffs = [np.abs(item - durMeanI) for item in subI["duration"].tolist()]
-    subI["durDiffs"] = durDiffs
-    print("Mean variance from duration mean for ironic samples\t{}".format(np.round(np.mean(subI["durDiffs"].tolist()), 2)))
+    # subI = subSet[subSet["label"] == "I"]
+    # durMeanI, durSDI = getDurationStats(subI["duration"].tolist())
+    # durDiffs = [np.abs(item - durMeanI) for item in subI["duration"].tolist()]
+    # subI["durDiffs"] = durDiffs
+    # print("Mean variance from duration mean for ironic samples\t{}".format(np.round(np.mean(subI["durDiffs"].tolist()), 2)))
 
-    subN = subSet[subSet["label"] == "N"]
-    durMeanN, durSDN = getDurationStats(subN["duration"].tolist())
-    durDiffs = [np.abs(item - durMeanN) for item in subN["duration"].tolist()]
-    subN["durDiffs"] = durDiffs
-    subN = subN.sort_values("durDiffs")
-    print("Mean variance from duration mean for non-ironic samples\t{}".format(np.round(np.mean(subN["durDiffs"].tolist()), 2)))
+    # subN = subSet[subSet["label"] == "N"]
+    # durMeanN, durSDN = getDurationStats(subN["duration"].tolist())
+    # durDiffs = [np.abs(item - durMeanN) for item in subN["duration"].tolist()]
+    # subN["durDiffs"] = durDiffs
+    # subN = subN.sort_values("durDiffs")
+    # print("Mean variance from duration mean for non-ironic samples\t{}".format(np.round(np.mean(subN["durDiffs"].tolist()), 2)))
 
-    newN = pd.DataFrame()
-    idx = np.round(np.linspace(0, subN.shape[0] - 1, subI.shape[0])).astype(int)
+    # newN = pd.DataFrame()
+    # idx = np.round(np.linspace(0, subN.shape[0] - 1, subI.shape[0])).astype(int)
 
-    i = 0
-    for _, row in subN.iterrows():
-        if i in idx:
-            newN = newN.append(row)
-        i += 1
+    # i = 0
+    # for _, row in subN.iterrows():
+    #     if i in idx:
+    #         newN = newN.append(row)
+    #     i += 1
 
-    subN = newN
+    # subN = newN
 
-    print(subI.shape)
-    print(subN.shape)
+    # print(subI.shape)
+    # print(subN.shape)
 
-    subSet = subI.append(subN)
+    # subSet = subI.append(subN)
 
-    print("Removed extra non-ironic samples with greatest variance from duration mean")
-    print("Mean variance from duration mean for ironic samples\t{}".format(np.round(np.mean(subI["durDiffs"].tolist()), 2)))
-    print("Mean variance from duration mean for non-ironic samples\t{}".format(np.round(np.mean(subN["durDiffs"].tolist()), 2)))
+    # print("Removed extra non-ironic samples with greatest variance from duration mean")
+    # print("Mean variance from duration mean for ironic samples\t{}".format(np.round(np.mean(subI["durDiffs"].tolist()), 2)))
+    # print("Mean variance from duration mean for non-ironic samples\t{}".format(np.round(np.mean(subN["durDiffs"].tolist()), 2)))
 
     print("Saving pruned dataset to separate directory")
 
