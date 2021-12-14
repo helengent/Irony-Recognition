@@ -37,7 +37,7 @@ from sd import sd
 
 class ModelTrainer:
 
-    def __init__(self, fileMod, fileList, speakerList, inputType, dataPath, speakerSplit="independent", f0Normed=False, percentage=10, measureList=None, frameMax=200):
+    def __init__(self, fileMod, fileList, speakerList, inputType, dataPath, subDir, speakerSplit="independent", f0Normed=False, percentage=10, measureList=None, frameMax=200):
         self.fileMod = fileMod
         self.fileList = fileList
         self.speakerList = speakerList
@@ -48,6 +48,7 @@ class ModelTrainer:
         self.percentage = percentage
         self.measureList = measureList
         self.frameMax = frameMax
+        self.subDir = subDir
 
         if self.glob_acoustic:
             if self.glob_acoustic == "ComParE":
@@ -63,14 +64,14 @@ class ModelTrainer:
         if self.text:
             self.prefix = self.prefix + "text_"
 
-        self.csv_path = "Checkpoints/{}checkpoints.csv".format(self.prefix)
-        self.checkpoint_path = "Checkpoints/{}checkpoints.ckpt".format(self.prefix)
+        self.csv_path = "Checkpoints/{}/{}checkpoints.csv".format(self.subDir, self.prefix)
+        self.checkpoint_path = "Checkpoints/{}/{}checkpoints.ckpt".format(self.subDir, self.prefix)
         
-        if self.speakerSplit == "independent":
+        if "independent" in self.speakerSplit:
             counters = self.speakerList
         else:
             counters = range(5)
-        self.plot_paths = {counter: "Plots/{}_{}.png".format(self.prefix, counter) for counter in counters}
+        self.plot_paths = {counter: "Plots/{}/{}_{}.png".format(self.subDir, self.prefix, counter) for counter in counters}
 
         self.train_performance_list, self.test_performance_list, self.rocStats = list(), list(), list()
         self.class_weights = {0.0: 1.0, 1.0: 1.0}
@@ -89,9 +90,9 @@ class ModelTrainer:
         if self.speakerSplit == "independent":
             for speaker in self.speakerList:
 
-                leftOutList = [item for item in self.fileList if item.split("_")[1][0] != speaker]
+                leftOutList = [item for item in self.fileList if item.split("_")[1][0] not in speaker]
                 tr, d = train_test_split(leftOutList, test_size=0.1, shuffle=True, stratify=[item[-1] for item in leftOutList], random_state=6)
-                t = [item for item in self.fileList if item.split("_")[1][0] == speaker]
+                t = [item for item in self.fileList if item.split("_")[1][0] in speaker]
 
                 tr_labs = [item[-1] for item in tr]
                 d_labs = [item[-1] for item in d]
@@ -327,24 +328,24 @@ class ModelTrainer:
     def createScalers(self):
         #Create scaler for sequential data
         if self.seq_acoustic:
-            if not os.path.exists("{}/{}/scaler.pkl".format(self.dataPath, self.seq_acoustic)):
+            if not os.path.exists("{}/{}/{}/scaler.pkl".format(self.dataPath, self.seq_acoustic, self.subDir)):
                 ndata = [item for item in self.fileList if item[-1] == "N"]
                 ndata = self.assembleArray(ndata)
                 seq_scaler= self.makeScaler(ndata)
-                with open("{}/{}/scaler.pkl".format(dataPath, self.seq_acoustic), "wb") as f:
+                with open("{}/{}/{}/scaler.pkl".format(dataPath, self.seq_acoustic, self.subDir), "wb") as f:
                     pickle.dump(seq_scaler, f)
             else:
-                with open("{}/{}/scaler.pkl".format(dataPath, self.seq_acoustic), "rb") as f:
+                with open("{}/{}/{}/scaler.pkl".format(dataPath, self.seq_acoustic, self.subDir), "rb") as f:
                     seq_scaler = pickle.load(f)
 
-            if not os.path.exists("{}/{}/imputer.pkl".format(self.dataPath, self.seq_acoustic)):
+            if not os.path.exists("{}/{}/{}/imputer.pkl".format(self.dataPath, self.seq_acoustic, self.subDir)):
                 ndata = [item for item in self.fileList if item[-1] == "N"]
                 ndata = self.assembleArray(ndata)
                 seq_imputer = self.makeImputer(ndata)
-                with open("{}/{}/imputer.pkl".format(dataPath, self.seq_acoustic), "wb") as f:
+                with open("{}/{}/{}/imputer.pkl".format(dataPath, self.seq_acoustic, self.subDir), "wb") as f:
                     pickle.dump(seq_imputer, f)
             else:
-                with open("{}/{}/imputer.pkl".format(dataPath, self.seq_acoustic), "rb") as f:
+                with open("{}/{}/{}/imputer.pkl".format(dataPath, self.seq_acoustic, self.subDir), "rb") as f:
                     seq_imputer = pickle.load(f)
         else:
             seq_scaler = None
@@ -369,7 +370,7 @@ class ModelTrainer:
 
     def performanceReport(self):
 
-        with open("Results/performanceReport_{}_{}.txt".format(self.fileMod, self.prefix), "w") as f:
+        with open("Results/{}/performanceReport_{}_{}.txt".format(self.subDir, self.fileMod, self.prefix), "w") as f:
 
             test_precisions, test_recalls, test_f1s, test_accuracies = list(), list(), list(), list()
 
@@ -477,7 +478,7 @@ class ModelTrainer:
 
         ax.set(xlim=[-0.05, 1.05], ylim=[-0.05, 1.05], title="ROC Curve")
         ax.legend(loc="lower right")
-        plt.savefig("Plots/ROC_{}.png".format(self.prefix))
+        plt.savefig("Plots/{}/ROC_{}.png".format(self.subDir, self.prefix))
 
 
     def transformLabs(self, x_list):
@@ -503,48 +504,43 @@ class ModelTrainer:
 
             if self.seq_acoustic:
 
-                if not os.path.exists("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter)):
+                if not os.path.exists("{}/{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter)):
                     X_train = self.assembleArray(X_train)
                     X_train = self.scaleIt(X_train)
-                    with open("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter), "wb") as f:
                         np.save(f, X_train)
 
-                if not os.path.exists("{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter)):
+                if not os.path.exists("{}/{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter)):
                     y_train = np.array(self.transformLabs(y_train))
-                    with open("{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter), "wb") as f:
                         np.save(f, y_train)
 
-                if not os.path.exists("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter)):
+                if not os.path.exists("{}/{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter)):
                     X_dev= self.assembleArray(X_dev)
                     X_dev = self.scaleIt(X_dev)
-                    with open("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter), "wb") as f:
                         np.save(f, X_dev)
 
-                if not os.path.exists("{}/{}/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter)):
+                if not os.path.exists("{}/{}/{}/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter)):
                     y_dev = np.array(self.transformLabs(y_dev))
-                    with open("{}/{}/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/{}/{}/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter), "wb") as f:
                         np.save(f, y_dev)
 
-                if not os.path.exists("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter)):
+                if not os.path.exists("{}/{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter)):
                     X_test = self.assembleArray(X_test)
                     X_test = self.scaleIt(X_test)
-                    with open("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter), "wb") as f:
                         np.save(f, X_test)
 
-                if not os.path.exists("{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter)):
+                if not os.path.exists("{}/{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter)):
                     y_test = np.array(self.transformLabs(y_test))
-                    with open("{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter), "wb") as f:
                         np.save(f, y_test)
 
 
             if self.glob_acoustic:
 
-                if not os.path.exists("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
-                    # desiredIndices = list()
-                    # for i, item in enumerate(self.glob_file["fileName"].tolist()): 
-                    #     if item in X_train: 
-                            # desiredIndices.append(i)
-                    # X_train = self.glob_file.iloc[desiredIndices]
+                if not os.path.exists("{}/{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter)):
                     newX = pd.DataFrame()
                     for name in X_train:
                         subset = self.glob_file[self.glob_file["fileName"] == name]
@@ -561,20 +557,15 @@ class ModelTrainer:
                         #     X_train = self.glob_imputer.transform(X_train)
                         X_train = self.glob_scaler.transform(X_train)
                     X_train = np.array(X_train)
-                    with open("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter), "wb") as f:
                         np.save(f, X_train)
 
-                if not os.path.exists("{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
+                if not os.path.exists("{}/{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter)):
                     y_train = np.array(self.transformLabs(y_train))
-                    with open("{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter), "wb") as f:
                         np.save(f, y_train)
 
-                if not os.path.exists("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
-                    # desiredIndices = list()
-                    # for i, item in enumerate(self.glob_file["fileName"].tolist()): 
-                    #     if item in X_dev: 
-                    #         desiredIndices.append(i)
-                    # X_dev = self.glob_file.iloc[desiredIndices]
+                if not os.path.exists("{}/{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter)):
                     newX = pd.DataFrame()
                     for name in X_dev:
                         subset = self.glob_file[self.glob_file["fileName"] == name]
@@ -586,26 +577,20 @@ class ModelTrainer:
                     dev_meta["label"] = X_dev.pop("label")
                     dev_meta.to_csv("{}/speaker-{}_dev_{}.meta".format(self.dataPath, self.speakerSplit, counter))
 
-
                     if "PCs" not in self.glob_acoustic:
                         # if np.isnan(np.sum(X_dev)):
                         #     X_train = self.glob_imputer.transform(X_dev)
                         X_dev = self.glob_scaler.transform(X_dev)
                     X_dev = np.array(X_dev)
-                    with open("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter), "wb") as f:
                         np.save(f, X_dev)
 
-                if not os.path.exists("{}/{}/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
+                if not os.path.exists("{}/{}/{}/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter)):
                     y_dev = np.array(self.transformLabs(y_dev))
-                    with open("{}/{}/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/{}/{}/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter), "wb") as f:
                         np.save(f, y_dev)
 
-                if not os.path.exists("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
-                    # desiredIndices = list()
-                    # for i, item in enumerate(self.glob_file["fileName"].tolist()): 
-                    #     if item in X_test: 
-                    #         desiredIndices.append(i)
-                    # X_test = self.glob_file.iloc[desiredIndices]  
+                if not os.path.exists("{}/{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter)): 
                     newX = pd.DataFrame()
                     for name in X_test:
                         subset = self.glob_file[self.glob_file["fileName"] == name]
@@ -617,66 +602,65 @@ class ModelTrainer:
                     test_meta["label"] = X_test.pop("label")
                     test_meta.to_csv("{}/speaker-{}_test_{}.meta".format(self.dataPath, self.speakerSplit, counter))
 
-
                     if "PCs" not in self.glob_acoustic:
                         # if np.isnan(np.sum(X_test)):
                         #     X_train = self.glob_imputer.transform(X_test)
                         X_test = self.glob_scaler.transform(X_test)
                     X_test = np.array(X_test)
-                    with open("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter), "wb") as f:
                         np.save(f, X_test)
 
-                if not os.path.exists("{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
+                if not os.path.exists("{}/{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter)):
                     y_test = np.array(self.transformLabs(y_test))
-                    with open("{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter), "wb") as f:
                         np.save(f, y_test)
 
 
             if self.text:
 
-                if not os.path.exists("{}/Text/speaker-{}_train-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter)):
+                if not os.path.exists("{}/Text/newSplit/speaker-{}_train-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter)):
                     textList = list()
                     for f in X_train:
                         text = open("/home/hmgent2/Data/TextData/{}_asr/{}.txt".format(self.fileMod, f)).read()
                         textList.append(text)
                     sequences = self.tokenizer.texts_to_sequences(textList)
                     X_train = sequence.pad_sequences(sequences, padding="post", truncating="post", maxlen=25) #maxlen chosen as 95th percentile of sentence lengths
-                    with open("{}/Text/speaker-{}_train-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/Text/newSplit/speaker-{}_train-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter), "wb") as f:
                         np.save(f, X_train)
 
-                if not os.path.exists("{}/Text/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter)):
+                if not os.path.exists("{}/newSplit/Text/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter)):
                     y_train = np.array(self.transformLabs(y_train))
-                    with open("{}/Text/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/Text/newSplit/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter), "wb") as f:
                         np.save(f, y_train)
 
-                if not os.path.exists("{}/Text/speaker-{}_dev-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter)):
+                if not os.path.exists("{}/Text/newSplit/speaker-{}_dev-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter)):
                     textList = list()
                     for f in X_dev:
                         text = open("/home/hmgent2/Data/TextData/{}_asr/{}.txt".format(self.fileMod, f)).read()
                         textList.append(text)
                     sequences = self.tokenizer.texts_to_sequences(textList)
                     X_dev = sequence.pad_sequences(sequences, padding="post", truncating="post", maxlen=25) #maxlen chosen as 95th percentile of sentence lengths
-                    with open("{}/Text/speaker-{}_dev-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/Text/newSplit/speaker-{}_dev-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter), "wb") as f:
                         np.save(f, X_dev)
 
-                if not os.path.exists("{}/Text/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter)):
+                if not os.path.exists("{}/newSplit/Text/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter)):
                     y_dev = np.array(self.transformLabs(y_dev))
-                    with open("{}/Text/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/Text/newSplit/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter), "wb") as f:
                         np.save(f, y_dev)
 
-                if not os.path.exists("{}/Text/speaker-{}_test-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter)):
+                if not os.path.exists("{}/Text/newSplit/speaker-{}_test-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter)):
                     textList = list()
                     for f in X_test:
                         text = open("/home/hmgent2/Data/TextData/{}_asr/{}.txt".format(self.fileMod, f)).read()
                         textList.append(text)
                     sequences = self.tokenizer.texts_to_sequences(textList)
                     X_test = sequence.pad_sequences(sequences, padding="post", truncating="post", maxlen=25) #maxlen chosen as 95th percentile of sentence lengths
-                    with open("{}/Text/speaker-{}_test-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/Text/newSplit/speaker-{}_test-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter), "wb") as f:
                         np.save(f, X_test)
 
-                if not os.path.exists("{}/Text/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter)):
+                if not os.path.exists("{}/Text/newSplit/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter)):
                     y_test = np.array(self.transformLabs(y_test))
-                    with open("{}/Text/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter), "wb") as f:
+                    with open("{}/Text/newSplit/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter), "wb") as f:
                         np.save(f, y_test)
 
 
@@ -690,35 +674,35 @@ class ModelTrainer:
 
             if self.seq_acoustic:
 
-                seq_acoustic_train_data = np.load("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter))
-                train_labs = np.load("{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter))
+                seq_acoustic_train_data = np.load("{}/{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter))
+                train_labs = np.load("{}/{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter))
 
-                seq_acoustic_dev_data = np.load("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter))
-                dev_labs = np.load("{}/{}/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter))
+                seq_acoustic_dev_data = np.load("{}/{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter))
+                dev_labs = np.load("{}/{}/{}/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter))
 
-                seq_acoustic_test_data = np.load("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter))
-                test_labs = np.load("{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, counter))
+                seq_acoustic_test_data = np.load("{}/{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter))
+                test_labs = np.load("{}/{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.subDir, self.speakerSplit, counter))
 
             if self.glob_acoustic:
 
-                glob_acoustic_train_data = np.load("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter))
-                train_labs = np.load("{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter))
+                glob_acoustic_train_data = np.load("{}/{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter))
+                train_labs = np.load("{}/{}/{}/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter))
 
-                glob_acoustic_dev_data = np.load("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter))
-                dev_labs = np.load("{}/{}/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter))
+                glob_acoustic_dev_data = np.load("{}/{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter))
+                dev_labs = np.load("{}/{}/{}/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter))
 
-                glob_acoustic_test_data = np.load("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter))
-                test_labs = np.load("{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter))
+                glob_acoustic_test_data = np.load("{}/{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter))
+                test_labs = np.load("{}/{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.subDir, self.speakerSplit, counter))
             
             if self.text:
-                text_train_data = np.load("{}/Text/speaker-{}_train-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter))
-                train_labs = np.load("{}/Text/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter))
+                text_train_data = np.load("{}/Text/newSplit/speaker-{}_train-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter))
+                train_labs = np.load("{}/Text/newSplit/speaker-{}_train-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter))
 
-                text_dev_data = np.load("{}/Text/speaker-{}_dev-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter))
-                dev_labs = np.load("{}/Text/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter))
+                text_dev_data = np.load("{}/Text/newSplit/speaker-{}_dev-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter))
+                dev_labs = np.load("{}/Text/newSplit/speaker-{}_dev-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter))
 
-                text_test_data = np.load("{}/Text/speaker-{}_test-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter))
-                test_labs = np.load("{}/Text/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter))
+                text_test_data = np.load("{}/Text/newSplit/speaker-{}_test-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter))
+                test_labs = np.load("{}/Text/newSplit/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter))
 
 
             if self.seq_acoustic and not self.glob_acoustic and not self.text:
@@ -800,10 +784,13 @@ if __name__=="__main__":
     fileMod = "Pruned3"
     fileList = glob("../../AudioData/Gated{}/*.wav".format(fileMod))
     baseList = np.array([item.split("/")[-1][:-4] for item in fileList])
-    speakerList = list(set([item.split("_")[1][0] for item in baseList]))
+
+    speakerList = ["c", "d", "ejou", "fhkqst"]
+    # speakerList = list(set([item.split("_")[1][0] for item in baseList]))
+
     dataPath = "/home/hmgent2/Data/ModelInputs"
-    speakerSplits = ["dependent", "independent"]
-    # speakerSplits = ["independent"]
+    # speakerSplits = ["dependent", "independent"]
+    speakerSplits = ["independent"]
 
     #Make list of tuples with combinations of input types
     # glob_acoustic = [False, "PCs", "rawGlobal"]
@@ -819,25 +806,46 @@ if __name__=="__main__":
     #                 ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),("rawGlobal", "percentChunks", True),
     #                 ("ComParE", "rawSequential", False), ("PCs", "rawSequential", True), ("PCs_feats", "rawSequential", True),("rawGlobal", "rawSequential", True)]
 
-    inputTypes = [("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False), ("rawGlobal", False, False),
-                    (False, "rawSequential", True), ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True), ("rawGlobal", False, True), 
-                    ("ComParE", "percentChunks", False), ("PCs", "percentChunks", False), ("PCs_feats", "percentChunks", False),("rawGlobal", "percentChunks", False), 
-                    ("ComParE", "rawSequential", False), ("PCs", "rawSequential", False), ("PCs_feats", "rawSequential", False),("rawGlobal", "rawSequential", False), 
-                    ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),("rawGlobal", "percentChunks", True),
-                    ("ComParE", "rawSequential", False), ("PCs", "rawSequential", True), ("PCs_feats", "rawSequential", True),("rawGlobal", "rawSequential", True)]
+    inputTypes = [(False, False, True), (False, "percentChunks", False), (False, "rawSequential", False), 
+                    ("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False),
+                    (False, "percentChunks", True),
+                    ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True),
+                    ("ComParE", "percentChunks", False), ("PCs", "percentChunks", False), ("PCs_feats", "percentChunks", False),
+                    ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True)]
 
-    measureList = ["f0", "hnr", "mfcc", "plp"]
+    # measureList = ["f0", "hnr", "mfcc", "plp"]
+    measureLists = [["f0", "hnr", "mfcc", "plp"], 
+                    ["f0", "hnr", "mfcc", "plp"], ["f0", "hnr"], ["f0", "mfcc"], ["f0", "plp"], ["f0", "hnr", "mfcc"], ["f0", "hnr", "plp"], 
+                    ["hnr"], ["hnr", "mfcc"], ["hnr", "plp"], ["hnr", "mfcc", "plp"],  #removing redundant results is at hnr-mfcc-plp
+                    ["mfcc"], ["mfcc", "plp"], 
+                    ["plp"]]
     f0Normed=False
     percentage=10
 
-    for inputType in inputTypes:
-        for speakerSplit in speakerSplits:
+    # subDirs = ["newSplit", 
+    #             "f0", "f0-hnr", "f0-mfcc", "f0-plp", "f0-hnr-mfcc", "f0-hnr-plp", 
+    #             "hnr", "hnr-mfcc", "hnr-plp", "hnr-mfcc-plp", 
+    #             "mfcc", "mfcc-plp",
+    #             "plp"]
 
-            try:
-                m = ModelTrainer(fileMod, baseList, speakerList, inputType, dataPath, speakerSplit=speakerSplit, f0Normed=f0Normed, percentage=percentage, measureList = measureList)
+    for measureList in measureLists:
 
-                m.trainModel()
+        subDir = "newSplit-{}".format("-".join(measureList))
 
-            except Exception as e:
-                with open("bad.txt", "a+") as f:
-                    f.write("{}\t{}\n{}\n\n".format(inputType, speakerSplit, e))
+        if not os.path.isdir("Checkpoints/{}".format(subDir)):
+            for parent in ["Results", "Checkpoints", "Plots"]:
+                os.mkdir("{}/{}".format(parent, subDir))
+            for parent in ["ComParE", "PCs", "PCs_feats", "percentChunks", "rawGlobal", "rawSequential"]:
+                os.mkdir("{}/{}/{}".format(dataPath, parent, subDir))
+            
+        for inputType in inputTypes:
+            for speakerSplit in speakerSplits:
+
+                try:
+                    m = ModelTrainer(fileMod, baseList, speakerList, inputType, dataPath, subDir, speakerSplit=speakerSplit, f0Normed=f0Normed, percentage=percentage, measureList = measureList)
+
+                    m.trainModel()
+
+                except Exception as e:
+                    with open("bad.txt", "a+") as f:
+                        f.write("{}\t{}\n{}\n\n".format(inputType, speakerSplit, e))

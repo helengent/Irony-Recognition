@@ -48,7 +48,7 @@ def extractFeats(wavPath, speakerList, outputType, winSize=10, tg_mod="asr", sav
 
     extract_textDependent.main(wavPath, tg_mod, saveWhole=saveWhole)
 
-    getSpeakerSegmentalData.speakerSegmentalData("../../Data/AcousticData/text_feats/{}_{}_text_feats.csv".format(wavPath, tg_mod))
+    # getSpeakerSegmentalData.speakerSegmentalData("../../Data/AcousticData/text_feats/{}_{}_text_feats.csv".format(wavPath, tg_mod))
 
 
 if __name__=="__main__":
@@ -62,6 +62,6 @@ if __name__=="__main__":
     saveWhole = True
 
     t0 = time.time()
-    preProcess(wavPath, speakerList, haveManualT=False)
-    # extractFeats(wavPath, speakerList, outputList, tg_mod=tg_mod, saveWhole=saveWhole)
+    # preProcess(wavPath, speakerList, haveManualT=False)
+    extractFeats(wavPath, speakerList, outputList, tg_mod=tg_mod, saveWhole=saveWhole)
     print("All processes completed in {} minutes".format(np.round((time.time() - t0) / 60), 2))
