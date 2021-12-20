@@ -1,0 +1,72 @@
+Model 0
+
+Confusion Matrix
+
+[[409 173]
+ [186 395]]
+
+Test performance
+Precision:	[0.68739496 0.69542254]
+Recall:	[0.70274914 0.67986231]
+F1:	[0.69498726 0.6875544 ]
+Accuracy:	0.6913155631986242
+
+Model 1
+
+Confusion Matrix
+
+[[357 224]
+ [138 444]]
+
+Test performance
+Precision:	[0.72121212 0.66467066]
+Recall:	[0.61445783 0.7628866 ]
+F1:	[0.66356877 0.7104    ]
+Accuracy:	0.6887360275150473
+
+Model 2
+
+Confusion Matrix
+
+[[390 191]
+ [193 388]]
+
+Test performance
+Precision:	[0.66895369 0.6701209 ]
+Recall:	[0.67125645 0.66781411]
+F1:	[0.67010309 0.66896552]
+Accuracy:	0.6695352839931153
+
+Model 3
+
+Confusion Matrix
+
+[[396 185]
+ [155 426]]
+
+Test performance
+Precision:	[0.71869328 0.69721768]
+Recall:	[0.68158348 0.73321859]
+F1:	[0.69964664 0.7147651 ]
+Accuracy:	0.7074010327022375
+
+Model 4
+
+Confusion Matrix
+
+[[409 172]
+ [172 409]]
+
+Test performance
+Precision:	[0.70395869 0.70395869]
+Recall:	[0.70395869 0.70395869]
+F1:	[0.70395869 0.70395869]
+Accuracy:	0.7039586919104991
+
+Cross-Validated Average Performance
+
+Test performance
+Precision:	[0.70004255 0.68627809]
+Recall:	[0.67480112 0.70954806]
+F1:	[0.68645289 0.69712874]
+Accuracy:	0.6921893198639046

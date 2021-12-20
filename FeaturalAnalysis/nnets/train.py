@@ -806,19 +806,19 @@ if __name__=="__main__":
     #                 ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),("rawGlobal", "percentChunks", True),
     #                 ("ComParE", "rawSequential", False), ("PCs", "rawSequential", True), ("PCs_feats", "rawSequential", True),("rawGlobal", "rawSequential", True)]
 
-    inputTypes = [(False, False, True), (False, "percentChunks", False), (False, "rawSequential", False), 
-                    ("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False),
+    inputTypes = [(False, "percentChunks", False), (False, "rawSequential", False), 
                     (False, "percentChunks", True),
-                    ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True),
                     ("ComParE", "percentChunks", False), ("PCs", "percentChunks", False), ("PCs_feats", "percentChunks", False),
                     ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True)]
 
     # measureList = ["f0", "hnr", "mfcc", "plp"]
-    measureLists = [["f0", "hnr", "mfcc", "plp"], 
-                    ["f0", "hnr", "mfcc", "plp"], ["f0", "hnr"], ["f0", "mfcc"], ["f0", "plp"], ["f0", "hnr", "mfcc"], ["f0", "hnr", "plp"], 
-                    ["hnr"], ["hnr", "mfcc"], ["hnr", "plp"], ["hnr", "mfcc", "plp"],  #removing redundant results is at hnr-mfcc-plp
-                    ["mfcc"], ["mfcc", "plp"], 
-                    ["plp"]]
+    # measureLists = [["f0", "hnr"], ["f0", "mfcc"], ["f0", "plp"], ["f0", "hnr", "mfcc"], ["f0", "hnr", "plp"], 
+    #                 ["hnr"], ["hnr", "mfcc"], ["hnr", "plp"], ["hnr", "mfcc", "plp"],  
+    #                 ["mfcc"], ["mfcc", "plp"],
+    #                 ["plp"]]
+
+    measureLists = [["f0"]]
+
     f0Normed=False
     percentage=10
 
@@ -829,17 +829,22 @@ if __name__=="__main__":
     #             "plp"]
 
     for measureList in measureLists:
-
-        subDir = "newSplit-{}".format("-".join(measureList))
-
-        if not os.path.isdir("Checkpoints/{}".format(subDir)):
-            for parent in ["Results", "Checkpoints", "Plots"]:
-                os.mkdir("{}/{}".format(parent, subDir))
-            for parent in ["ComParE", "PCs", "PCs_feats", "percentChunks", "rawGlobal", "rawSequential"]:
-                os.mkdir("{}/{}/{}".format(dataPath, parent, subDir))
             
         for inputType in inputTypes:
             for speakerSplit in speakerSplits:
+
+                # if speakerSplit == "dependent":
+                #     subDir = "speakerDependent-{}".format("-".join(measureList))
+                # elif speakerSplit == "independent" and len(speakerList) > 4:
+                #     subDir = "oldSplit-{}".format("-".join(measureList))
+
+                subDir = "newSplit-{}".format("-".join(measureList))
+
+                if not os.path.isdir("Checkpoints/{}".format(subDir)):
+                    for parent in ["Results", "Checkpoints", "Plots"]:
+                        os.mkdir("{}/{}".format(parent, subDir))
+                    for parent in ["ComParE", "PCs", "PCs_feats", "percentChunks", "rawGlobal", "rawSequential"]:
+                        os.mkdir("{}/{}/{}".format(dataPath, parent, subDir))
 
                 try:
                     m = ModelTrainer(fileMod, baseList, speakerList, inputType, dataPath, subDir, speakerSplit=speakerSplit, f0Normed=f0Normed, percentage=percentage, measureList = measureList)
