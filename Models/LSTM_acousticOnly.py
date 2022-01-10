@@ -14,7 +14,6 @@ from sklearn.metrics import precision_recall_fscore_support
 
 
 #This is designed to handle sequential data
-#Unimodal 1D input - Probably not great for things like mfccs, ams, rastaplp
 class acousticOnlyLSTM():
 
 

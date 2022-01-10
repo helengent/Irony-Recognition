@@ -284,8 +284,8 @@ def main(df, numComps, subDir):
 
     #Plotting
     plotVariance(var, subDir)
-    plotPCs(finalDF, subDir)
-    plotPCs3D(finalDF, subDir)
+    # plotPCs(finalDF, subDir)
+    # plotPCs3D(finalDF, subDir)
 
 
     outFeats = list()
@@ -325,7 +325,7 @@ if __name__=="__main__":
     # df = pd.read_csv("../Data/ComParE.csv", index_col = 0)
     # df = df.drop(columns=["index"])
 
-    numComps = [3]
+    numComps = [6]
     subDir = "narrowed"
 
     for n in numComps:
