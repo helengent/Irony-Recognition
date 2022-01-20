@@ -112,7 +112,7 @@ class ModelTester:
         # plt.colorbar()
         test_cm.plot(cmap=plt.cm.Blues)
         plt.ylabel('True Label')
-        plt.xlabel('Predicated Label')
+        plt.xlabel('Predicted Label')
         plt.savefig("Inference/CM_{}{}.png".format(self.prefix, self.counter))
 
 
