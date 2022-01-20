@@ -138,7 +138,7 @@ def narrow(normed_df):
     return newDF
 
 
-def main(df):
+def main(df, prefix=""):
 
     df = pd.read_csv(df, index_col=0)
     df = df.reset_index()
@@ -156,23 +156,25 @@ def main(df):
                         "duration", "sound2silenceRatio", "totalPauses", "Avg. Word Dur.", "Avg. Sil. Dur.", "SyllPerSecond"]]
 
 
-    prevAttested.to_csv("../Data/prevAttested.csv", index=False)
+    prevAttested.to_csv("../Data/{}prevAttested.csv".format(prefix), index=False)
 
     df = combine_formantTimes(df)
 
-    # df_normed = normSegs(df)
+    df_normed = normSegs(df)
 
-    # df_normed.to_csv("../Data/all_Normed.csv", index=False)
+    df_normed.to_csv("../Data/{}all_Normed.csv".format(prefix), index=False)
 
-    df_normed = pd.read_csv("../Data/all_Normed.csv")
+    # df_normed = pd.read_csv("../Data/{}all_Normed.csv")
 
     df_narrowed = narrow(df_normed)
 
-    df_narrowed.to_csv("../Data/all_narrowed.csv", index=False)
+    df_narrowed.to_csv("../Data/{}all_narrowed.csv".format(prefix), index=False)
 
 
 if __name__=="__main__":
 
-    input_df = "~/Data/AcousticData/text_feats/Pruned3_asr_text_feats.csv"
+    # input_df = "~/Data/AcousticData/text_feats/Pruned3_asr_text_feats.csv"
+    input_df = "~/Data/AcousticData/text_feats/newTest_asr_text_feats.csv"
+    prefix = "newTest_"
 
-    main(input_df)
+    main(input_df, prefix=prefix)

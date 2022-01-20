@@ -37,11 +37,14 @@ from sd import sd
 
 class ModelTester:
 
-    def __init__(self, inputType, dataPath, counter, speakerSplit="independent"):
+    def __init__(self, inputType, dataPath, counter, measureList, modelPath, speakerSplit="independent", splitName="newSplit", fileMod="Pruned3"):
         self.glob_acoustic, self.seq_acoustic, self.text = inputType 
         self.dataPath = dataPath
         self.speakerSplit = speakerSplit
+        self.splitName = splitName
         self.counter = counter
+        self.measureList = measureList
+        self.fileMod = fileMod
 
         self.prefix = "speaker-{}_".format(self.speakerSplit)
         if self.glob_acoustic:
@@ -51,7 +54,7 @@ class ModelTester:
         if self.text:
             self.prefix = self.prefix + "text_"
 
-        self.model_path = "Checkpoints/{}checkpoints.csv".format(self.prefix)
+        self.model_path = modelPath
         self.model = models.load_model(self.model_path)
 
         self.model_inputs = self.loadData()
@@ -99,10 +102,18 @@ class ModelTester:
         plt.savefig("Inference/ROC_{}{}.png".format(self.prefix, self.counter))
 
 
-    #TODO
     def confusionMatrix(self, predictions):
 
-        test_cm = ConfusionMatrixDisplay.from_predictions(self.labels, predictions)
+        cm = confusion_matrix(self.labels, predictions, normalize="true")
+        test_cm = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["N", "I"])
+        # fig = plt.figure()
+        # plt.matshow(cm)
+        # plt.title('Confusion Matrix for Best Model')
+        # plt.colorbar()
+        test_cm.plot(cmap=plt.cm.Blues)
+        plt.ylabel('True Label')
+        plt.xlabel('Predicated Label')
+        plt.savefig("Inference/CM_{}{}.png".format(self.prefix, self.counter))
 
 
     def outputPredictions(self, predictions):
@@ -126,7 +137,7 @@ class ModelTester:
                 raise Exception
 
         self.meta["prediction"] = transformedPreds
-        self.meta["match"] = transformedLabs == transformedPreds
+        self.meta["match"] = [item1 == item2 for item1, item2 in zip(transformedLabs, transformedPreds)]
 
         self.meta.to_csv("Inference/predictions_{}{}".format(self.prefix, self.counter), index = False)
 
@@ -136,22 +147,22 @@ class ModelTester:
         inputs = list()
 
         self.meta = pd.read_csv("{}/speaker-{}_test_{}.meta".format(self.dataPath, self.speakerSplit, self.counter))
-        textList = [open("/home/hmgent2/Data/TextData/{}_asr/{}.txt".format(self.fileMod, f)).read() for f in self.meta["fileName"].tolist()]
+        textList = [open("/home/hmgent2/Data/TextData/{}_asr/{}.txt".format(self.fileMod, f)).read().strip("\n") for f in self.meta["fileName"].tolist()]
         self.meta["text"] = textList
 
         if self.text:
-            self.text_test = np.load("{}/Text/speaker-{}_test-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, self.counter))
-            self.labels = np.load("{}/Text/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.speakerSplit, self.counter))
+            self.text_test = np.load("{}/Text/{}/speaker-{}_test-{}_tokenized.npy".format(self.dataPath, self.splitName, self.speakerSplit, self.counter))
+            self.labels = np.load("{}/Text/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.splitName, self.speakerSplit, self.counter))
             inputs.append(self.text_test)
 
         if self.seq_acoustic:
-            self.seq_acoustic_test = np.load("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, self.counter))
-            self.labels = np.load("{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.speakerSplit, self.counter))
+            self.seq_acoustic_test = np.load("{}/{}/{}-{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.seq_acoustic, self.splitName, "-".join(self.measureList), self.speakerSplit, self.counter))
+            self.labels = np.load("{}/{}/{}-{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.seq_acoustic, self.splitName, "-".join(self.measureList), self.speakerSplit, self.counter))
             inputs.append(self.seq_acoustic_test)
 
         if self.glob_acoustic:
-            self.glob_acoustic_test = np.load("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, self.counter))
-            self.labels = np.load("{}/{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, self.counter))
+            self.glob_acoustic_test = np.load("{}/{}/{}-{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.splitName, "-".join(self.measureList), self.speakerSplit, self.counter))
+            self.labels = np.load("{}/{}/{}-{}/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.glob_acoustic, self.splitName, "-".join(self.measureList), self.speakerSplit, self.counter))
             inputs.append(self.glob_acoustic_test)
 
         return inputs
@@ -159,7 +170,7 @@ class ModelTester:
 
     def testModel(self):
 
-        test_preds = self.model.test(inupts = self.model_inputs)
+        test_preds = self.model.predict(self.model_inputs)
 
         test_stats = precision_recall_fscore_support(self.labels, test_preds.argmax(axis=1))
         test_accuracy = accuracy_score(self.labels, test_preds.argmax(axis=1))
@@ -176,6 +187,10 @@ class ModelTester:
 
 if __name__=="__main__":
 
+    # fileMod = "newTest"
+    # dataPath = "/home/hmgent2/Data/newTest_ModelInputs"
+
+    fileMod = "Pruned3"
     dataPath = "/home/hmgent2/Data/ModelInputs"
     speakerSplits = ["dependent", "independent"]
 
@@ -184,24 +199,29 @@ if __name__=="__main__":
     # seq_acoustic = [False, "percentChunks", "rawSequential"]
     # text = [False, True]
 
-    inputTypes = [(False, False, True), (False, "percentChunks", False), (False, "rawSequential", False), 
-                    ("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False), ("rawGlobal", False, False),
-                    (False, "percentChunks", True), (False, "rawSequential", True), 
-                    ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True), ("rawGlobal", False, True), 
-                    ("ComParE", "percentChunks", False), ("PCs", "percentChunks", False), ("PCs_feats", "percentChunks", False),("rawGlobal", "percentChunks", False), 
-                    ("ComParE", "rawSequential", False), ("PCs", "rawSequential", False), ("PCs_feats", "rawSequential", False),("rawGlobal", "rawSequential", False), 
-                    ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),("rawGlobal", "percentChunks", True),
-                    ("ComParE", "rawSequential", False), ("PCs", "rawSequential", True), ("PCs_feats", "rawSequential", True),("rawGlobal", "rawSequential", True)]
+    # inputTypes = [(False, False, True), (False, "percentChunks", False), (False, "rawSequential", False), 
+    #                 ("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False), ("rawGlobal", False, False),
+    #                 (False, "percentChunks", True), (False, "rawSequential", True), 
+    #                 ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True), ("rawGlobal", False, True), 
+    #                 ("ComParE", "percentChunks", False), ("PCs", "percentChunks", False), ("PCs_feats", "percentChunks", False),("rawGlobal", "percentChunks", False), 
+    #                 ("ComParE", "rawSequential", False), ("PCs", "rawSequential", False), ("PCs_feats", "rawSequential", False),("rawGlobal", "rawSequential", False), 
+    #                 ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),("rawGlobal", "percentChunks", True),
+    #                 ("ComParE", "rawSequential", False), ("PCs", "rawSequential", True), ("PCs_feats", "rawSequential", True),("rawGlobal", "rawSequential", True)]
 
+    inputTypes = [("PCs", "percentChunks", True), ("2PCs_feats", "percentChunks", True)]
+    measureLists = [["f0", "hnr", "mfcc"], ["f0", "mfcc", "plp"]]
 
-    for inputType in inputTypes:
-        for speakerSplit in speakerSplits:
+    for inputType, speakerSplit, measureList in zip(inputTypes, speakerSplits, measureLists):
 
-            if speakerSplit == "dependent":
-                counter = 0
-            elif speakerSplit == "independent":
-                #This means speaker c was left out of the training data
-                counter = "c"
+        if speakerSplit == "dependent":
+            counter = 3
+            splitName = "speakerDependent"
+            modelPath = "Checkpoints/speakerDependent-f0-hnr-mfcc/speaker-dependent_PCs_percentChunks_text_checkpoints.ckpt_{}".format(counter)
+        elif speakerSplit == "independent":
+            #This means speaker c was left out of the training data
+            counter = "c"
+            splitName = "newSplit"
+            modelPath = "Checkpoints/newSplit-f0-mfcc-plp/speaker-independent_2PCs_feats_percentChunks_text_checkpoints.ckpt_{}".format(counter)
 
-            m = ModelTester(inputType, dataPath, counter, speakerSplit=speakerSplit)
-            m.testModel()
+        m = ModelTester(inputType, dataPath, counter, measureList, modelPath, speakerSplit=speakerSplit, splitName=splitName, fileMod = fileMod)
+        m.testModel()

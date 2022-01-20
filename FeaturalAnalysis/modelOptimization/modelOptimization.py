@@ -44,8 +44,8 @@ def buildModel_LSTM_FFNN_CNN_withText(hp):
 
     #input layers (shapes based on knowledge of input shapes)
     text = layers.Input(shape=(25))
-    seq_acoustic = layers.Input(shape=(10, 48))
-    glob_acoustic = layers.Input(shape=17)
+    seq_acoustic = layers.Input(shape=(10, 46))
+    glob_acoustic = layers.Input(shape=11)
 
     embedded = layers.Embedding(input_dim=embeddings.shape[0], output_dim=embeddings.shape[1], input_length=25, weights=[embeddings], trainable=False)(text)
 
@@ -76,7 +76,9 @@ def buildModel_LSTM_FFNN_CNN_withText(hp):
     z = layers.Dense(2, activation=hp.Choice("outActivation", ["sigmoid", "softmax"]))(z)
 
     model = keras.Model(inputs=x.input, outputs=z)
-    model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+
+    model.compile(loss='sparse_categorical_crossentropy', optimizer=hp.Choice("optimizer", ['adam', 'sgd']), metrics=['accuracy'])
     
     return model
 
@@ -95,51 +97,66 @@ def main(fileMod, dataPath, inputType, measureList):
 
     #Load data
     if text:
-        text_train = np.load("{}/Text/speakerDependent/speaker-dependent_train-0_tokenized.npy".format(dataPath))
-        text_dev = np.load("{}/Text/speakerDependent/speaker-dependent_dev-0_tokenized.npy".format(dataPath))
-        text_test = np.load("{}/Text/speakerDependent/speaker-dependent_test-0_tokenized.npy".format(dataPath))
+        text_train = np.load("{}/Text/oldSplit/speaker-independent_train-c_tokenized.npy".format(dataPath))
+        text_dev = np.load("{}/Text/oldSplit/speaker-independent_dev-c_tokenized.npy".format(dataPath))
+        text_test = np.load("{}/Text/oldSplit/speaker-independent_test-c_tokenized.npy".format(dataPath))
 
         X_train.append(text_train)
         X_dev.append(text_dev)
         X_test.append(text_test)
 
-        y_train = np.load("{}/Text/speakerDependent/speaker-dependent_train-0_labels.npy".format(dataPath))
-        y_dev = np.load("{}/Text/speakerDependent/speaker-dependent_dev-0_labels.npy".format(dataPath))
-        y_test = np.load("{}/Text/speakerDependent/speaker-dependent_test-0_labels.npy".format(dataPath))
+        y_train = np.load("{}/Text/oldSplit/speaker-independent_train-c_labels.npy".format(dataPath))
+        y_dev = np.load("{}/Text/oldSplit/speaker-independent_dev-c_labels.npy".format(dataPath))
+        y_test = np.load("{}/Text/oldSplit/speaker-independent_test-c_labels.npy".format(dataPath))
 
     if sequential_acoustic:
-        seq_train = np.load("{}/{}/speakerDependent/speaker-dependent_train-0_acoustic.npy".format(dataPath, sequential_acoustic))
-        seq_dev = np.load("{}/{}/speakerDependent/speaker-dependent_dev-0_acoustic.npy".format(dataPath, sequential_acoustic))
-        seq_test = np.load("{}/{}/speakerDependent/speaker-dependent_test-0_acoustic.npy".format(dataPath, sequential_acoustic))
+        seq_train = np.load("{}/{}/oldSplit-{}/speaker-independent_train-c_acoustic.npy".format(dataPath, sequential_acoustic, "-".join(measureList)))
+        seq_dev = np.load("{}/{}/oldSplit-{}/speaker-independent_dev-c_acoustic.npy".format(dataPath, sequential_acoustic, "-".join(measureList)))
+        seq_test = np.load("{}/{}/oldSplit-{}/speaker-independent_test-c_acoustic.npy".format(dataPath, sequential_acoustic, "-".join(measureList)))
 
         X_train.append(seq_train)
         X_dev.append(seq_dev)
         X_test.append(seq_test)
 
-        y_train = np.load("{}/{}/speakerDependent/speaker-dependent_train-0_labels.npy".format(dataPath, sequential_acoustic))
-        y_dev = np.load("{}/{}/speakerDependent/speaker-dependent_dev-0_labels.npy".format(dataPath, sequential_acoustic))
-        y_test = np.load("{}/{}/speakerDependent/speaker-dependent_test-0_labels.npy".format(dataPath, sequential_acoustic))
+        y_train = np.load("{}/{}/oldSplit-{}/speaker-independent_train-c_labels.npy".format(dataPath, sequential_acoustic, "-".join(measureList)))
+        y_dev = np.load("{}/{}/oldSplit-{}/speaker-independent_dev-c_labels.npy".format(dataPath, sequential_acoustic, "-".join(measureList)))
+        y_test = np.load("{}/{}/oldSplit-{}/speaker-independent_test-c_labels.npy".format(dataPath, sequential_acoustic, "-".join(measureList)))
 
     if global_acoustic:
-        glob_train = np.load("{}/{}/speakerDependent/speaker-dependent_train-0_acoustic.npy".format(dataPath, global_acoustic))
-        glob_dev = np.load("{}/{}/speakerDependent/speaker-dependent_dev-0_acoustic.npy".format(dataPath, global_acoustic))
-        glob_test = np.load("{}/{}/speakerDependent/speaker-dependent_test-0_acoustic.npy".format(dataPath, global_acoustic))
+        glob_train = np.load("{}/{}/oldSplit-{}/speaker-independent_train-c_acoustic.npy".format(dataPath, global_acoustic, "-".join(measureList)))
+        glob_dev = np.load("{}/{}/oldSplit-{}/speaker-independent_dev-c_acoustic.npy".format(dataPath, global_acoustic, "-".join(measureList)))
+        glob_test = np.load("{}/{}/oldSplit-{}/speaker-independent_test-c_acoustic.npy".format(dataPath, global_acoustic, "-".join(measureList)))
 
         X_train.append(glob_train)
         X_dev.append(glob_dev)
         X_test.append(glob_test)
 
-        y_train = np.load("{}/{}/speakerDependent/speaker-dependent_train-0_labels.npy".format(dataPath, global_acoustic))
-        y_dev = np.load("{}/{}/speakerDependent/speaker-dependent_dev-0_labels.npy".format(dataPath, global_acoustic))
-        y_test = np.load("{}/{}/speakerDependent/speaker-dependent_test-0_labels.npy".format(dataPath, global_acoustic))
+        y_train = np.load("{}/{}/oldSplit-{}/speaker-independent_train-c_labels.npy".format(dataPath, global_acoustic, "-".join(measureList)))
+        y_dev = np.load("{}/{}/oldSplit-{}/speaker-independent_dev-c_labels.npy".format(dataPath, global_acoustic, "-".join(measureList)))
+        y_test = np.load("{}/{}/oldSplit-{}/speaker-independent_test-c_labels.npy".format(dataPath, global_acoustic, "-".join(measureList)))
 
 
     if sequential_acoustic and global_acoustic and text:
-        tuner = kt.RandomSearch(buildModel_LSTM_FFNN_CNN_withText, objective='val_accuracy', max_trials=500, directory="Results", project_name="trimodal")
+        tuner = kt.RandomSearch(buildModel_LSTM_FFNN_CNN_withText, objective='val_accuracy', max_trials=500, directory="Results", project_name="LOSO_PCs-feats_f0-mfcc-plp")
 
-    tuner.search(X_train, y_train, epochs=100, validation_data=(X_dev, y_dev))
+    es = keras.callbacks.EarlyStopping(monitor='loss', patience=3)
+    tuner.search(X_train, y_train, epochs=100, validation_data=(X_dev, y_dev), callbacks=[es])
 
     tuner.results_summary()
+
+    best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
+
+    model = tuner.hypermodel.build(best_hps)
+    history = model.fit(X_train, y_train, epochs=150, validation_data = (X_dev, y_dev))
+    val_acc_per_epoch = history.history["val_accuracy"]
+    best_epoch = val_acc_per_epoch.index(max(val_acc_per_epoch)) + 1
+    print("Best epoch number: {}".format(best_epoch))
+
+    model = model = tuner.hypermodel.build(best_hps)
+    model.fit(X_train, y_train, epochs=best_epoch, validation_data = (X_dev, y_dev))
+
+    eval_result = model.evaluate(X_test, y_test)
+    print("Test loss: {}\tTest accuracy: {}".format(eval_result[0], eval_result[1]))
 
 
 if __name__=="__main__":
@@ -147,7 +164,7 @@ if __name__=="__main__":
     fileMod = "Pruned3"
 
     dataPath = "/home/hmgent2/Data/ModelInputs/"
-    inputType = ("PCs_feats", "percentChunks", True)
-    measureList = ["f0", "hnr", "mfcc", "plp"]
+    inputType = ("2PCs_feats", "percentChunks", True)
+    measureList = ["f0", "mfcc", "plp"]
 
     main(fileMod, dataPath, inputType, measureList)

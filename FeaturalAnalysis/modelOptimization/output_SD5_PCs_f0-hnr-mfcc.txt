@@ -1,0 +1,140 @@
+Best val_accuracy So Far: 0.7806451320648193
+Total elapsed time: 07h 14m 03s
+Results summary
+Results in Results/SD5_PCs_f0-hnr-mfcc
+Showing 10 best trials
+Objective(name='val_accuracy', direction='max')
+
+Trial summary
+Hyperparameters:
+conv_layers: 5
+concat_size: 328
+lstm_size: 116
+lstm_dropout: 0.1
+recurrent_dropout: 0.25
+dropout: 0.9
+z1_size: 28
+outActivation: sigmoid
+optimizer: adam
+Score: 0.7806451320648193
+
+Trial summary
+Hyperparameters:
+conv_layers: 2
+concat_size: 352
+lstm_size: 208
+lstm_dropout: 0.0
+recurrent_dropout: 0.5
+dropout: 0.7000000000000001
+z1_size: 16
+outActivation: softmax
+optimizer: sgd
+Score: 0.7677419185638428
+
+Trial summary
+Hyperparameters:
+conv_layers: 4
+concat_size: 192
+lstm_size: 272
+lstm_dropout: 0.25
+recurrent_dropout: 0.5
+dropout: 0.75
+z1_size: 30
+outActivation: sigmoid
+optimizer: sgd
+Score: 0.7655913829803467
+
+Trial summary
+Hyperparameters:
+conv_layers: 3
+concat_size: 264
+lstm_size: 176
+lstm_dropout: 0.2
+recurrent_dropout: 0.05
+dropout: 0.35000000000000003
+z1_size: 24
+outActivation: softmax
+optimizer: sgd
+Score: 0.7655913829803467
+
+Trial summary
+Hyperparameters:
+conv_layers: 2
+concat_size: 136
+lstm_size: 228
+lstm_dropout: 0.25
+recurrent_dropout: 0.30000000000000004
+dropout: 0.65
+z1_size: 12
+outActivation: sigmoid
+optimizer: sgd
+Score: 0.7655913829803467
+
+Trial summary
+Hyperparameters:
+conv_layers: 3
+concat_size: 368
+lstm_size: 84
+lstm_dropout: 0.05
+recurrent_dropout: 0.25
+dropout: 0.5
+z1_size: 18
+outActivation: sigmoid
+optimizer: adam
+Score: 0.7634408473968506
+
+Trial summary
+Hyperparameters:
+conv_layers: 4
+concat_size: 396
+lstm_size: 252
+lstm_dropout: 0.45
+recurrent_dropout: 0.35000000000000003
+dropout: 0.25
+z1_size: 8
+outActivation: sigmoid
+optimizer: sgd
+Score: 0.7634408473968506
+
+Trial summary
+Hyperparameters:
+conv_layers: 5
+concat_size: 44
+lstm_size: 248
+lstm_dropout: 0.25
+recurrent_dropout: 0.1
+dropout: 0.8500000000000001
+z1_size: 14
+outActivation: sigmoid
+optimizer: adam
+Score: 0.7634408473968506
+
+Trial summary
+Hyperparameters:
+conv_layers: 5
+concat_size: 20
+lstm_size: 228
+lstm_dropout: 0.0
+recurrent_dropout: 0.4
+dropout: 0.7000000000000001
+z1_size: 24
+outActivation: softmax
+optimizer: sgd
+Score: 0.7634408473968506
+
+Trial summary
+Hyperparameters:
+conv_layers: 2
+concat_size: 192
+lstm_size: 324
+lstm_dropout: 0.05
+recurrent_dropout: 0.1
+dropout: 0.2
+z1_size: 4
+outActivation: softmax
+optimizer: sgd
+Score: 0.7612903118133545
+
+Best epoch number: 10
+
+Test loss: 0.8543522953987122	Test accuracy: 0.7426850199699402

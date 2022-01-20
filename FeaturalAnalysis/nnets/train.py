@@ -27,6 +27,7 @@ from LSTM_withText import acousticTextLSTM
 from LSTM_CNN_withText import acousticTextLSTM_CNN
 from globAcousticCNN import globAcousticCNN
 from LSTM_FFNN_CNN_withText import acousticTextLSTM_CNN_FFNN
+# from LSTM_FFNN_CNN_withText_TUNED import acousticTextLSTM_CNN_FFNN
 from FFNN_CNN_withText import acousticTextCNN_FFNN
 from LSTM_FFNN import acousticLSTM_FFNN
 from LSTM_FFNN_CNN_withText_Attention import acousticTextLSTM_CNN_FFNN_Attention
@@ -83,6 +84,14 @@ class ModelTrainer:
     
         self.train_list, self.dev_list, self.test_list = self.trainTestSplit()
         self.glob_scaler, self.seq_scaler, self.glob_imputer, self.seq_imputer = self.createScalers()
+        
+        #For preparing supplemental test data
+        # with open("/home/hmgent2/Data/ModelInputs/{}/{}/scaler.pkl".format(self.seq_acoustic, self.subDir), "rb") as f:
+        #             self.seq_scaler = pickle.load(f)
+        # with open("/home/hmgent2/Data/ModelInputs/{}/{}/imputer.pkl".format(self.seq_acoustic, self.subDir), "rb") as f:
+        #             self.seq_imputer = pickle.load(f)
+        # self.glob_scaler = None
+        # self.glob_imputer = None
         self.tokenizer = self.makeTokenizer()
 
         self.prepareData()
@@ -110,6 +119,13 @@ class ModelTrainer:
         else:
             #Do 5-fold cross validation
             lab_list = np.array([item[-1] for item in self.fileList])
+
+            # For preparing test-only data
+            # t = np.array(self.fileList)
+            # t_labs = lab_list
+            # test_list.append((t, t_labs, 0))
+
+
             skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=6)
             count = 0
             for train_index, test_index in skf.split(self.fileList, lab_list):
@@ -814,6 +830,7 @@ class ModelTrainer:
 if __name__=="__main__":
 
     fileMod = "Pruned3"
+    # fileMod = "newTest"
     fileList = glob("../../AudioData/Gated{}/*.wav".format(fileMod))
     baseList = np.array([item.split("/")[-1][:-4] for item in fileList])
 
@@ -821,7 +838,8 @@ if __name__=="__main__":
     speakerList = list(set([item.split("_")[1][0] for item in baseList]))
 
     dataPath = "/home/hmgent2/Data/ModelInputs"
-    speakerSplits = ["dependent", "independent", "independent_2"] #"dependent", "independent", 
+    # dataPath = "/home/hmgent2/Data/newTest_ModelInputs"
+    speakerSplits = ["dependent", "independent"] #"dependent", "independent", 
     att = False
     # speakerSplits = ["independent"]
 
@@ -841,46 +859,51 @@ if __name__=="__main__":
 
 
     # inputTypes = [(False, "percentChunks", False), ("PCs", "percentChunks", True)]
-    inputTypes = [("PCs", "percentChunks", True)]
+    inputTypes = [("2PCs_feats", "percentChunks", True), ("PCs", "percentChunks", True)]
 
     # measureLists = [["f0", "hnr", "mfcc", "plp"]]
     # measureLists = [["f0", "hnr"], ["f0", "mfcc"], ["f0", "plp"], ["f0", "hnr", "mfcc"], ["f0", "hnr", "plp"], 
     #                 ["hnr"], ["hnr", "mfcc"], ["hnr", "plp"], ["hnr", "mfcc", "plp"],  
     #                 ["mfcc"], ["mfcc", "plp"],
     #                 ["plp"]]
-    measureLists = [["f0", "hnr", "mfcc"]]
+    measureLists = [["f0", "mfcc", "plp"], ["f0", "hnr", "mfcc"]]
 
     f0Normed=False
     percentage=10
 
-    for measureList in measureLists:
+    for measureList, inputType in zip(measureLists, inputTypes):
             
-        for inputType in inputTypes:
-            for speakerSplit in speakerSplits:
+        # for inputType in inputTypes:
+        for speakerSplit in speakerSplits:
 
-                if speakerSplit == "dependent":
+            if speakerSplit == "dependent":
+                if len(measureList) != 4:
                     subDir = "speakerDependent-{}".format("-".join(measureList))
-                    # subDir = "speakerDependent"
-                elif speakerSplit == "independent":
+                else:
+                    subDir = "speakerDependent"
+            elif speakerSplit == "independent":
+                if len(measureList) != 4:
                     subDir = "oldSplit-{}".format("-".join(measureList))
-                    # subDir = "oldSplit"
-                elif speakerSplit == "independent_2":
-                    subDir = "newSplit-{}".format("-".join(measureList))
-                    speakerList = ["c", "d", "ejou", "fhkqst"]
-                    speakerSplit = "independent"
+                else:
+                    subDir = "oldSplit"
+            elif speakerSplit == "independent_2":
+                subDir = "newSplit-{}".format("-".join(measureList))
+                speakerList = ["c", "d", "ejou", "fhkqst"]
+                speakerSplit = "independent"
 
-                if not os.path.isdir("Checkpoints/{}".format(subDir)):
-                    for parent in ["Results", "Checkpoints", "Plots"]:
-                        os.mkdir("{}/{}".format(parent, subDir))
-                    # for parent in ["ComParE", "PCs", "PCs_feats", "percentChunks", "rawGlobal", "rawSequential"]:
-                    for parent in ["PCs", "percentChunks"]:
-                        os.mkdir("{}/{}/{}".format(dataPath, parent, subDir))
+            # if not os.path.isdir("Results/{}".format(subDir)):
+            #     for parent in ["Results", "Checkpoints", "Plots"]: #
+            #         os.mkdir("{}/{}".format(parent, subDir))
+                # for parent in ["ComParE", "PCs", "PCs_feats", "percentChunks", "rawGlobal", "rawSequential"]:
+            if not os.path.isdir("{}/percentChunks/{}".format(dataPath, subDir)):
+                for parent in ["2PCs", "2PCs_feats", "percentChunks"]:
+                    os.mkdir("{}/{}/{}".format(dataPath, parent, subDir))
 
-                try:
-                    m = ModelTrainer(fileMod, baseList, speakerList, inputType, dataPath, subDir, speakerSplit=speakerSplit, f0Normed=f0Normed, percentage=percentage, measureList = measureList, use_attention = att)
+            try:
+                m = ModelTrainer(fileMod, baseList, speakerList, inputType, dataPath, subDir, speakerSplit=speakerSplit, f0Normed=f0Normed, percentage=percentage, measureList = measureList, use_attention = att)
 
-                    m.trainModel()
+                m.trainModel()
 
-                except Exception as e:
-                    with open("bad.txt", "a+") as f:
-                        f.write("{}\t{}\n{}\n\n".format(inputType, speakerSplit, e))
+            except Exception as e:
+                with open("bad.txt", "a+") as f:
+                    f.write("{}\t{}\n{}\n\n".format(inputType, speakerSplit, e))

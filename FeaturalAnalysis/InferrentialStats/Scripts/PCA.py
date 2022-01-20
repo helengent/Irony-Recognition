@@ -241,7 +241,7 @@ def plotVariance(v, subDir):
     plt.savefig("../Output/{}/PCA_analysis.png".format(subDir))
 
 
-def main(df, numComps, subDir):
+def main(df, newdf, numComps, subDir):
 
     #Data preparation
     features = df.columns[3:].tolist()
@@ -249,25 +249,30 @@ def main(df, numComps, subDir):
     n = n.loc[:, features].values
 
     x = df.loc[:, features].values
+    new_x = newdf.loc[:, features].values
     y = df.loc[:, ["label"]].values
 
     #Scale data and impute missing values
     scaler = StandardScaler()
     scaler.fit(n)
     x = scaler.transform(x)
+    new_x = scaler.transform(new_x)
 
     imp_mean = SimpleImputer()
-    x = imp_mean.fit_transform(x)
+    imp_mean.fit(x)
+    x = imp_mean.transform(x)
+    new_x = imp_mean.transform(new_x)
 
     #PCA
     pca = PCA(n_components=numComps)
-    principalComponents = pca.fit_transform(x)
+    pca.fit(x)
+    principalComponents = pca.transform(new_x)
 
     PCnames = ["PC{}".format(i) for i in range(1, numComps+1)]
 
     #Data frames with PC values per sample
     principalDF = pd.DataFrame(data = principalComponents, columns = PCnames)
-    finalDF = pd.concat([df[['fileName', 'speaker','label']], principalDF], axis = 1)
+    finalDF = pd.concat([newdf[['fileName', 'speaker','label']], principalDF], axis = 1)
     finalDF.to_csv("../Output/{}/{}factorPCA.csv".format(subDir, numComps), index = False)
 
     #Compute variance explained by each PC
@@ -304,29 +309,29 @@ def main(df, numComps, subDir):
             if (feat, ind) not in outFeats:
                 outFeats.append((feat, ind))
 
-    outDF.to_csv("../Output/{}/PCA_top_feats.csv".format(subDir))
+    # outDF.to_csv("../Output/{}/PCA_top_feats.csv".format(subDir))
 
-    print(outDF)
+    # print(outDF)
 
     #Plotting
-    plotCorrelation(outDF, finalDF, pca, features, subDir)
+    # plotCorrelation(outDF, finalDF, pca, features, subDir)
 
     for f in outFeats:
         feat, ind = f
-        finalDF[feat] = x[:, ind]
+        finalDF[feat] = new_x[:, ind]
 
     finalDF.to_csv("../Output/{}/{}Factor_feats.csv".format(subDir, numComps), index=False)
 
 
 if __name__=="__main__":
 
-    # df = pd.read_csv("~/Data/AcousticData/text_feats/Pruned3_asr_text_feats.csv")
     df = pd.read_csv("../Data/all_narrowed.csv")
+    new_df = pd.read_csv("../Data/newTest_all_narrowed.csv")
     # df = pd.read_csv("../Data/ComParE.csv", index_col = 0)
     # df = df.drop(columns=["index"])
 
-    numComps = [6]
-    subDir = "narrowed"
+    numComps = [3]
+    subDir = "newTest"
 
     for n in numComps:
-        main(df, n, subDir)
+        main(df, new_df, n, subDir)
