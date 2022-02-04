@@ -2,7 +2,7 @@ Before running acoustic feature extraction scripts, there are a few other things
 
   1) These scripts rely on the existence of a directory called Data with subdirectories AcousticData and TextData. The Data directory should be located within the same parent directory as Irony-Recognition.
   2) reconcile.py, located in the preProcessing folder, is the script used to reconcile responses from two annotators for the same set of wave files and sort them into matches, mismatches, and odd files. The inputs and outputs from this scripts should also be separate from the Irony-Recognition directory.
-  3) After running reconcile.py, move the matched files to Irony-Recognition/AudioData/All3. Then run prune.sh to listen to each file and verify audio quality. Good files can be kept with a "y" response. Bad files removed with "n".
+  3) After running reconcile.py, move the matched files to Irony-Recognition/AudioData/All3. If the new data is a new data set, create a new subdirectory to house it. If it is meant to be included with another data set, place it in the appropriate subdirectory.
   4) pruneByDur.py, located in the preProcessing folder, is used to remove outliers by duration and balance the representation of ironic and non-ironic samples. If only the removal of outliers is desired (leaving the data unbalanced), comment out lines 65-114.
 
 Acoustic Feature Extraction Scripts
