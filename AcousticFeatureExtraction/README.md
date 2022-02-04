@@ -20,7 +20,7 @@ These scripts perform the following steps to extract usable dataframes of acoust
     iii) AMS (matlab)
     iv) RASTA-PLP (matlab)
     
-  3) Identify mean f0 and f0 standard deviation for each speaker. Use these values to identify upper and lower limits for f0 to remove statistical outliers.
+  3) Identify mean F0 and F0 standard deviation for each speaker. Use these values to identify upper and lower limits for F0 to remove statistical outliers.
   
   4) Identify mean durations for words, vowels, consonants, pauses, and each ARPABET symbol used in the Penn Forced Aligner
   
