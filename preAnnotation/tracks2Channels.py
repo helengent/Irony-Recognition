@@ -5,6 +5,11 @@ from glob import glob
 from lib.WAVReader import WAVReader as WR
 from lib.WAVWriter import WAVWriter as WW
 
+
+#Take individual speaker tracks and concatenated them 
+# into a single audio file where each speaker has one channel
+
+#The resulting audio file is NOT used for acoustic analysis, only for annotation
 def tr2ch(fileList, fileName):
 
     trackList = list()
