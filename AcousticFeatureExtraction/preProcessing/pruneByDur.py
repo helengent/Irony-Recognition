@@ -26,9 +26,6 @@ def recordDurations(allDir):
 
     for i, wav in enumerate(glob("{}/*.wav".format(allDir))):
 
-        # if i % 100 == 0:
-        #     print(i)
-
         readr = WR(wav)
         base = os.path.basename(wav).split(".")[0]
 
@@ -41,10 +38,10 @@ def recordDurations(allDir):
 
 def main(allDir, outDir):
 
-    # durDict = recordDurations(allDir)
-    # durDict = pd.DataFrame(durDict)
+    durDict = recordDurations(allDir)
+    durDict = pd.DataFrame(durDict)
 
-    # durDict.to_csv("{}_durations.csv".format(os.path.basename(allDir)))
+    durDict.to_csv("{}_durations.csv".format(os.path.basename(allDir)))
     durDict = pd.read_csv("{}_durations.csv".format(os.path.basename(allDir)))
 
     durMean, durSD = getDurationStats(durDict['duration'].tolist())
@@ -108,13 +105,11 @@ def main(allDir, outDir):
 
     subSet = subI.append(subN)
 
-    print("Removed extra non-ironic samples with greatest variance from duration mean")
+    print("Removed extra non-ironic samples while preserving average variance from duration mean")
     print("Mean variance from duration mean for ironic samples\t{}".format(np.round(np.mean(subI["durDiffs"].tolist()), 2)))
     print("Mean variance from duration mean for non-ironic samples\t{}".format(np.round(np.mean(subN["durDiffs"].tolist()), 2)))
 
     print("Saving pruned dataset to separate directory")
-
-    sys.exit()
 
     if not os.path.isdir(outDir):
         os.mkdir(outDir)
@@ -126,7 +121,7 @@ def main(allDir, outDir):
 
 if __name__=="__main__":
 
-    allDir = "../../AudioData/All3/good"
+    allDir = "../../AudioData/All3/newTest"
     outDir = "../../AudioData/newTest"
 
     main(allDir, outDir)

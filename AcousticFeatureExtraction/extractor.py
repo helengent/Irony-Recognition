@@ -13,7 +13,6 @@ import matplotlib.pyplot as plt
 from parselmouth.praat import call
 from scipy.io import wavfile as wave
 from preProcessing.silence import highPass, validateTs
-# from reaper_f0extractor import f0VecTime
 from lib.WAVReader import WAVReader as WR
 from preProcessing.limitsUpperLower import giveMean, giveSD
 from python_speech_features import mfcc, logfbank
@@ -22,7 +21,6 @@ from lib.DSP_Tools import findEndpoint, normaliseRMS
 class Extractor:
     def __init__(self, wav, speaker, irony, winSize=10):
         self.name = wav
-        # self.text = text
         self.speaker = speaker
         self.irony = irony
         self.winSize = winSize
@@ -69,8 +67,6 @@ class Extractor:
 
         return f0_array, energy_array
     
-        #This is the code to get the reaper f0 contour
-        # f0Contour = f0VecTime(self.text, lowerLimit, upperLimit, ms=self.winSize)
 
     def getMeanf0(self):
         return giveMean(self.f0Data) 
@@ -173,5 +169,3 @@ class Extractor:
 
         return energyRange, energySD
 
-    #Relative spectral transform
-    #TODO

@@ -92,21 +92,7 @@ def preProcess(wav, tarRMS):
     signal, k = normaliseRMS(signal, tarRMS)
 
     #trim leading and trailing silence
-    #TODO investigate if a filter would help make this better?
     gated_sig, silences = trimSilence(signal, fs, 0.005)
-
-    # Plotting to check filter efficacy
-    # toPlot = [signal, silences, gated_sig]
-    # labels = ["Original Signal", "Detected Silences", "Trimmed Signal"]
-    # xlabs = ["Time", "Time", "Time"]
-    # ylabs = ["Amplitude", "Silence", "Amplitude"]
-    # spacing = np.linspace(0+dur/nb_sample, dur, nb_sample)
-    # win_spacing = np.linspace(0+dur/len(silences), dur, len(silences))
-    # new_dur = len(gated_sig)/fs
-    # gated_spacing = np.linspace(0+new_dur/len(gated_sig), new_dur, len(gated_sig))
-    # x = [spacing, win_spacing, gated_spacing]
-    # name = "../../SilenceTrimmingPlots{}/".format(wavPath) + os.path.basename(wav).split(".")[0] + ".pdf"
-    # plotIt(toPlot, x, labels, xlabs, ylabs, name)
 
     return gated_sig, fs, readr.getBitsPerSample()
 
@@ -124,7 +110,7 @@ def findAvgRMS(wavs):
 def main(wavPath, k, attemptCount):
 
     if attemptCount > 100:
-        print("Attempts have exceed limit. Try something else.")
+        print("Attempts have exceeded limit. Try something else.")
         print("k = {}".format(k))
         print("attempts = {}".format(attemptCount))
         raise Exception
@@ -132,7 +118,6 @@ def main(wavPath, k, attemptCount):
     wavList = glob('../AudioData/temp{}/*.wav'.format(wavPath))
 
     createDir("Gated{}".format(wavPath))
-    #createDir("../../SilenceTrimmingPlots/{}".format(wavPath))
 
     for i, wav in enumerate(wavList):
 
@@ -189,6 +174,6 @@ def preMain(wavPath):
 
 if __name__ == "__main__":
 
-    preMain("ANH")
+    preMain("Pruned3")
 
     

@@ -70,7 +70,7 @@ def main(f):
 
 if __name__=="__main__":
 
-    input_dir = "data/ANH_manual"
+    input_dir = "../../../../Data/TextData/Pruned3_asr"
     fileList = glob("{}/*.TextGrid".format(input_dir))
 
     for f in fileList:

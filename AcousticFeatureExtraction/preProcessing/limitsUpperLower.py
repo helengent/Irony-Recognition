@@ -23,21 +23,6 @@ def lowerLimit(vec):
     return lower
 
 
-# def assembleVec(files):
-#     vec = []
-#     for thing in files:
-#         f = open(thing, "r")
-#         text = f.read()
-#         f.close()
-#         text = text.split()
-#         for item in text:
-#             if item != "NaN":
-#                 vec.append(float(item))
-#             else:
-#                 vec.append(0.0)
-#     return vec
-
-#New method to work with parseltongue and WAV files instead of REAPER text outputs
 def assembleVec(files):
     vec = []
     for thing in files:
@@ -82,7 +67,6 @@ def giveSD(vec):
 
 
 def main(wavPath, winSize, speakerList):
-    # f0Files = glob('../ReaperTxtFiles/{}_{}ms_ReaperF0Results/*.f0.p'.format(wavPath, winSize))
     f0Files = glob('../AudioData/Gated{}/*.wav'.format(wavPath))
     for speaker in speakerList:
         filesList = []
@@ -100,11 +84,3 @@ def main(wavPath, winSize, speakerList):
             for key in indv.keys():
                 f.write("{}\t{}\n".format(key, str(indv[key])))
         f.close()
-
-if __name__=="__main__":
-
-    # speakerList = ["B", "G", "P", "R", "Y"]
-    # main("test", "10", speakerList)
-
-    speakerList = ["C", "D", "E"]
-    main("ANH", 10, speakerList)

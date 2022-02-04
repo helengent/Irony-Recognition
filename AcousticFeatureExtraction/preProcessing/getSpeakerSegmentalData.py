@@ -24,10 +24,3 @@ def speakerSegmentalData(df):
                 if c != "Avg. Voca. Dur." and c != "Avg. Cons. Dur.":
                     f.write("{}\t{}\n".format(c, np.nanmean(df[c])))
                    
-
-
-if __name__=="__main__":
-
-    df = "../../../Data/AcousticData/text_feats/Pruned3_asr_text_feats.csv"
-
-    speakerSegmentalData(df)

@@ -5,35 +5,10 @@ import shutil
 from glob import glob
 
 
-def speakerPairSave(episodePath, speakers, matches, mismatches1, mismatches2):
+def saveOut(episodePath, speakers, matchList, speaker1Mismatches, speaker2Mismatches, speaker1odd, speaker2odd, parentDir):
 
-    outDir = "/Users/helengent/Desktop/forIRR/{}_{}".format(speakers[0], speakers[1])
-
-    if not os.path.isdir(outDir):
-        os.mkdir(outDir)
-        os.mkdir("{}/{}".format(outDir, speakers[0]))
-        os.mkdir("{}/{}".format(outDir, speakers[1]))
-
-    for i, s in enumerate(speakers):
-        for item in matches:
-            shutil.copy("{}/{}/{}".format(episodePath, s, item), "{}/{}/{}".format(outDir, s, item))
-        if i == 0:
-            for item in mismatches1:
-                shutil.copy("{}/{}/{}".format(episodePath, s, item), "{}/{}/{}".format(outDir, s, item))
-        elif i == 1:
-            for item in mismatches2:
-                shutil.copy("{}/{}/{}".format(episodePath, s, item), "{}/{}/{}".format(outDir, s, item))
-        else:
-            print("Shouldn't be here")
-            raise Exception
-
-
-def saveOut(episodePath, speakers, matchList, speaker1Mismatches, speaker2Mismatches, speaker1odd, speaker2odd):
-
-    ep = episodePath.split("/")[-1]
-    
-    parentDir = "/Users/helengent/Desktop/reconcileD/{}".format(ep)
-    os.mkdir(parentDir)
+    if not os.path.isdir(parentDir):
+        os.mkdir(parentDir)
 
     os.mkdir("{}/matched".format(parentDir))
     for item in matchList:
@@ -91,7 +66,7 @@ def reconcile(uttDict, speakers):
     return matchList, speaker1Mismatches, speaker2Mismatches, speaker1odd, speaker2odd
 
 
-def main(episodePath):
+def main(episodePath, recOutDir):
 
     dirList = glob("{}/AN*".format(episodePath))
     speakers = [item.split("/")[-1] for item in dirList]
@@ -109,17 +84,17 @@ def main(episodePath):
     print("{} odd files for {}".format(len(speaker1odd), speakers[0]))
     print("{} odd files for {}".format(len(speaker2odd), speakers[1]))
 
-    saveOut(episodePath, speakers, matchList, speaker1Mismatches, speaker2Mismatches, speaker1odd, speaker2odd)
-
-    speakerPairSave(episodePath, speakers, matchList, speaker1Mismatches, speaker2Mismatches)
+    saveOut(episodePath, speakers, matchList, speaker1Mismatches, speaker2Mismatches, speaker1odd, speaker2odd, recOutDir)
 
 
 if __name__=="__main__":
 
-    # episodePath = "/Users/helengent/Desktop/reconcile/SBep27"
-    nums = ["12"]
+    nums = ["16"]
     
     for num in nums:
         episodePath = "/Users/helengent/Desktop/reconcile/SBep{}".format(num)
+        
+        ep = episodePath.split("/")[-1]
+        recOutDir = "/Users/helengent/Desktop/reconcileD/{}".format(ep)
 
-        main(episodePath)
+        main(episodePath, recOutDir)

@@ -14,7 +14,3 @@ def main(wavPath, haveManualT=False):
     if haveManualT == True:
         bashCommand = "cd preProcessing/ASR; ./run_Penn.sh ../../../AudioData/Gated{} ../../../../Data/TextData/{}_manual; cd ../..".format(wavPath, wavPath)
         subprocess.run(bashCommand, shell=True)
-
-if __name__=="__main__":
-
-    main("ANH", haveManualT=True)

@@ -29,6 +29,6 @@ def main(fileMod):
 
 if __name__=="__main__":
 
-    fileMod = "Pruned2_asr"
+    fileMod = "Pruned3_asr"
 
     main(fileMod)

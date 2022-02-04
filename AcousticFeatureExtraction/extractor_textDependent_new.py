@@ -20,6 +20,7 @@ from lib.DSP_Tools import findEndpoint
 from preProcessing.ASR import parseTextGrid
 from parselmouth.praat import call
 
+#Thank you Chase Adams for the starting code <3
 
 class Extractor:
 

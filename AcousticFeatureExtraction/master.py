@@ -48,7 +48,7 @@ def extractFeats(wavPath, speakerList, outputType, winSize=10, tg_mod="asr", sav
 
     extract_textDependent.main(wavPath, tg_mod, saveWhole=saveWhole)
 
-    # getSpeakerSegmentalData.speakerSegmentalData("../../Data/AcousticData/text_feats/{}_{}_text_feats.csv".format(wavPath, tg_mod))
+    getSpeakerSegmentalData.speakerSegmentalData("../../Data/AcousticData/text_feats/{}_{}_text_feats.csv".format(wavPath, tg_mod))
 
 
 if __name__=="__main__":

@@ -18,9 +18,6 @@ def main(in_dir, out_dir):
 
     wit_key = "R5533FE2CVI32BM2LVQRLFMDPMSZ55L3"
 
-    # with open("/Users/helengent/Desktop/Irony-Recognition/AcousticFeatureExtraction/preProcessing/ASR/api-key.json") as f:
-    #     GOOGLE_CLOUD_SPEECH_CREDENTIALS = f.read()
-
     r = sr.Recognizer()
     textDict = {"filename": [], "speaker": [], "label": [], "transcription": []}
 
@@ -42,7 +39,6 @@ def main(in_dir, out_dir):
 
                 try:
                     text = r.recognize_wit(w, wit_key)
-                    # text = r.recognize_google_cloud(w, credentials_json=GOOGLE_CLOUD_SPEECH_CREDENTIALS)
 
                     print("File {}/{}\t{}".format(i+1, len(wavList), name.split(".")[0]))
                     print(text)
@@ -61,6 +57,6 @@ def main(in_dir, out_dir):
 
 if __name__=="__main__":
 
-    input_dir = "../../../AudioData/ANH"
+    input_dir = "../../../AudioData/GatedPruned3"
 
     main(input_dir, "../../../TextData/{}_asr".format(os.path.basename(input_dir)))

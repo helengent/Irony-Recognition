@@ -13,10 +13,6 @@ from extractor import Extractor
 
 
 def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
-    # f = open("../ReaperTxtFiles/{}_{}ms_ReaperF0Results/{}.wav.f0.p".format(wavPath, winSize, os.path.basename(wav).split(".")[0]), "r")
-    # f0text = f.read()
-    # f.close()
-    # f0text = f0text.split()
 
     wavfile = os.path.basename(wav).split(".")[0]
 
@@ -167,11 +163,3 @@ def main(wavPath, speakerList, output, winSize="10"):
         global_df = pd.DataFrame(GLOBALDICT)
         global_df.to_csv("../../Data/AcousticData/{}_global_measures.csv".format(wavPath), index=False)
 
-if __name__ == "__main__":
-    t0 = time.time()
-
-    speakers = ["C", "D", "E", "S", "U"]
-    outputList = ['individual', 'global']
-    main("Pruned2", speakers, outputList)
-    t1 = time.time()
-    print("All processes completed in {} minutes".format((t1-t0)/60))

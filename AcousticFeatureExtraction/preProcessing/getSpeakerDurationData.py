@@ -57,14 +57,3 @@ def speakerDurationData(input_dir, speakerList):
                 if p in arpabetConsonantalList or p in arpabetVocalicList:
                     f.write("{}\t{}\n".format(p, phoneDict[p]))
                    
-
-
-if __name__=="__main__":
-
-    # input_dir = "../TextData/ANH_manual"
-    # speakerList = ["C", "D", "E"]
-
-    input_dir = "../TextData/Pruned_asr"
-    speakerList = ["B", "G", "P", "R", "Y"]
-
-    speakerDurationData(input_dir, speakerList)
