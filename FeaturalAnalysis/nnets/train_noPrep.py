@@ -8,8 +8,8 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 
 sys.path.append("../../Models")
 
-# from LSTM_FFNN_CNN_withText import acousticTextLSTM_CNN_FFNN
-from LSTM_FFNN_CNN_withText_TUNED import acousticTextLSTM_CNN_FFNN
+from LSTM_FFNN_CNN_withText import acousticTextLSTM_CNN_FFNN
+# from LSTM_FFNN_CNN_withText_TUNED_speakerDep import acousticTextLSTM_CNN_FFNN
 
 
 class ModelTrainer:
@@ -91,10 +91,10 @@ if __name__=="__main__":
     fileList = glob("../../AudioData/Gated{}/*.wav".format(fileMod))
     fileList = np.array([item.split("/")[-1][:-4] for item in fileList])
     
-    speakerSplit = "independent"
+    speakerSplit = "dependent"
 
     if speakerSplit == "dependent":
-        modelName = "TUNED_speakerDependent_final"
+        modelName = "speakerDependent_final"
 
         train_seq = "/home/hmgent2/Data/ModelInputs/percentChunks/speakerDependent-f0-hnr-mfcc/speaker-dependent_train-unified_acoustic.npy"
         train_glob = "/home/hmgent2/Data/ModelInputs/PCs/speakerDependent-f0-hnr-mfcc/speaker-dependent_train-unified_acoustic.npy"

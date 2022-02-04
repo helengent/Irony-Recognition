@@ -26,7 +26,8 @@ from textOnly import textOnlyNN
 from LSTM_withText import acousticTextLSTM
 from LSTM_CNN_withText import acousticTextLSTM_CNN
 from globAcousticCNN import globAcousticCNN
-from LSTM_FFNN_CNN_withText import acousticTextLSTM_CNN_FFNN
+# from LSTM_FFNN_CNN_withText import acousticTextLSTM_CNN_FFNN
+from LSTM_FFNN_CNN_withText_TUNED_speakerDep import acousticTextLSTM_CNN_FFNN
 from FFNN_CNN_withText import acousticTextCNN_FFNN
 from LSTM_FFNN import acousticLSTM_FFNN
 
@@ -37,7 +38,7 @@ from sd import sd
 
 class ModelTester:
 
-    def __init__(self, inputType, dataPath, counter, measureList, modelPath, speakerSplit="independent", splitName="newSplit", fileMod="Pruned3"):
+    def __init__(self, inputType, dataPath, counter, measureList, modelPath, speakerSplit="independent", splitName="newSplit", fileMod="Pruned3", threshold = 0.5):
         self.glob_acoustic, self.seq_acoustic, self.text = inputType 
         self.dataPath = dataPath
         self.speakerSplit = speakerSplit
@@ -45,8 +46,9 @@ class ModelTester:
         self.counter = counter
         self.measureList = measureList
         self.fileMod = fileMod
+        self.threshold = threshold
 
-        self.prefix = "speaker-{}_".format(self.speakerSplit)
+        self.prefix = "TUNED_{}-speaker-{}_".format(self.fileMod, self.speakerSplit)
         if self.glob_acoustic:
             self.prefix = self.prefix + "{}_".format(inputType[0])
         if self.seq_acoustic:
@@ -62,7 +64,7 @@ class ModelTester:
 
     def performanceReport(self):
 
-        with open("Inference/performanceReport_{}_{}{}.txt".format(self.fileMod, self.prefix, self.counter), "w") as f:
+        with open("Inference/performanceReport_{}{}.txt".format(self.prefix, self.counter), "w") as f:
 
             f.write("Test performance\n")
             f.write("Precision:\t{}\n".format(self.test_performance[0][0]))
@@ -105,6 +107,9 @@ class ModelTester:
     def confusionMatrix(self, predictions):
 
         cm = confusion_matrix(self.labels, predictions, normalize="true")
+
+        print(cm)
+
         test_cm = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["N", "I"])
         # fig = plt.figure()
         # plt.matshow(cm)
@@ -172,8 +177,20 @@ class ModelTester:
 
         test_preds = self.model.predict(self.model_inputs)
 
-        test_stats = precision_recall_fscore_support(self.labels, test_preds.argmax(axis=1))
-        test_accuracy = accuracy_score(self.labels, test_preds.argmax(axis=1))
+        #Give option to mess with the threshold
+        if self.threshold == 0.5:
+            pred_nums = test_preds.argmax(axis=1)
+        else:
+            pred_nums = list()
+            for item in test_preds:
+                print(item)
+                if item[1] >= self.threshold:
+                    pred_nums.append(1)
+                else:
+                    pred_nums.append(0)
+
+        test_stats = precision_recall_fscore_support(self.labels, pred_nums)
+        test_accuracy = accuracy_score(self.labels, pred_nums)
 
         self.test_performance = (test_stats, test_accuracy)
 
@@ -181,18 +198,19 @@ class ModelTester:
 
         self.performanceReport()
         self.ROCcurve()
-        self.confusionMatrix(test_preds.argmax(axis=1))
-        self.outputPredictions(test_preds.argmax(axis=1))
+        self.confusionMatrix(pred_nums)
+        self.outputPredictions(pred_nums)
 
 
 if __name__=="__main__":
 
-    # fileMod = "newTest"
-    # dataPath = "/home/hmgent2/Data/newTest_ModelInputs"
+    fileMod = "newTest"
+    dataPath = "/home/hmgent2/Data/newTest_ModelInputs"
 
-    fileMod = "Pruned3"
-    dataPath = "/home/hmgent2/Data/ModelInputs"
-    speakerSplits = ["dependent", "independent"]
+    # fileMod = "Pruned3"
+    # dataPath = "/home/hmgent2/Data/ModelInputs"
+    speakerSplits = ["dependent"]
+    threshold = 0.5
 
     #Make list of tuples with combinations of input types
     # glob_acoustic = [False, "PCs", "rawGlobal"]
@@ -208,20 +226,21 @@ if __name__=="__main__":
     #                 ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),("rawGlobal", "percentChunks", True),
     #                 ("ComParE", "rawSequential", False), ("PCs", "rawSequential", True), ("PCs_feats", "rawSequential", True),("rawGlobal", "rawSequential", True)]
 
-    inputTypes = [("PCs", "percentChunks", True), ("2PCs_feats", "percentChunks", True)]
-    measureLists = [["f0", "hnr", "mfcc"], ["f0", "mfcc", "plp"]]
+    inputTypes = [("PCs", "percentChunks", True)]#, ("2PCs_feats", "percentChunks", True)]
+    measureLists = [["f0", "hnr", "mfcc"]]#, ["f0", "mfcc", "plp"]]
 
     for inputType, speakerSplit, measureList in zip(inputTypes, speakerSplits, measureLists):
 
         if speakerSplit == "dependent":
-            counter = 3
+            counter = 0
             splitName = "speakerDependent"
-            modelPath = "Checkpoints/speakerDependent-f0-hnr-mfcc/speaker-dependent_PCs_percentChunks_text_checkpoints.ckpt_{}".format(counter)
+            # modelPath = "Checkpoints/speakerDependent-f0-hnr-mfcc/speaker-dependent_PCs_percentChunks_text_checkpoints.ckpt_{}".format(counter)
+            modelPath = "Tuned/SpeakerDependent/TUNED_speakerDependent_final_checkpoints.ckpt"
         elif speakerSplit == "independent":
             #This means speaker c was left out of the training data
             counter = "c"
             splitName = "newSplit"
             modelPath = "Checkpoints/newSplit-f0-mfcc-plp/speaker-independent_2PCs_feats_percentChunks_text_checkpoints.ckpt_{}".format(counter)
 
-        m = ModelTester(inputType, dataPath, counter, measureList, modelPath, speakerSplit=speakerSplit, splitName=splitName, fileMod = fileMod)
+        m = ModelTester(inputType, dataPath, counter, measureList, modelPath, speakerSplit=speakerSplit, splitName=splitName, fileMod = fileMod, threshold = threshold)
         m.testModel()

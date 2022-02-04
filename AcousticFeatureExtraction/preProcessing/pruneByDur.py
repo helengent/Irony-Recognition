@@ -41,10 +41,10 @@ def recordDurations(allDir):
 
 def main(allDir, outDir):
 
-    durDict = recordDurations(allDir)
-    durDict = pd.DataFrame(durDict)
+    # durDict = recordDurations(allDir)
+    # durDict = pd.DataFrame(durDict)
 
-    durDict.to_csv("{}_durations.csv".format(os.path.basename(allDir)))
+    # durDict.to_csv("{}_durations.csv".format(os.path.basename(allDir)))
     durDict = pd.read_csv("{}_durations.csv".format(os.path.basename(allDir)))
 
     durMean, durSD = getDurationStats(durDict['duration'].tolist())
@@ -114,6 +114,8 @@ def main(allDir, outDir):
 
     print("Saving pruned dataset to separate directory")
 
+    sys.exit()
+
     if not os.path.isdir(outDir):
         os.mkdir(outDir)
 
@@ -124,7 +126,7 @@ def main(allDir, outDir):
 
 if __name__=="__main__":
 
-    allDir = "../../AudioData/All3/good2"
+    allDir = "../../AudioData/All3/good"
     outDir = "../../AudioData/newTest"
 
     main(allDir, outDir)

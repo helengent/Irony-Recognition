@@ -26,8 +26,8 @@ from textOnly import textOnlyNN
 from LSTM_withText import acousticTextLSTM
 from LSTM_CNN_withText import acousticTextLSTM_CNN
 from globAcousticCNN import globAcousticCNN
-from LSTM_FFNN_CNN_withText import acousticTextLSTM_CNN_FFNN
-# from LSTM_FFNN_CNN_withText_TUNED import acousticTextLSTM_CNN_FFNN
+# from LSTM_FFNN_CNN_withText import acousticTextLSTM_CNN_FFNN
+from LSTM_FFNN_CNN_withText_TUNED_speakerDep import acousticTextLSTM_CNN_FFNN
 from FFNN_CNN_withText import acousticTextCNN_FFNN
 from LSTM_FFNN import acousticLSTM_FFNN
 from LSTM_FFNN_CNN_withText_Attention import acousticTextLSTM_CNN_FFNN_Attention
@@ -40,7 +40,7 @@ from sd import sd
 
 class ModelTrainer:
 
-    def __init__(self, fileMod, fileList, speakerList, inputType, dataPath, subDir, speakerSplit="independent", f0Normed=False, percentage=10, measureList=None, frameMax=200, use_attention = False):
+    def __init__(self, fileMod, fileList, speakerList, inputType, dataPath, subDir, speakerSplit="independent", f0Normed=False, percentage=10, measureList=None, frameMax=200, use_attention = False, train_status = True):
         self.fileMod = fileMod
         self.fileList = fileList
         self.speakerList = speakerList
@@ -53,6 +53,7 @@ class ModelTrainer:
         self.frameMax = frameMax
         self.subDir = subDir
         self.use_attention = use_attention
+        self.train_status = train_status
 
         if self.glob_acoustic:
             if self.glob_acoustic == "ComParE":
@@ -60,7 +61,7 @@ class ModelTrainer:
             else:
                 self.glob_file = pd.read_csv("{}/{}/all_inputs.csv".format(self.dataPath, self.glob_acoustic))
 
-        self.prefix = "speaker-{}_".format(self.speakerSplit)
+        self.prefix = "TUNED-speaker-{}_".format(self.speakerSplit)
         if self.glob_acoustic:
             self.prefix = self.prefix + "{}_".format(inputType[0])
         if self.seq_acoustic:
@@ -481,6 +482,15 @@ class ModelTrainer:
             aucs.append(auc)
             eers.append(eer)
 
+        print()
+        print("{}\tAUCs".format(self.prefix))
+        print(aucs)
+        print("Mean:\t{}".format(np.mean(aucs)))
+        print("{}\tEERs".format(self.prefix))
+        print(eers)
+        print("Mean:\t{}".format(np.mean(eers)))
+        print()
+
         ax.plot([0, 1], [0, 1], linestyle='--', lw=2, color="r", label="Chance", alpha=0.8)
         mean_tpr = np.mean(tprs, axis=0)
         mean_tpr[-1] = 1
@@ -489,17 +499,26 @@ class ModelTrainer:
         mean_eer = np.mean(eers)
         std_eer = np.std(eers)
         ax.plot(mean_fpr, mean_tpr, color="b", 
-                label = "Mean ROC AUC: {} AUC std: {}\nEER: {} EER std: {}".format(np.round(mean_auc, 2), np.round(std_auc, 2), np.round(mean_eer, 2), np.round(std_eer, 2)), 
+                label = "Mean AUC: {}\nAUC std: {}".format(np.round(mean_auc, 2), np.round(std_auc, 2)), 
                 lw=2, alpha=0.8)
+        ax.plot(0, 0, color="w", 
+                label= "Mean EER: {}\nEER std {}".format(np.round(mean_eer, 2), np.round(std_eer, 2)))
 
         std_tpr = np.std(tprs, axis=0)
         tprs_upper = np.minimum(mean_tpr + std_tpr, 1)
         tprs_lower = np.maximum(mean_tpr - std_tpr, 0)
         ax.fill_between(mean_fpr, tprs_lower, tprs_upper, color="grey", alpha=0.2)
 
-        ax.set(xlim=[-0.05, 1.05], ylim=[-0.05, 1.05], title="ROC Curve")
+        if self.speakerSplit == "dependent":
+            plotTitle = "ROC Curve (SD5)"
+        elif self.speakerSplit == "indpendent" and len(self.speakerList) == 4:
+            plotTitle = "ROC Curve (SIB)"
+        else:
+            plotTitle = "ROC Curve (LOSO)"
+
+        ax.set(xlim=[-0.05, 1.05], ylim=[-0.05, 1.05], title=plotTitle, xlabel = "False Positive Rate", ylabel = "True Positive Rate")
         ax.legend(loc="lower right")
-        plt.savefig("Plots/{}/ROC_{}.png".format(self.subDir, self.prefix))
+        plt.savefig("Plots/{}/NEW_ROC_{}.png".format(self.subDir, self.prefix))
 
 
     def transformLabs(self, x_list):
@@ -743,75 +762,91 @@ class ModelTrainer:
                 text_test_data = np.load("{}/Text/newSplit/speaker-{}_test-{}_tokenized.npy".format(self.dataPath, self.speakerSplit, counter))
                 test_labs = np.load("{}/Text/newSplit/speaker-{}_test-{}_labels.npy".format(self.dataPath, self.speakerSplit, counter))
 
-            if self.seq_acoustic and not self.glob_acoustic and not self.text:
-                self.model = acousticOnlyLSTM(seq_acoustic_train_data, seq_acoustic_dev_data, seq_acoustic_test_data, 
+
+            if self.train_status:
+                if self.seq_acoustic and not self.glob_acoustic and not self.text:
+                    self.model = acousticOnlyLSTM(seq_acoustic_train_data, seq_acoustic_dev_data, seq_acoustic_test_data, 
+                                                    train_labs, dev_labs, test_labs, "{}_{}".format(self.csv_path, counter), 
+                                                    "{}_{}".format(self.checkpoint_path, counter), self.plot_paths[counter], 
+                                                    self.class_weights)
+
+                elif self.glob_acoustic and not self.seq_acoustic and not self.text:
+                    self.model = FeedForwardNN(glob_acoustic_train_data, glob_acoustic_dev_data, glob_acoustic_test_data, 
                                                 train_labs, dev_labs, test_labs, "{}_{}".format(self.csv_path, counter), 
                                                 "{}_{}".format(self.checkpoint_path, counter), self.plot_paths[counter], 
                                                 self.class_weights)
 
-            elif self.glob_acoustic and not self.seq_acoustic and not self.text:
-                self.model = FeedForwardNN(glob_acoustic_train_data, glob_acoustic_dev_data, glob_acoustic_test_data, 
-                                            train_labs, dev_labs, test_labs, "{}_{}".format(self.csv_path, counter), 
-                                            "{}_{}".format(self.checkpoint_path, counter), self.plot_paths[counter], 
-                                            self.class_weights)
+                elif self.text and not self.seq_acoustic and not self.glob_acoustic:
+                    self.model = textOnlyNN(text_train_data, text_dev_data, text_test_data, 
+                                            train_labs, dev_labs, test_labs, self.tokenizer, 
+                                            "{}_{}".format(self.csv_path, counter), 
+                                            "{}_{}".format(self.checkpoint_path, counter), 
+                                            self.plot_paths[counter], self.class_weights)
 
-            elif self.text and not self.seq_acoustic and not self.glob_acoustic:
-                self.model = textOnlyNN(text_train_data, text_dev_data, text_test_data, 
-                                        train_labs, dev_labs, test_labs, self.tokenizer, 
-                                        "{}_{}".format(self.csv_path, counter), 
-                                        "{}_{}".format(self.checkpoint_path, counter), 
-                                        self.plot_paths[counter], self.class_weights)
+                elif self.text and self.seq_acoustic and not self.glob_acoustic:
+                    self.model = acousticTextLSTM_CNN(seq_acoustic_train_data, seq_acoustic_dev_data, seq_acoustic_test_data, 
+                                                    text_train_data, text_dev_data, text_test_data, 
+                                                    train_labs, dev_labs, test_labs, self.tokenizer, 
+                                                    "{}_{}".format(self.csv_path, counter), 
+                                                    "{}_{}".format(self.checkpoint_path, counter), 
+                                                    self.plot_paths[counter], self.class_weights)
 
-            elif self.text and self.seq_acoustic and not self.glob_acoustic:
-                self.model = acousticTextLSTM_CNN(seq_acoustic_train_data, seq_acoustic_dev_data, seq_acoustic_test_data, 
-                                                text_train_data, text_dev_data, text_test_data, 
-                                                train_labs, dev_labs, test_labs, self.tokenizer, 
-                                                "{}_{}".format(self.csv_path, counter), 
-                                                "{}_{}".format(self.checkpoint_path, counter), 
-                                                self.plot_paths[counter], self.class_weights)
-
-            elif self.text and self.glob_acoustic and not self.seq_acoustic:
-                self.model = acousticTextCNN_FFNN(glob_acoustic_train_data, glob_acoustic_dev_data, glob_acoustic_test_data, 
-                                                text_train_data, text_dev_data, text_test_data, 
-                                                train_labs, dev_labs, test_labs, self.tokenizer,
-                                                "{}_{}".format(self.csv_path, counter), 
-                                                "{}_{}".format(self.checkpoint_path, counter), 
-                                                self.plot_paths[counter], self.class_weights)
+                elif self.text and self.glob_acoustic and not self.seq_acoustic:
+                    self.model = acousticTextCNN_FFNN(glob_acoustic_train_data, glob_acoustic_dev_data, glob_acoustic_test_data, 
+                                                    text_train_data, text_dev_data, text_test_data, 
+                                                    train_labs, dev_labs, test_labs, self.tokenizer,
+                                                    "{}_{}".format(self.csv_path, counter), 
+                                                    "{}_{}".format(self.checkpoint_path, counter), 
+                                                    self.plot_paths[counter], self.class_weights)
+                
+                elif self.seq_acoustic and self.glob_acoustic and not self.text:
+                    self.model = acousticLSTM_FFNN(seq_acoustic_train_data, seq_acoustic_dev_data, seq_acoustic_test_data, 
+                                                    glob_acoustic_train_data, glob_acoustic_dev_data, glob_acoustic_test_data, 
+                                                    train_labs, dev_labs, test_labs,
+                                                    "{}_{}".format(self.csv_path, counter), 
+                                                    "{}_{}".format(self.checkpoint_path, counter), 
+                                                    self.plot_paths[counter], self.class_weights)
             
-            elif self.seq_acoustic and self.glob_acoustic and not self.text:
-                self.model = acousticLSTM_FFNN(seq_acoustic_train_data, seq_acoustic_dev_data, seq_acoustic_test_data, 
-                                                glob_acoustic_train_data, glob_acoustic_dev_data, glob_acoustic_test_data, 
-                                                train_labs, dev_labs, test_labs,
-                                                "{}_{}".format(self.csv_path, counter), 
-                                                "{}_{}".format(self.checkpoint_path, counter), 
-                                                self.plot_paths[counter], self.class_weights)
-           
-            elif self.seq_acoustic and self.glob_acoustic and self.text:
-                if self.use_attention:
-                    self.model = acousticTextLSTM_CNN_FFNN_Attention(seq_acoustic_train_data, seq_acoustic_dev_data, seq_acoustic_test_data, 
-                                        glob_acoustic_train_data, glob_acoustic_dev_data, glob_acoustic_test_data, 
-                                        text_train_data, text_dev_data, text_test_data,
-                                        train_labs, dev_labs, test_labs, self.tokenizer, 
-                                        "{}_{}".format(self.csv_path, counter), 
-                                        "{}_{}".format(self.checkpoint_path, counter), 
-                                        self.plot_paths[counter], self.class_weights)
+                elif self.seq_acoustic and self.glob_acoustic and self.text:
+                    if self.use_attention:
+                        self.model = acousticTextLSTM_CNN_FFNN_Attention(seq_acoustic_train_data, seq_acoustic_dev_data, seq_acoustic_test_data, 
+                                            glob_acoustic_train_data, glob_acoustic_dev_data, glob_acoustic_test_data, 
+                                            text_train_data, text_dev_data, text_test_data,
+                                            train_labs, dev_labs, test_labs, self.tokenizer, 
+                                            "{}_{}".format(self.csv_path, counter), 
+                                            "{}_{}".format(self.checkpoint_path, counter), 
+                                            self.plot_paths[counter], self.class_weights)
+
+                    else:
+                        self.model = acousticTextLSTM_CNN_FFNN(seq_acoustic_train_data, seq_acoustic_dev_data, seq_acoustic_test_data, 
+                                                                glob_acoustic_train_data, glob_acoustic_dev_data, glob_acoustic_test_data, 
+                                                                text_train_data, text_dev_data, text_test_data,
+                                                                train_labs, dev_labs, test_labs, self.tokenizer, 
+                                                                "{}_{}".format(self.csv_path, counter), 
+                                                                "{}_{}".format(self.checkpoint_path, counter), 
+                                                                self.plot_paths[counter], self.class_weights)
 
                 else:
-                    self.model = acousticTextLSTM_CNN_FFNN(seq_acoustic_train_data, seq_acoustic_dev_data, seq_acoustic_test_data, 
-                                                            glob_acoustic_train_data, glob_acoustic_dev_data, glob_acoustic_test_data, 
-                                                            text_train_data, text_dev_data, text_test_data,
-                                                            train_labs, dev_labs, test_labs, self.tokenizer, 
-                                                            "{}_{}".format(self.csv_path, counter), 
-                                                            "{}_{}".format(self.checkpoint_path, counter), 
-                                                            self.plot_paths[counter], self.class_weights)
+                    print("Bad combination of model inputs... This shouldn't have been possible")
+
+                self.model.train()
+                print(self.model.model.summary())
+
+                test_preds = self.model.test()
 
             else:
-                print("Bad combination of model inputs... This shouldn't have been possible")
+                self.model = models.load_model("{}_{}".format(self.checkpoint_path, counter))
+                print(self.model.summary())
 
-            self.model.train()
-            print(self.model.model.summary())
+                model_inputs = list()
+                if self.text:
+                    model_inputs.append(text_test_data)
+                if self.seq_acoustic:
+                    model_inputs.append(seq_acoustic_test_data)
+                if self.glob_acoustic:
+                    model_inputs.append(glob_acoustic_test_data)
 
-            test_preds = self.model.test()
+                test_preds = self.model.predict(model_inputs)
 
             test_stats = precision_recall_fscore_support(test_labs, test_preds.argmax(axis=1))
             test_accuracy = accuracy_score(test_labs, test_preds.argmax(axis=1))
@@ -834,13 +869,11 @@ if __name__=="__main__":
     fileList = glob("../../AudioData/Gated{}/*.wav".format(fileMod))
     baseList = np.array([item.split("/")[-1][:-4] for item in fileList])
 
-    # speakerList = ["c", "d", "ejou", "fhkqst"]
-    speakerList = list(set([item.split("_")[1][0] for item in baseList]))
-
     dataPath = "/home/hmgent2/Data/ModelInputs"
     # dataPath = "/home/hmgent2/Data/newTest_ModelInputs"
-    speakerSplits = ["dependent", "independent"] #"dependent", "independent", 
+    speakerSplits = ["dependent"] #"dependent", "independent", 
     att = False
+    train_status = True
     # speakerSplits = ["independent"]
 
     #Make list of tuples with combinations of input types
@@ -859,14 +892,13 @@ if __name__=="__main__":
 
 
     # inputTypes = [(False, "percentChunks", False), ("PCs", "percentChunks", True)]
-    inputTypes = [("2PCs_feats", "percentChunks", True), ("PCs", "percentChunks", True)]
+    inputTypes = [("PCs", "percentChunks", True)]
 
-    # measureLists = [["f0", "hnr", "mfcc", "plp"]]
     # measureLists = [["f0", "hnr"], ["f0", "mfcc"], ["f0", "plp"], ["f0", "hnr", "mfcc"], ["f0", "hnr", "plp"], 
     #                 ["hnr"], ["hnr", "mfcc"], ["hnr", "plp"], ["hnr", "mfcc", "plp"],  
     #                 ["mfcc"], ["mfcc", "plp"],
     #                 ["plp"]]
-    measureLists = [["f0", "mfcc", "plp"], ["f0", "hnr", "mfcc"]]
+    measureLists = [["f0", "hnr", "mfcc"]]
 
     f0Normed=False
     percentage=10
@@ -877,11 +909,13 @@ if __name__=="__main__":
         for speakerSplit in speakerSplits:
 
             if speakerSplit == "dependent":
+                speakerList = list(set([item.split("_")[1][0] for item in baseList]))
                 if len(measureList) != 4:
                     subDir = "speakerDependent-{}".format("-".join(measureList))
                 else:
                     subDir = "speakerDependent"
             elif speakerSplit == "independent":
+                speakerList = list(set([item.split("_")[1][0] for item in baseList]))
                 if len(measureList) != 4:
                     subDir = "oldSplit-{}".format("-".join(measureList))
                 else:
@@ -891,19 +925,19 @@ if __name__=="__main__":
                 speakerList = ["c", "d", "ejou", "fhkqst"]
                 speakerSplit = "independent"
 
-            # if not os.path.isdir("Results/{}".format(subDir)):
-            #     for parent in ["Results", "Checkpoints", "Plots"]: #
-            #         os.mkdir("{}/{}".format(parent, subDir))
+            if not os.path.isdir("Results/{}".format(subDir)):
+                for parent in ["Results", "Checkpoints", "Plots"]: #
+                    os.mkdir("{}/{}".format(parent, subDir))
                 # for parent in ["ComParE", "PCs", "PCs_feats", "percentChunks", "rawGlobal", "rawSequential"]:
-            if not os.path.isdir("{}/percentChunks/{}".format(dataPath, subDir)):
-                for parent in ["2PCs", "2PCs_feats", "percentChunks"]:
-                    os.mkdir("{}/{}/{}".format(dataPath, parent, subDir))
+            # if not os.path.isdir("{}/percentChunks/{}".format(dataPath, subDir)):
+            #     for parent in ["2PCs", "2PCs_feats", "percentChunks"]:
+            #         os.mkdir("{}/{}/{}".format(dataPath, parent, subDir))
 
-            try:
-                m = ModelTrainer(fileMod, baseList, speakerList, inputType, dataPath, subDir, speakerSplit=speakerSplit, f0Normed=f0Normed, percentage=percentage, measureList = measureList, use_attention = att)
+            # try:
+            m = ModelTrainer(fileMod, baseList, speakerList, inputType, dataPath, subDir, speakerSplit=speakerSplit, f0Normed=f0Normed, percentage=percentage, measureList = measureList, use_attention = att, train_status=train_status)
 
-                m.trainModel()
+            m.trainModel()
 
-            except Exception as e:
-                with open("bad.txt", "a+") as f:
-                    f.write("{}\t{}\n{}\n\n".format(inputType, speakerSplit, e))
+            # except Exception as e:
+            #     with open("bad.txt", "a+") as f:
+            #         f.write("{}\t{}\n{}\n\n".format(inputType, speakerSplit, e))
