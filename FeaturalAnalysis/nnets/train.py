@@ -23,15 +23,12 @@ sys.path.append("../../Models")
 from LSTM_acousticOnly import acousticOnlyLSTM
 from FeedForward import FeedForwardNN
 from textOnly import textOnlyNN
-from LSTM_withText import acousticTextLSTM
 from LSTM_CNN_withText import acousticTextLSTM_CNN
-from globAcousticCNN import globAcousticCNN
-# from LSTM_FFNN_CNN_withText import acousticTextLSTM_CNN_FFNN
-from LSTM_FFNN_CNN_withText_TUNED_speakerDep import acousticTextLSTM_CNN_FFNN
+from LSTM_FFNN_CNN_withText import acousticTextLSTM_CNN_FFNN
+# from LSTM_FFNN_CNN_withText_TUNED_speakerDep import acousticTextLSTM_CNN_FFNN
 from FFNN_CNN_withText import acousticTextCNN_FFNN
 from LSTM_FFNN import acousticLSTM_FFNN
 from LSTM_FFNN_CNN_withText_Attention import acousticTextLSTM_CNN_FFNN_Attention
-from LSTM_FFNN_LSTM_withText import acousticTextLSTM_LSTM_FFNN
 
 sys.path.append("../../AcousticFeatureExtraction")
 from speaker import Speaker
