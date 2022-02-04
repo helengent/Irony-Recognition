@@ -1,1 +1,1 @@
-
+This directory contains the script used to configure long-form episode length WAV files for individual speakers into a single WAV file where each speaker has their own channel. This file is then used in the segmentation and annotation processes so that individual speakers can still be isolated in periods of simultaneous speech, but conversational context can be preserved.
