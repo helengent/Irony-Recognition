@@ -215,11 +215,11 @@ class ModelTrainer:
             X_test, y_test, counter = test
 
             if not os.path.exists("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
-                desiredIndices = list()
-                for i, item in enumerate(self.glob_file["fileName"].tolist()): 
-                    if item in X_train: 
-                        desiredIndices.append(i)
-                X_train = self.glob_file.iloc[desiredIndices]
+                newX = pd.DataFrame()
+                for name in X_train:
+                    subset = self.glob_file[self.glob_file["fileName"] == name]
+                    newX = newX.append(subset)
+                X_train = newX
                 X_train.pop("fileName")
                 X_train.pop("speaker")
                 X_train.pop("label")
@@ -236,11 +236,11 @@ class ModelTrainer:
                     np.save(f, y_train)
 
             if not os.path.exists("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
-                desiredIndices = list()
-                for i, item in enumerate(self.glob_file["fileName"].tolist()): 
-                    if item in X_dev: 
-                        desiredIndices.append(i)
-                X_dev = self.glob_file.iloc[desiredIndices]
+                newX = pd.DataFrame()
+                for name in X_dev:
+                    subset = self.glob_file[self.glob_file["fileName"] == name]
+                    newX = newX.append(subset)
+                X_dev = newX
                 X_dev.pop("fileName")
                 X_dev.pop("speaker")
                 X_dev.pop("label")
@@ -257,11 +257,11 @@ class ModelTrainer:
                     np.save(f, y_dev)
 
             if not os.path.exists("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter)):
-                desiredIndices = list()
-                for i, item in enumerate(self.glob_file["fileName"].tolist()): 
-                    if item in X_test: 
-                        desiredIndices.append(i)
-                X_test = self.glob_file.iloc[desiredIndices]                    
+                newX = pd.DataFrame()
+                for name in X_test:
+                    subset = self.glob_file[self.glob_file["fileName"] == name]
+                    newX = newX.append(subset)
+                X_test = newX                  
                 X_test.pop("fileName")
                 X_test.pop("speaker")
                 X_test.pop("label")
@@ -324,16 +324,15 @@ if __name__=="__main__":
     dataPath = "/home/hmgent2/Data/ModelInputs"
     speakerSplits = ["dependent", "independent"]
 
-    #Make list of tuples with combinations of input types
-    # glob_acoustic = [False, "PCs", "rawGlobal"]
-    # seq_acoustic = [False, "percentChunks", "rawSequential"]
-    # text = [False, "bert", "w2v"]
-
     inputTypes = ["PCs_feats", "PCs", "ComParE", "rawGlobal"]
 
     for speakerSplit in speakerSplits:
         for inputType in inputTypes:
 
-            m = ModelTrainer(fileMod, baseList, speakerList, inputType, dataPath, speakerSplit=speakerSplit)
+            try:
+                m = ModelTrainer(fileMod, baseList, speakerList, inputType, dataPath, speakerSplit=speakerSplit)
 
-            m.trainModel()
+                m.trainModel()
+            except:
+                with Exception as e:
+                    print(e)
