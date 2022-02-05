@@ -167,5 +167,5 @@ class Extractor:
         energyRange = np.max(self.energyData) - np.min(self.energyData)
         energySD = giveSD(self.energyData)
 
-        return energyRange, energySD
+        return energyRange, energySD, self.energyData
 

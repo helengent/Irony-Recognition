@@ -55,8 +55,9 @@ if __name__=="__main__":
 
     # wavPath = "Pruned3"
     wavPath = "newTest"
+    # speakerList = ["C", "D", "E", "F", "H", "J", "K", "O", "Q", "S", "T", "U"]
     speakerList = ["C", "D"]
-    outputList = ['individual', 'global']
+    outputList = ['individual']#, 'global']
 
     tg_mod = "asr"
     saveWhole = True

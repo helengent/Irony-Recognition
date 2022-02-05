@@ -18,17 +18,14 @@ from tensorflow.keras.preprocessing.text import Tokenizer
 from sklearn.metrics import precision_recall_fscore_support, confusion_matrix, accuracy_score, roc_auc_score, roc_curve
 from sklearn.model_selection import train_test_split, StratifiedKFold
 
-
 sys.path.append("../../Models")
 from LSTM_acousticOnly import acousticOnlyLSTM
 from FeedForward import FeedForwardNN
 from textOnly import textOnlyNN
 from LSTM_CNN_withText import acousticTextLSTM_CNN
 from LSTM_FFNN_CNN_withText import acousticTextLSTM_CNN_FFNN
-# from LSTM_FFNN_CNN_withText_TUNED_speakerDep import acousticTextLSTM_CNN_FFNN
 from FFNN_CNN_withText import acousticTextCNN_FFNN
 from LSTM_FFNN import acousticLSTM_FFNN
-from LSTM_FFNN_CNN_withText_Attention import acousticTextLSTM_CNN_FFNN_Attention
 
 sys.path.append("../../AcousticFeatureExtraction")
 from speaker import Speaker
@@ -37,7 +34,7 @@ from sd import sd
 
 class ModelTrainer:
 
-    def __init__(self, fileMod, fileList, speakerList, inputType, dataPath, subDir, speakerSplit="independent", f0Normed=False, percentage=10, measureList=None, frameMax=200, use_attention = False, train_status = True):
+    def __init__(self, fileMod, fileList, speakerList, inputType, dataPath, subDir, speakerSplit="independent", f0Normed=False, percentage=10, measureList=None, frameMax=200, train_status = True):
         self.fileMod = fileMod
         self.fileList = fileList
         self.speakerList = speakerList
@@ -49,7 +46,6 @@ class ModelTrainer:
         self.measureList = measureList
         self.frameMax = frameMax
         self.subDir = subDir
-        self.use_attention = use_attention
         self.train_status = train_status
 
         if self.glob_acoustic:
@@ -58,15 +54,14 @@ class ModelTrainer:
             else:
                 self.glob_file = pd.read_csv("{}/{}/all_inputs.csv".format(self.dataPath, self.glob_acoustic))
 
-        self.prefix = "TUNED-speaker-{}_".format(self.speakerSplit)
+        self.prefix = "speaker-{}_".format(self.speakerSplit)
         if self.glob_acoustic:
             self.prefix = self.prefix + "{}_".format(inputType[0])
         if self.seq_acoustic:
             self.prefix = self.prefix + "{}_".format(inputType[1])
         if self.text:
             self.prefix = self.prefix + "text_"
-        if self.use_attention:
-            self.prefix = self.prefix + "ATTENTION_"
+
 
         self.csv_path = "Checkpoints/{}/{}checkpoints.csv".format(self.subDir, self.prefix)
         self.checkpoint_path = "Checkpoints/{}/{}checkpoints.ckpt".format(self.subDir, self.prefix)
@@ -805,23 +800,13 @@ class ModelTrainer:
                                                     self.plot_paths[counter], self.class_weights)
             
                 elif self.seq_acoustic and self.glob_acoustic and self.text:
-                    if self.use_attention:
-                        self.model = acousticTextLSTM_CNN_FFNN_Attention(seq_acoustic_train_data, seq_acoustic_dev_data, seq_acoustic_test_data, 
-                                            glob_acoustic_train_data, glob_acoustic_dev_data, glob_acoustic_test_data, 
-                                            text_train_data, text_dev_data, text_test_data,
-                                            train_labs, dev_labs, test_labs, self.tokenizer, 
-                                            "{}_{}".format(self.csv_path, counter), 
-                                            "{}_{}".format(self.checkpoint_path, counter), 
-                                            self.plot_paths[counter], self.class_weights)
-
-                    else:
-                        self.model = acousticTextLSTM_CNN_FFNN(seq_acoustic_train_data, seq_acoustic_dev_data, seq_acoustic_test_data, 
-                                                                glob_acoustic_train_data, glob_acoustic_dev_data, glob_acoustic_test_data, 
-                                                                text_train_data, text_dev_data, text_test_data,
-                                                                train_labs, dev_labs, test_labs, self.tokenizer, 
-                                                                "{}_{}".format(self.csv_path, counter), 
-                                                                "{}_{}".format(self.checkpoint_path, counter), 
-                                                                self.plot_paths[counter], self.class_weights)
+                    self.model = acousticTextLSTM_CNN_FFNN(seq_acoustic_train_data, seq_acoustic_dev_data, seq_acoustic_test_data, 
+                                                    glob_acoustic_train_data, glob_acoustic_dev_data, glob_acoustic_test_data, 
+                                                    text_train_data, text_dev_data, text_test_data,
+                                                    train_labs, dev_labs, test_labs, self.tokenizer, 
+                                                    "{}_{}".format(self.csv_path, counter), 
+                                                    "{}_{}".format(self.checkpoint_path, counter), 
+                                                    self.plot_paths[counter], self.class_weights)
 
                 else:
                     print("Bad combination of model inputs... This shouldn't have been possible")
@@ -869,7 +854,6 @@ if __name__=="__main__":
     dataPath = "/home/hmgent2/Data/ModelInputs"
     # dataPath = "/home/hmgent2/Data/newTest_ModelInputs"
     speakerSplits = ["dependent"] #"dependent", "independent", 
-    att = False
     train_status = True
     # speakerSplits = ["independent"]
 
@@ -931,7 +915,7 @@ if __name__=="__main__":
             #         os.mkdir("{}/{}/{}".format(dataPath, parent, subDir))
 
             # try:
-            m = ModelTrainer(fileMod, baseList, speakerList, inputType, dataPath, subDir, speakerSplit=speakerSplit, f0Normed=f0Normed, percentage=percentage, measureList = measureList, use_attention = att, train_status=train_status)
+            m = ModelTrainer(fileMod, baseList, speakerList, inputType, dataPath, subDir, speakerSplit=speakerSplit, f0Normed=f0Normed, percentage=percentage, measureList = measureList, train_status=train_status)
 
             m.trainModel()
 

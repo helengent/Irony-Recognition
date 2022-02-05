@@ -26,15 +26,6 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.neural_network import MLPClassifier
 
 
-sys.path.append("../../Models")
-from LSTM_acousticOnly import acousticOnlyLSTM
-from FeedForward import FeedForwardNN
-
-sys.path.append("../../AcousticFeatureExtraction")
-from speaker import Speaker
-from sd import sd
-
-
 class ModelTrainer:
 
     def __init__(self, fileMod, fileList, speakerList, inputType, dataPath, speakerSplit="independent"):
@@ -123,25 +114,6 @@ class ModelTrainer:
                 count += 1
         
         return train_list, dev_list, test_list
-
-
-    def Hz2Mels(self, value):
-        return (1/np.log(2)) * (np.log(1 + (value/1000))) * 1000
-
-
-    def normF0(self, f0, speaker, normType="m"):
-        #possible normTypes: "m", "z", "d"
-        f0_mean = speaker.getSpeakerMeanF0()
-        f0_sd = speaker.getSpeakerSDF0()
-        if normType == "m":
-            normedVec = [(self.Hz2Mels(value) - f0_mean)/f0_mean for value in f0]
-        elif normType == "z":
-            normedVec = [(self.Hz2Mels(value) - f0_mean)/f0_sd for value in f0]
-        elif normType == "d":
-            normedVec = [self.Hz2Mels(value) - f0_mean for value in f0]
-        else:
-            raise ValueError("Invalid normType")
-        return np.array(normedVec)
 
 
     #Fit appropriate scaler(s) from non-ironic data
@@ -329,10 +301,6 @@ if __name__=="__main__":
     for speakerSplit in speakerSplits:
         for inputType in inputTypes:
 
-            try:
-                m = ModelTrainer(fileMod, baseList, speakerList, inputType, dataPath, speakerSplit=speakerSplit)
+            m = ModelTrainer(fileMod, baseList, speakerList, inputType, dataPath, speakerSplit=speakerSplit)
 
-                m.trainModel()
-            except:
-                with Exception as e:
-                    print(e)
+            m.trainModel()

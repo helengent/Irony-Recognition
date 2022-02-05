@@ -45,7 +45,7 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
         F0sd = extractor.getSDf0()
         rangeF0 = extractor.getRangef0()
         medianF0 = extractor.getMedianf0()
-        energyRange, energySD = extractor.getEnergyStats()
+        energyRange, energySD, energyData = extractor.getEnergyStats()
         apl, s2s, tp = extractor.getTimingStats()
         ams = extractor.getAMS()
         plp = extractor.getPLP()
@@ -78,6 +78,9 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
         #Append f0 to F0CONTOURS
         F0CONTOURS.append(f0)
 
+        #Append energy to ENERGYCONTOURS
+        ENERGYCONTOURS.append
+
         #Append mfccs to MFCCS
         MFCCS.append(mfccs)
 
@@ -92,6 +95,8 @@ def extractVectors(wav, speakers, wavPath, winSize, saveIndv=False):
 
         ##This code saves out individual csv files for each sequential measure and for the global measure vector for each .wav file
         if saveIndv == True:
+            rms = pd.DataFrame(np.array(energyData))
+            rms.to_csv("../../Data/AcousticData/rms/{}.csv".format(fileID), index=False)
 
             f0 = pd.DataFrame(np.array(f0))
             f0.to_csv("../../Data/AcousticData/f0/{}.csv".format(fileID), index=False)
@@ -135,6 +140,9 @@ def main(wavPath, speakerList, output, winSize="10"):
 
     global F0CONTOURS
     F0CONTOURS = list()
+
+    global ENERGYCONTOURS
+    ENERGYCONTOURS = list()
 
     global MFCCS
     MFCCS = list()
