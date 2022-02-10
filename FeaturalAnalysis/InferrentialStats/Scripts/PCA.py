@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from matplotlib.markers import MarkerStyle
 import numpy as np
 import pandas as pd
 
@@ -118,13 +119,13 @@ def plotPCs3D(finalDF, subDir):
                 , alpha = 0.5
                 , c = color
                 , s = 50)
-    # ax.legend(targets)
+    ax.legend(targets, fontsize = 30, markerscale = 2.0)
 
     plt.savefig("../Output/{}/3_factorPCA.png".format(subDir))
 
-    for i in range(151, 156):
-        ax.view_init(0, i)
-        plt.savefig("../Output/{}/3Factor/0_{}.png".format(subDir, i))
+    # for i in range(151, 156):
+    #     ax.view_init(0, i)
+    #     plt.savefig("../Output/{}/3Factor/0_{}.png".format(subDir, i))
 
     angles = [0, 60, 120, 180, 240, 300, 360]
 
@@ -160,6 +161,7 @@ def plotPCs3D(finalDF, subDir):
     ax.set_xlabel('Principal Component 1', fontsize = 10)
     ax.set_ylabel('Principal Component 2', fontsize = 10)
     ax.set_zlabel('Principal Component 3', fontsize = 10)
+    ax.legend()
     ax.set_title('3 component PCA - Non-Ironic', fontsize = 15)
 
     indicesToKeep = finalDF['label'] == 'N'
@@ -289,8 +291,8 @@ def main(df, newdf, numComps, subDir):
 
     #Plotting
     plotVariance(var, subDir)
-    # plotPCs(finalDF, subDir)
-    # plotPCs3D(finalDF, subDir)
+    plotPCs(finalDF, subDir)
+    plotPCs3D(finalDF, subDir)
 
 
     outFeats = list()
@@ -309,12 +311,12 @@ def main(df, newdf, numComps, subDir):
             if (feat, ind) not in outFeats:
                 outFeats.append((feat, ind))
 
-    # outDF.to_csv("../Output/{}/PCA_top_feats.csv".format(subDir))
+    outDF.to_csv("../Output/{}/PCA_top_feats.csv".format(subDir))
 
-    # print(outDF)
+    print(outDF)
 
-    #Plotting
-    # plotCorrelation(outDF, finalDF, pca, features, subDir)
+    # Plotting
+    plotCorrelation(outDF, finalDF, pca, features, subDir)
 
     for f in outFeats:
         feat, ind = f
@@ -326,12 +328,13 @@ def main(df, newdf, numComps, subDir):
 if __name__=="__main__":
 
     df = pd.read_csv("../Data/all_narrowed.csv")
-    new_df = pd.read_csv("../Data/newTest_all_narrowed.csv")
+    new_df = pd.read_csv("../Data/all_narrowed.csv")
+    # new_df = pd.read_csv("../Data/newTest_all_narrowed.csv")
     # df = pd.read_csv("../Data/ComParE.csv", index_col = 0)
     # df = df.drop(columns=["index"])
 
     numComps = [3]
-    subDir = "newTest"
+    subDir = "narrowed"
 
     for n in numComps:
         main(df, new_df, n, subDir)
