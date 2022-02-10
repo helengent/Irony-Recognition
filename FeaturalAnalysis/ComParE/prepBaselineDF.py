@@ -7,12 +7,11 @@ import pandas as pd
 from glob import glob
 
 #Create consolidated dataframe that incorporates speaker information and irony label
-def main(data_dir):
+def main(data_dir, out_dir):
 
     bigDF = pd.DataFrame()
     fileNameList, speakerList, labelList = list(), list(), list()
 
-    out_dir = os.path.dirname(data_dir)
     mod = data_dir.split("/")[-1].strip("baseline")
 
     for f in glob("{}/*.csv".format(data_dir)):
@@ -44,11 +43,12 @@ def main(data_dir):
     print(bigDF.shape)
     print(bigDF)
 
-    bigDF.to_csv("/home/hmgent2/Data/ModelInputs/ComParE/all_inputs.csv".format(out_dir))
+    bigDF.to_csv("{}/all_inputs.csv".format(out_dir))
     
 
 if __name__=="__main__":
 
     data_dir = "../../../../Data/AcousticData/ComParE/baselinePruned3"
+    out_dir = "/home/hmgent2/Data/ModelInputs/ComParE"
 
-    main(data_dir)
+    main(data_dir, outdir)
