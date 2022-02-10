@@ -32,7 +32,6 @@ def main(data_dir):
 
         row = pd.read_csv(f)
         bigDF = bigDF.append(row, ignore_index=True)
-        print(bigDF.shape)
 
     bigDF["fileName"] = fileNameList
     bigDF['speaker'] = speakerList
@@ -47,8 +46,6 @@ def main(data_dir):
 
     bigDF.to_csv("/home/hmgent2/Data/ModelInputs/ComParE/all_inputs.csv".format(out_dir))
     
-    # with open("{}/baseline_consolidated_{}.pkl".format(out_dir, mod), "wb") as p:
-    #     pickle.dump(bigDF, p, protocol=4)
 
 if __name__=="__main__":
 

@@ -123,10 +123,6 @@ def plotPCs3D(finalDF, subDir):
 
     plt.savefig("../Output/{}/3_factorPCA.png".format(subDir))
 
-    # for i in range(151, 156):
-    #     ax.view_init(0, i)
-    #     plt.savefig("../Output/{}/3Factor/0_{}.png".format(subDir, i))
-
     angles = [0, 60, 120, 180, 240, 300, 360]
 
     for angle in angles:
@@ -329,9 +325,6 @@ if __name__=="__main__":
 
     df = pd.read_csv("../Data/all_narrowed.csv")
     new_df = pd.read_csv("../Data/all_narrowed.csv")
-    # new_df = pd.read_csv("../Data/newTest_all_narrowed.csv")
-    # df = pd.read_csv("../Data/ComParE.csv", index_col = 0)
-    # df = df.drop(columns=["index"])
 
     numComps = [3]
     subDir = "narrowed"

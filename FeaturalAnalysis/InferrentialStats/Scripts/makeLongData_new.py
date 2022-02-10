@@ -92,8 +92,6 @@ def interpolate(subset, measureName, name, win_size):
 
         longInterpolated = longInterpolated.append(sbubset, ignore_index=True)
     
-    # longInterpolated = longInterpolated.rename(columns={longInterpolated.columns[0]: measure})
-    # longInterpolated = longInterpolated.reindex(columns=["filename", "speaker", "label", "time", colName, measure])
     return longInterpolated
 
 
@@ -133,7 +131,7 @@ def main(measure, fileList, win_size):
 
 if __name__=="__main__":
 
-    # measures = ["f0", "mfcc", 'ams', 'plp', 'hnr', 'rms']
+    # measures = ["f0", "mfcc", 'ams', 'plp', 'hnr']
 
     fileList = glob("../../../AudioData/GatedPruned3/*.wav")
 

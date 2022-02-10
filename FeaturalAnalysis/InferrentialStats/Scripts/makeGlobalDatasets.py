@@ -173,8 +173,7 @@ def main(df, prefix=""):
 
 if __name__=="__main__":
 
-    # input_df = "~/Data/AcousticData/text_feats/Pruned3_asr_text_feats.csv"
-    input_df = "~/Data/AcousticData/text_feats/newTest_asr_text_feats.csv"
-    prefix = "newTest_"
+    input_df = "~/Data/AcousticData/text_feats/Pruned3_asr_text_feats.csv"
+    prefix = "Pruned3_"
 
     main(input_df, prefix=prefix)
