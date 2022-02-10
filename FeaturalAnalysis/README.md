@@ -7,8 +7,15 @@ The subdirectories are as follows
     i) data_dir = the path to the directory containing individual output csv files from AcousticFeatureExtraction/openSmile.py
     
     ii) out_dir - the path to the directory where the output dataframe should be saved
+    
     prepBaselineDF.py simply compiles the individual files containing the utterance-level values for the ComParE feature set into a single dataframe.
     
 2)  InferentialStats - The InferentialStats subdirectory contains code for a number of purposes
     
-    i)  Scripts/makeGlobalDatasets.py - 
+    i)  Scripts/makeGlobalDatasets.py -
+    
+    ii) Scripts/makeLongData_new.py
+    
+    iii) Scripts/PCA.py
+    
+3)  modelOptimization - the ModelOptimization subdirectory contains only the script modelOptimization.py, 
