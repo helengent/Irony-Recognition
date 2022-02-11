@@ -868,6 +868,8 @@ if __name__=="__main__":
                     ("6PCs", "percentChunks", True), ("6PCs_feats", "percentChunks", True), 
                     ("30PCs", "percentChunks", True), ("30PCs_feats", "percentChunks", True)]
 
+
+    #Time-series acoustic feature combinationsd
     measureLists = [["f0", "hnr", "mfcc", "plp"], 
                     ["f0", "hnr", "mfcc"], ["f0", "hnr", "plp"], 
                     ["f0", "mfcc", "plp"], ["hnr", "mfcc", "plp"],
@@ -881,9 +883,6 @@ if __name__=="__main__":
     percentage=10
 
     for i, measureList in enumerate(measureLists):
-
-        if i != 0:
-            inputTypes = [(False, "percentChunks", True), ("PCs_feats", "percentChunks", True), ("rawGlobal", "percentChunks", True)]
             
         for inputType in inputTypes:
             for speakerSplit in speakerSplits:
