@@ -19,7 +19,7 @@ require(itsadug)
 Load prepared hnr data
 ```{r}
 
-setwd(choose.dir())
+setwd("C:/Users/Helen/Desktop/Stats/Pruned3_big")
 
 hnrData = read.csv("hnr_ready_for_gamms.csv")
 
@@ -40,23 +40,25 @@ summary(m1hnr)
 
 summary and plots
 ```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
-cbPalette = c("#88CCEE", "#CC6677","#DDCC77","#117733","#332288","#AA4499","#44AA99","#999933","#882255","#661100","#6699CC","#888888")
+cbPalette = c("#88CCEE", "#CC6677","#DDCC77","#117733","#332288","#AA4499",
+              "#44AA99","#999933","#882255","#661100","#6699CC","#888888")
 
 par(mfrow=c(2,2))
-plot(m1hnr, select=1, main = "Ironic", shade=TRUE, 
+plot(m1hnr, select=1, main = "Ironic", shade=TRUE, xlab="time (percent)",
      shade.col = cbPalette[1])
-plot(m1hnr, select=2, main = "Non-Ironic", shade=TRUE, 
+plot(m1hnr, select=2, main = "Non-Ironic", shade=TRUE, xlab="time (percent)",
      shade.col = cbPalette[2])
 plot(m1hnr, select=1, ylab="te(time):lab", xlab="time (percent)", 
      main = "Both Curves");
 par(new=TRUE);
 plot(m1hnr, select=2, ylab="", xlab="", main="", col=cbPalette[2])
-plot_diff(m1hnr, view="time", shade=TRUE, comp=list(label=c("I", "N")))
+plot_diff(m1hnr, view="time", shade=TRUE, xlab="time (percent)", 
+          comp=list(label=c("I", "N")))
 ```
 
 
 ```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all'}
-hnrData$pred = predict(m1F0)
+hnrData$pred = predict(m1hnr)
 ```
 
 
@@ -64,18 +66,32 @@ hnrData$pred = predict(m1F0)
 
 par(mfrow=c(1, 2))
 
-plot_smooth(m1hnr, view="time", cond=list("label"="I"), plot_all=c("speaker"), main = "All Speakers (Ironic)", col = cbPalette[1:12], rm.ranef=FALSE, se=0)
-plot_smooth(m1hnr, view="time", cond=list("label"="N"), plot_all=c("speaker"), main = "All Speakers (Non-Ironic)", col = cbPalette[1:12], rm.ranef=FALSE, se=0)
+plot_smooth(m1hnr, view="time", cond=list("label"="I"), plot_all=c("speaker"), 
+            main = "All Speakers (Ironic)", col = cbPalette[1:12], 
+            rm.ranef=FALSE, se=0,
+            xlab="time (% total utterance length)")
+plot_smooth(m1hnr, view="time", cond=list("label"="N"), plot_all=c("speaker"), 
+            main = "All Speakers (Non-Ironic)", col = cbPalette[1:12], 
+            rm.ranef=FALSE, se=0,
+            xlab="time (% total utterance length)")
 
 ```
 
 ```{r}
 par(mfrow=c(2, 2))
 
-plot_smooth(m1hnr, view="time", cond=list("speaker"="c"), plot_all=c("label"), main = "Speaker C", col = cbPalette[1:2], rm.ranef=FALSE, se=0)
-plot_smooth(m1hnr, view="time", cond=list("speaker"="d"), plot_all=c("label"), main = "Speaker D", col = cbPalette[1:2], rm.ranef=FALSE, se=0)
-plot_smooth(m1hnr, view="time", cond=list("speaker"="e"), plot_all=c("label"), main = "Speaker E", col = cbPalette[1:2], rm.ranef=FALSE, se=0)
-plot_smooth(m1hnr, view="time", cond=list("speaker"="k"), plot_all=c("label"), main = "Speaker K", col = cbPalette[1:2], rm.ranef=FALSE, se=0)
+plot_smooth(m1hnr, view="time", cond=list("speaker"="c"), plot_all=c("label"),
+            main = "Speaker C", col = cbPalette[1:2], rm.ranef=FALSE, se=0,
+            xlab="time (% total utterance length)")
+plot_smooth(m1hnr, view="time", cond=list("speaker"="d"), plot_all=c("label"), 
+            main = "Speaker D", col = cbPalette[1:2], rm.ranef=FALSE, se=0,
+            xlab="time (% total utterance length)")
+plot_smooth(m1hnr, view="time", cond=list("speaker"="e"), plot_all=c("label"), 
+            main = "Speaker E", col = cbPalette[1:2], rm.ranef=FALSE, se=0,
+            xlab="time (% total utterance length)")
+plot_smooth(m1hnr, view="time", cond=list("speaker"="k"), plot_all=c("label"), 
+            main = "Speaker K", col = cbPalette[1:2], rm.ranef=FALSE, se=0,
+            xlab="time (% total utterance length)")
 
 ```
 

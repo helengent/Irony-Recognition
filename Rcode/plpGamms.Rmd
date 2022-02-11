@@ -19,13 +19,12 @@ require(itsadug)
 Load prepared plp data
 ```{r}
 
-setwd(choose.dir())
+setwd("C:/Users/Helen/Desktop/Stats/Pruned3_big")
 
 plpData = read.csv("plp_ready_for_gamms.csv")
 
 plpData$speaker = as.factor(plpData$speaker)
 plpData$label = as.factor(plpData$label)
-
 ```
 
 GAM with tensor product interaction for plp
@@ -42,86 +41,22 @@ summary(m1plp)
 
 
 ```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep=1}
-print(plot(m1plpViz, allTerms=T, rm.ranef = FALSE), pages=3)
+print(plot(m1plpViz, allTerms=T, rm.ranef = FALSE) + scale_y_continuous(
+    breaks = c(2, 4, 6, 8),
+    labels = c("2", "4", "6", "8")), pages=3)
 ```
 
 ```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="80%", out.height="80%"}
 par(mfrow=c(1, 2))
-plot_diff(m1plp, view="plpNum", shade=TRUE, comp=list(label=c("I", "N")), rm.ranef = TRUE)
-plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("I", "N")), rm.ranef = TRUE)
+plot_diff(m1plp, view="plpNum", shade=TRUE, comp=list(label=c("I", "N")), 
+          rm.ranef = TRUE)
+plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
+          rm.ranef = TRUE)
 
 par(mfrow=c(1, 1))
 par(mar=c(5, 5, 3, 8))
 plot_diff2(m1plp, view=c("time", "plpNum"), comp=list(label=c("I", "N")), 
            main="Difference by label", rm.ranef = TRUE)
-```
-
-```{r, warning=FALSE,message=FALSE,error=FALSE, results='hide',fig.keep='all', out.width="75%", out.height="75%"}
-par(mfrow=c(2, 2))
-plot.new
-plot_smooth(m1plp, view="time", cond=list("label"="I", plpNum=1), 
-            col="darkorchid1", main="plp1", rm.ranef = FALSE)
-plot_smooth(m1plp, view="time", cond=list("label"="N", plpNum=1), 
-            col="springgreen3", main="", add=TRUE, rm.ranef = FALSE)
-plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
-          cond=list(plpNum=1), main="plp1", rm.ranef = FALSE)
-
-plot_smooth(m1plp, view="time", cond=list("label"="I", plpNum=2), 
-            col="darkorchid1", main="plp2", rm.ranef = FALSE)
-plot_smooth(m1plp, view="time", cond=list("label"="N", plpNum=2), 
-            col="springgreen3", main="", add=TRUE, rm.ranef = FALSE)
-plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
-          cond=list(plpNum=2), main="plp2", rm.ranef = FALSE)
-
-plot_smooth(m1plp, view="time", cond=list("label"="I", plpNum=3), 
-            col="darkorchid1", main="plp3", rm.ranef = FALSE)
-plot_smooth(m1plp, view="time", cond=list("label"="N", plpNum=3),
-            col="springgreen3", main="", add=TRUE, rm.ranef = FALSE)
-plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
-          cond=list(plpNum=3), main="plp3", rm.ranef = FALSE)
-
-plot_smooth(m1plp, view="time", cond=list("label"="I", plpNum=4), 
-            col="darkorchid1", main="plp4", rm.ranef = FALSE)
-plot_smooth(m1plp, view="time", cond=list("label"="N", plpNum=4), 
-            col="springgreen3", main="", add=TRUE, rm.ranef = FALSE)
-plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
-          cond=list(plpNum=4), main="plp4", rm.ranef = FALSE)
-
-plot_smooth(m1plp, view="time", cond=list("label"="I", plpNum=5), 
-            col="darkorchid1", main="plp5", rm.ranef = FALSE)
-plot_smooth(m1plp, view="time", cond=list("label"="N", plpNum=5), 
-            col="springgreen3", main="", add=TRUE, rm.ranef = FALSE)
-plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
-          cond=list(plpNum=5), main="plp5", rm.ranef = FALSE)
-
-plot_smooth(m1plp, view="time", cond=list("label"="I", plpNum=6), 
-            col="darkorchid1", main="plp6", rm.ranef = FALSE)
-plot_smooth(m1plp, view="time", cond=list("label"="N", plpNum=6), 
-            col="springgreen3", main="", add=TRUE, rm.ranef = FALSE)
-plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
-          cond=list(plpNum=6), main="plp6", rm.ranef = FALSE)
-
-plot_smooth(m1plp, view="time", cond=list("label"="I", plpNum=7), 
-            col="darkorchid1", main="plp7", rm.ranef = FALSE)
-plot_smooth(m1plp, view="time", cond=list("label"="N", plpNum=7), 
-            col="springgreen3", main="", add=TRUE, rm.ranef = FALSE)
-plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
-          cond=list(plpNum=7), main="plp7", rm.ranef = FALSE)
-
-plot_smooth(m1plp, view="time", cond=list("label"="I", plpNum=8), 
-            col="darkorchid1", main="plp8", rm.ranef = FALSE)
-plot_smooth(m1plp, view="time", cond=list("label"="N", plpNum=8), 
-            col="springgreen3", main="", add=TRUE, rm.ranef = FALSE)
-plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
-          cond=list(plpNum=8), main="plp8", rm.ranef = FALSE)
-
-plot_smooth(m1plp, view="time", cond=list("label"="I", plpNum=9), 
-            col="darkorchid1", main="plp9", rm.ranef = FALSE)
-plot_smooth(m1plp, view="time", cond=list("label"="N", plpNum=9), 
-            col="springgreen3", main="", add=TRUE, rm.ranef = FALSE)
-plot_diff(m1plp, view="time", shade=TRUE, comp=list(label=c("I", "N")), 
-          cond=list(plpNum=9), main="plp9", rm.ranef = FALSE)
-
 ```
 
 
