@@ -1,0 +1,184 @@
+Results summary
+Results in ./untitled_project
+Showing 10 best trials
+Objective(name='val_acc', direction='max')
+
+Trial summary
+Hyperparameters:
+conv_layers: 3
+conv0_size: 216
+concat_size: 352
+lstm_size: 180
+lstm_dropout: 0.1
+recurrent_dropout: 0.2
+dropout: 0.15000000000000002
+z1_size: 32
+outActivation: softmax
+optimizer: sgd
+conv1_size: 192
+conv2_size: 216
+conv3_size: 224
+conv4_size: 224
+Score: 0.7480907589197159
+
+Trial summary
+Hyperparameters:
+conv_layers: 5
+conv0_size: 120
+concat_size: 212
+lstm_size: 336
+lstm_dropout: 0.05
+recurrent_dropout: 0.1
+dropout: 0.2
+z1_size: 10
+outActivation: softmax
+optimizer: sgd
+conv1_size: 168
+conv2_size: 120
+conv3_size: 232
+conv4_size: 16
+Score: 0.7473693937063217
+
+Trial summary
+Hyperparameters:
+conv_layers: 3
+conv0_size: 240
+concat_size: 272
+lstm_size: 320
+lstm_dropout: 0.2
+recurrent_dropout: 0.25
+dropout: 0.1
+z1_size: 14
+outActivation: softmax
+optimizer: sgd
+conv1_size: 48
+conv2_size: 120
+conv3_size: 256
+conv4_size: 128
+Score: 0.7472922950983047
+
+Trial summary
+Hyperparameters:
+conv_layers: 1
+conv0_size: 264
+concat_size: 320
+lstm_size: 352
+lstm_dropout: 0.05
+recurrent_dropout: 0.4
+dropout: 0.1
+z1_size: 6
+outActivation: sigmoid
+optimizer: sgd
+conv1_size: 88
+conv2_size: 136
+conv3_size: 160
+conv4_size: 152
+Score: 0.7459378987550735
+
+Trial summary
+Hyperparameters:
+conv_layers: 3
+conv0_size: 240
+concat_size: 52
+lstm_size: 392
+lstm_dropout: 0.0
+recurrent_dropout: 0.2
+dropout: 0.15000000000000002
+z1_size: 30
+outActivation: softmax
+optimizer: sgd
+conv1_size: 232
+conv2_size: 24
+conv3_size: 176
+conv4_size: 160
+Score: 0.7440066486597061
+
+Trial summary
+Hyperparameters:
+conv_layers: 3
+conv0_size: 264
+concat_size: 200
+lstm_size: 132
+lstm_dropout: 0.0
+recurrent_dropout: 0.15000000000000002
+dropout: 0.30000000000000004
+z1_size: 8
+outActivation: softmax
+optimizer: sgd
+conv1_size: 200
+conv2_size: 120
+conv3_size: 152
+conv4_size: 160
+Score: 0.743526890873909
+
+Trial summary
+Hyperparameters:
+conv_layers: 1
+conv0_size: 184
+concat_size: 360
+lstm_size: 124
+lstm_dropout: 0.30000000000000004
+recurrent_dropout: 0.30000000000000004
+dropout: 0.1
+z1_size: 20
+outActivation: softmax
+optimizer: sgd
+conv1_size: 168
+conv2_size: 88
+conv3_size: 24
+conv4_size: 88
+Score: 0.741137906908989
+
+Trial summary
+Hyperparameters:
+conv_layers: 3
+conv0_size: 200
+concat_size: 368
+lstm_size: 196
+lstm_dropout: 0.15000000000000002
+recurrent_dropout: 0.25
+dropout: 0.6000000000000001
+z1_size: 24
+outActivation: softmax
+optimizer: sgd
+conv1_size: 232
+conv2_size: 128
+conv3_size: 176
+conv4_size: 152
+Score: 0.741082489490509
+
+Trial summary
+Hyperparameters:
+conv_layers: 4
+conv0_size: 216
+concat_size: 268
+lstm_size: 364
+lstm_dropout: 0.7000000000000001
+recurrent_dropout: 0.35000000000000003
+dropout: 0.15000000000000002
+z1_size: 24
+outActivation: sigmoid
+optimizer: sgd
+conv1_size: 216
+conv2_size: 168
+conv3_size: 152
+conv4_size: 48
+Score: 0.7401059716939926
+
+Trial summary
+Hyperparameters:
+conv_layers: 2
+conv0_size: 56
+concat_size: 224
+lstm_size: 48
+lstm_dropout: 0.05
+recurrent_dropout: 0.25
+dropout: 0.0
+z1_size: 28
+outActivation: softmax
+optimizer: adam
+conv1_size: 88
+conv2_size: 80
+conv3_size: 72
+conv4_size: 160
+Score: 0.7400572299957275
