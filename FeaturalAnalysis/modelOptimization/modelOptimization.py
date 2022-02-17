@@ -15,6 +15,8 @@ from sklearn.metrics import precision_recall_fscore_support
 import keras_tuner as kt  
 from gensim.models import KeyedVectors
 from tensorflow.keras.preprocessing.text import Tokenizer
+import subprocess
+import sys
 
 
 def makeTokenizer(fileMod, fileList):
@@ -53,7 +55,7 @@ def buildModel_LSTM_FFNN_CNN_withText_speakerDep(hp):
     pooling_size = 2
     for p_size in range(hp.Int("conv_layers", 1, 5, step=1)):
         pooling_size += 1
-        conv = layers.Conv1D(128, pooling_size, activation='relu')(embedded)
+        conv = layers.Conv1D(hp.Int("conv{}_size".format(p_size), 16, 264, step=8), pooling_size, activation='relu')(embedded)
         conv = layers.GlobalMaxPooling1D()(conv)
         embeddingConvs.append(conv)
 
@@ -103,7 +105,7 @@ def buildModel_LSTM_FFNN_CNN_withText_speakerInd(hp):
     pooling_size = 2
     for p_size in range(hp.Int("conv_layers", 1, 5, step=1)):
         pooling_size += 1
-        conv = layers.Conv1D(128, pooling_size, activation='relu')(embedded)
+        conv = layers.Conv1D(hp.Int("conv{}_size".format(p_size), 16, 264, step=8), pooling_size, activation='relu')(embedded)
         conv = layers.GlobalMaxPooling1D()(conv)
         embeddingConvs.append(conv)
 
@@ -134,14 +136,14 @@ def buildModel_LSTM_FFNN_CNN_withText_speakerInd(hp):
 
 class CVTuner(kt.engine.tuner.Tuner):
   def run_trial(self, trial, x, y, batch_size=32, epochs=1):
-    val_losses = []
+    val_acc = []
     for train, test in zip(x, y):
         x_train, x_test = train
         y_train, y_test = test
         model = self.hypermodel.build(trial.hyperparameters)
         model.fit(x_train, y_train, batch_size=batch_size, epochs=epochs)
-        val_losses.append(model.evaluate(x_test, y_test))
-    self.oracle.update_trial(trial.trial_id, {'val_loss': np.mean(val_losses)})
+        val_acc.append(model.evaluate(x_test, y_test, return_dict=True)['accuracy'])
+    self.oracle.update_trial(trial.trial_id, {'val_acc': np.mean(val_acc)})
     self.save_model(trial.trial_id, model)
 
 
@@ -149,83 +151,32 @@ def main(fileMod, dataPath, inputType, measureList, speakerSplit):
 
     global_acoustic, sequential_acoustic, text = inputType
 
-    X_train, X_dev, X_test = list(), list(), list()
-
     #Create tokenizer
     fileList = glob("../../AudioData/Gated{}/*.wav".format(fileMod))
     baseList = np.array([item.split("/")[-1][:-4] for item in fileList])
     global TOKENIZER
     TOKENIZER = makeTokenizer(fileMod, baseList)
 
-    #Load data
-    # if text:
-    #     text_train = np.load("{}/Text/oldSplit/speaker-independent_train-c_tokenized.npy".format(dataPath))
-    #     text_dev = np.load("{}/Text/oldSplit/speaker-independent_dev-c_tokenized.npy".format(dataPath))
-    #     text_test = np.load("{}/Text/oldSplit/speaker-independent_test-c_tokenized.npy".format(dataPath))
-
-    #     X_train.append(text_train)
-    #     X_dev.append(text_dev)
-    #     X_test.append(text_test)
-
-    #     y_train = np.load("{}/Text/oldSplit/speaker-independent_train-c_labels.npy".format(dataPath))
-    #     y_dev = np.load("{}/Text/oldSplit/speaker-independent_dev-c_labels.npy".format(dataPath))
-    #     y_test = np.load("{}/Text/oldSplit/speaker-independent_test-c_labels.npy".format(dataPath))
-
-    # if sequential_acoustic:
-    #     seq_train = np.load("{}/{}/oldSplit-{}/speaker-independent_train-c_acoustic.npy".format(dataPath, sequential_acoustic, "-".join(measureList)))
-    #     seq_dev = np.load("{}/{}/oldSplit-{}/speaker-independent_dev-c_acoustic.npy".format(dataPath, sequential_acoustic, "-".join(measureList)))
-    #     seq_test = np.load("{}/{}/oldSplit-{}/speaker-independent_test-c_acoustic.npy".format(dataPath, sequential_acoustic, "-".join(measureList)))
-
-    #     X_train.append(seq_train)
-    #     X_dev.append(seq_dev)
-    #     X_test.append(seq_test)
-
-    #     y_train = np.load("{}/{}/oldSplit-{}/speaker-independent_train-c_labels.npy".format(dataPath, sequential_acoustic, "-".join(measureList)))
-    #     y_dev = np.load("{}/{}/oldSplit-{}/speaker-independent_dev-c_labels.npy".format(dataPath, sequential_acoustic, "-".join(measureList)))
-    #     y_test = np.load("{}/{}/oldSplit-{}/speaker-independent_test-c_labels.npy".format(dataPath, sequential_acoustic, "-".join(measureList)))
-
-    # if global_acoustic:
-    #     glob_train = np.load("{}/{}/oldSplit-{}/speaker-independent_train-c_acoustic.npy".format(dataPath, global_acoustic, "-".join(measureList)))
-    #     glob_dev = np.load("{}/{}/oldSplit-{}/speaker-independent_dev-c_acoustic.npy".format(dataPath, global_acoustic, "-".join(measureList)))
-    #     glob_test = np.load("{}/{}/oldSplit-{}/speaker-independent_test-c_acoustic.npy".format(dataPath, global_acoustic, "-".join(measureList)))
-
-    #     X_train.append(glob_train)
-    #     X_dev.append(glob_dev)
-    #     X_test.append(glob_test)
-
-    #     y_train = np.load("{}/{}/oldSplit-{}/speaker-independent_train-c_labels.npy".format(dataPath, global_acoustic, "-".join(measureList)))
-    #     y_dev = np.load("{}/{}/oldSplit-{}/speaker-independent_dev-c_labels.npy".format(dataPath, global_acoustic, "-".join(measureList)))
-    #     y_test = np.load("{}/{}/oldSplit-{}/speaker-independent_test-c_labels.npy".format(dataPath, global_acoustic, "-".join(measureList)))
-
-
-    # if sequential_acoustic and global_acoustic and text and speakerSplit == "dependent":
-    #     tuner = kt.RandomSearch(buildModel_LSTM_FFNN_CNN_withText_speakerDep, objective='val_accuracy', max_trials=500, directory="Results", project_name="Dep_PCs_f0-hnr-mfcc")
-    # elif sequential_acoustic and global_acoustic and text and speakerSplit == "independent":
-    #     tuner = kt.RandomSearch(buildModel_LSTM_FFNN_CNN_withText_speakerInd, objective='val_accuracy', max_trials=500, directory="Results", project_name="newSplit_PCs-feats_f0-mfcc-plp")
-
     es = keras.callbacks.EarlyStopping(monitor='loss', patience=3)
-    # tuner.search(X_train, y_train, epochs=100, validation_data=(X_dev, y_dev), callbacks=[es])
 
     x, y = list(), list()
 
     if speakerSplit == "dependent":
         counters = [0, 1, 2, 3, 4]
         subDir = "speakerDependent-{}".format("-".join(measureList))
-        textSubDir = "speakerDependent"
     elif speakerSplit == "independent":
         counters = ["c", "d", "ejou", "fhkqst"]
         subDir = "newSplit-{}".format("-".join(measureList))
-        textSubDir = "newSplit"
     
     for c in counters:
         train_seq = np.load("{}/{}/{}/speaker-{}_train-{}_acoustic.npy".format(dataPath, sequential_acoustic, subDir, speakerSplit, c))
-        train_glob = np.load("{}/{}/{}/speaker-{}_train-{}_acoustic.npy".format(dataPath, global_acoustic, subDir, speakerSplit, c))
-        train_text = np.load("{}/Text/{}/speaker-{}_train-{}_tokenized.npy".format(dataPath, textSubDir, speakerSplit, c))
+        train_glob = np.load("{}/{}/speaker-{}_train-{}_acoustic.npy".format(dataPath, global_acoustic, speakerSplit, c))
+        train_text = np.load("{}/Text/speaker-{}_train-{}_tokenized.npy".format(dataPath, speakerSplit, c))
         train_data = [train_text, train_seq, train_glob]
 
         dev_seq = np.load("{}/{}/{}/speaker-{}_dev-{}_acoustic.npy".format(dataPath, sequential_acoustic, subDir, speakerSplit, c))
-        dev_glob = np.load("{}/{}/{}/speaker-{}_dev-{}_acoustic.npy".format(dataPath, global_acoustic, subDir, speakerSplit, c))
-        dev_text = np.load("{}/Text/{}/speaker-{}_dev-{}_tokenized.npy".format(dataPath, textSubDir, speakerSplit, c))  
+        dev_glob = np.load("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(dataPath, global_acoustic, speakerSplit, c))
+        dev_text = np.load("{}/Text/speaker-{}_dev-{}_tokenized.npy".format(dataPath, speakerSplit, c))  
         dev_data = [dev_text, dev_seq, dev_glob]
         x.append((train_data, dev_data))
         train_labs = np.load("{}/{}/{}/speaker-{}_train-{}_labels.npy".format(dataPath, sequential_acoustic, subDir, speakerSplit, c))
@@ -240,26 +191,12 @@ def main(fileMod, dataPath, inputType, measureList, speakerSplit):
 
     tuner = CVTuner(hypermodel=my_build_model,
         oracle=kt.oracles.RandomSearchOracle(
-        objective='val_loss',
-        max_trials=500))
+        objective='val_acc',
+        max_trials=200))
         
     tuner.search(x, y, batch_size=64, epochs=30)
 
     tuner.results_summary()
-
-    # best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
-
-    # model = tuner.hypermodel.build(best_hps)
-    # history = model.fit(X_train, y_train, epochs=150, validation_data = (X_dev, y_dev))
-    # val_acc_per_epoch = history.history["val_accuracy"]
-    # best_epoch = val_acc_per_epoch.index(max(val_acc_per_epoch)) + 1
-    # print("Best epoch number: {}".format(best_epoch))
-
-    # model = model = tuner.hypermodel.build(best_hps)
-    # model.fit(X_train, y_train, epochs=best_epoch, validation_data = (X_dev, y_dev))
-
-    # eval_result = model.evaluate(X_test, y_test)
-    # print("Test loss: {}\tTest accuracy: {}".format(eval_result[0], eval_result[1]))
 
 
 if __name__=="__main__":
@@ -273,9 +210,21 @@ if __name__=="__main__":
 
     i = 0
     for inputType, measureList, speakerSplit in zip(inputTypes, measureLists, speakerSplits):
-        if i != 0:
 
-            print("Beginning hyperparameter tuning for the speaker {} model".format(speakerSplit))
-            main(fileMod, dataPath, inputType, measureList, speakerSplit)
-            print("Successfully completed speaker {} hyperparameter tuning".format(speakerSplit))
+        if os.path.isdir("untitled_project"):
+            print("trial directory not successfully cleared")
+            sys.exit()
+
+        print("Beginning hyperparameter tuning for the speaker {} model".format(speakerSplit))
+        main(fileMod, dataPath, inputType, measureList, speakerSplit)
+        print("Successfully completed speaker {} hyperparameter tuning".format(speakerSplit))
+        
+        if i == 0:
+            bashCommand = "mv untitled_project speakerDependent"
+            subprocess.run(bashCommand, shell=True)
+        elif i == 1:
+            bashCommand = "mv untitled_project speakerIndependent"
+            subprocess.run(bashCommand, shell=True)
+
         i += 1
+        

@@ -1,27 +1,30 @@
 #!/usr/bin/env python3
 
-from typing import Text
-import tensorflow as tf
+import os
 import keras
 import numpy as np
 import pandas as pd
 from keras import layers
 from keras import models
 import matplotlib.pyplot as plt
+from sklearn.model_selection import KFold
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_recall_fscore_support
+
 from gensim.models import KeyedVectors
 
 
-#This is designed to handle ComParE-style data where the input is non-sequential
-class textOnlyNN():
+#This is designed to handle sequential data
+#Unimodal 1D input - Probably not great for things like mfccs, ams, rastaplp
+class acousticTextLSTM_CNN_FFNN():
 
 
-    def __init__(self, X_train, X_dev, X_test, y_train, y_dev, y_test, tokenizer, csv_path, checkpoint_path, plot_path, class_weights):
+    def __init__(self, seq_acoustic_train, seq_acoustic_dev, seq_acoustic_test, glob_acoustic_train, glob_acoustic_dev, glob_acoustic_test, text_train, text_dev, text_test, y_train, y_dev, y_test, tokenizer, csv_path, checkpoint_path, plot_path, class_weights):
 
         # Load in training, dev, and test data
-        self.train_in = [X_train]
-        self.dev_in = [X_dev]
-        self.test_in = [X_test]
+        self.train_input = [text_train, seq_acoustic_train, glob_acoustic_train]
+        self.dev_input = [text_dev, seq_acoustic_dev, glob_acoustic_dev]
+        self.test_input = [text_test, seq_acoustic_test, glob_acoustic_test]
 
         # Load in training, dev, and test labels
         self.train_out = y_train
@@ -33,7 +36,7 @@ class textOnlyNN():
         self.class_weights = class_weights
         self.plotName = plot_path
 
-        input_dim = np.shape(self.train_in)[-1]
+        input_dim = np.shape(text_train)[-1]
 
         #Load pre-trained embeddings (thanks Google)
         w2v = KeyedVectors.load_word2vec_format('/home/hmgent2/Data/GoogleNews-vectors-negative300.bin', binary=True)
@@ -43,39 +46,38 @@ class textOnlyNN():
             if word in w2v:
                 embeddings[i] = w2v[word]
 
+        #input layers
         text = layers.Input(shape=(input_dim))
+        seq_acoustic = layers.Input(shape=(seq_acoustic_train.shape[1], seq_acoustic_train.shape[2]))
+        glob_acoustic = layers.Input(shape=glob_acoustic_train.shape[-1])
+
         embedded = layers.Embedding(input_dim=embeddings.shape[0], output_dim=embeddings.shape[1], input_length=input_dim, weights=[embeddings], trainable=False)(text)
-        
+        # embedded = layers.GlobalMaxPooling1D()(embedded)
+
         embeddingConvs = list()
-        for pooling_size in [3, 4, 5]:
-            conv = layers.Conv1D(128, pooling_size, activation='relu')(embedded)
+        for pooling_size, conv_size in zip([3, 4, 5], [216, 192, 216]):
+            conv = layers.Conv1D(conv_size, pooling_size, activation='relu')(embedded)
             conv = layers.GlobalMaxPooling1D()(conv)
             embeddingConvs.append(conv)
 
         embedded = layers.Concatenate()(embeddingConvs)
+        embedded = layers.Dense(352, activation='relu')(embedded)
 
-        dropout = layers.Dropout(0.5)(embedded)
-        x = keras.Model(inputs=[text], outputs=dropout)
+        lstm = layers.LSTM(189, activation='relu', dropout=0.1, recurrent_dropout=0.2)(seq_acoustic)
+        lstm = layers.Dense(352, activation='relu')(lstm)
+
+        ffnn = layers.Dense(352)(glob_acoustic)
+
+        fused = layers.Concatenate()([embedded, lstm, ffnn])
+        
+        dropout = layers.Dropout(0.15)(fused)
+        x = keras.Model(inputs=[text, seq_acoustic, glob_acoustic], outputs=dropout)
             
-        z = layers.Dense(16, activation='relu')(x.output)
-        z = layers.Dense(2, activation='sigmoid')(z)
+        z = layers.Dense(32, activation='relu')(x.output)
+        z = layers.Dense(2, activation='softmax')(z)
 
         self.model = keras.Model(inputs=x.input, outputs=z)
-        self.model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-
-        # self.model = models.Sequential()
-        # self.model.add(layers.Embedding(input_dim=embeddings.shape[0], output_dim=embeddings.shape[1], input_length=input_dim, weights=[embeddings], trainable=False))
-        
-        # self.model.add(layers.Conv1D(128, 3, activation='relu'))
-        # self.model.add(layers.GlobalAveragePooling1D())
-        
-        # self.model.add(layers.Dropout(0.5))
-
-        # self.model.add(layers.Dense(16, activation='relu'))
-        # self.model.add(layers.Dense(2, activation='softmax'))
-
-        # self.model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-        # # self.model.compile(loss=keras.losses.BinaryCrossentropy(from_logits=True), optimizer='adam', metrics=['binary_accuracy'])
+        self.model.compile(loss='sparse_categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
 
 
     def plotHist(self):
@@ -114,18 +116,15 @@ class textOnlyNN():
         cp = keras.callbacks.ModelCheckpoint(filepath = self.checkpoint_path, verbose=1, monitor = "val_loss", save_best_only = True, mode = "min")
 
         # Fit the model
-        self.history = self.model.fit(self.train_in, self.train_out, epochs = 150, batch_size = 64, validation_data = (self.dev_in, self.dev_out), callbacks=[es, csv, cp], class_weight = self.class_weights)
+        self.history = self.model.fit(self.train_input, self.train_out, epochs = 150, batch_size = 64, validation_data = (self.dev_input, self.dev_out), callbacks=[es, csv, cp], class_weight=self.class_weights)
         self.plotHist()
 
 
     def test(self, inputs = None):
 
         if inputs == None:
-            test_preds = self.model.predict(self.test_in)
+            test_preds = self.model.predict(self.test_input)
         else:
             test_preds = self.model.predict(inputs)
 
-        return test_preds
-
-
-            
+        return test_preds           

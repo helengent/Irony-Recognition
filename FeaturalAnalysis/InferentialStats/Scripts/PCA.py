@@ -286,9 +286,9 @@ def main(df, newdf, numComps, subDir):
     varDF.to_csv("../Output/{}/PCA_variance.csv".format(subDir))
 
     #Plotting
-    plotVariance(var, subDir)
-    plotPCs(finalDF, subDir)
-    plotPCs3D(finalDF, subDir)
+    # plotVariance(var, subDir)
+    # plotPCs(finalDF, subDir)
+    # plotPCs3D(finalDF, subDir)
 
 
     outFeats = list()

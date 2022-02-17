@@ -292,7 +292,7 @@ for inputType in inputTypes:
             intermediateResults["speakerDependentEER"], intermediateResults["oldSplitEER"], intermediateResults["newSplitEER"],
             intermediateResults["speakerDependentEERstd"], intermediateResults["oldSplitEERstd"], intermediateResults["newSplitEERstd"]]
 
-        if len(measureList) == 5 and globAcoustic not in ["2PCs", "2PCs_feats", "6PCs", "6PCs_feats", "30PCs", "30PCs_feats"]:
+        if len(measureList) == 4 and globAcoustic not in ["2PCs", "2PCs_feats", "6PCs", "6PCs_feats", "30PCs", "30PCs_feats"]:
             # Results for models with all 5 time-series acoustic features will finish first
             # Only these results will go in resultsDict, fiveResults, and threeResults
 
@@ -369,16 +369,16 @@ for inputType in inputTypes:
 
 
 #ResultsDict
-# outResults = pd.DataFrame(resultsDict)
-# outResults.to_csv("ResultsTables/modalityCompare.csv", index=False)
+outResults = pd.DataFrame(resultsDict)
+outResults.to_csv("ResultsTables/modalityCompare.csv", index=False)
 
-#seqResultsDict
-seqResults = pd.DataFrame(seqResultsDict)
-seqResults.to_csv("ResultsTables/seqResults.csv", index=False)
+# #seqResultsDict
+# seqResults = pd.DataFrame(seqResultsDict)
+# seqResults.to_csv("ResultsTables/seqResults.csv", index=False)
 
-#seqDiffsDict
-seqDiffs = pd.DataFrame(seqDiffsDict)
-seqDiffs.to_csv("ResultsTables/seqDiffs.csv", index=False)
+# #seqDiffsDict
+# seqDiffs = pd.DataFrame(seqDiffsDict)
+# seqDiffs.to_csv("ResultsTables/seqDiffs.csv", index=False)
 
 # #PCResultsDict
 # PCResults = pd.DataFrame(PCResultsDict)

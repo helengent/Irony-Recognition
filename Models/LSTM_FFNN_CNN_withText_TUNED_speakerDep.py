@@ -55,25 +55,25 @@ class acousticTextLSTM_CNN_FFNN():
         # embedded = layers.GlobalMaxPooling1D()(embedded)
 
         embeddingConvs = list()
-        for pooling_size in [3, 4, 5]:
-            conv = layers.Conv1D(128, pooling_size, activation='relu')(embedded)
+        for pooling_size, conv_size in zip([3, 4], [88, 168]):
+            conv = layers.Conv1D(conv_size, pooling_size, activation='relu')(embedded)
             conv = layers.GlobalMaxPooling1D()(conv)
             embeddingConvs.append(conv)
 
         embedded = layers.Concatenate()(embeddingConvs)
-        embedded = layers.Dense(80, activation='relu')(embedded)
+        embedded = layers.Dense(296, activation='relu')(embedded)
 
-        lstm = layers.LSTM(236, activation='relu', dropout=0.25, recurrent_dropout=0.2)(seq_acoustic)
-        lstm = layers.Dense(80, activation='relu')(lstm)
+        lstm = layers.LSTM(156, activation='relu', dropout=0.25, recurrent_dropout=0.15)(seq_acoustic)
+        lstm = layers.Dense(296, activation='relu')(lstm)
 
-        ffnn = layers.Dense(80)(glob_acoustic)
+        ffnn = layers.Dense(296)(glob_acoustic)
 
         fused = layers.Concatenate()([embedded, lstm, ffnn])
         
-        dropout = layers.Dropout(0.25)(fused)
+        dropout = layers.Dropout(0.05)(fused)
         x = keras.Model(inputs=[text, seq_acoustic, glob_acoustic], outputs=dropout)
             
-        z = layers.Dense(32, activation='relu')(x.output)
+        z = layers.Dense(14, activation='relu')(x.output)
         z = layers.Dense(2, activation='sigmoid')(z)
 
         self.model = keras.Model(inputs=x.input, outputs=z)

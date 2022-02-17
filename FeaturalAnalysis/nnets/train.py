@@ -23,9 +23,12 @@ from LSTM_acousticOnly import acousticOnlyLSTM
 from FeedForward import FeedForwardNN
 from textOnly import textOnlyNN
 from LSTM_CNN_withText import acousticTextLSTM_CNN
-from LSTM_FFNN_CNN_withText import acousticTextLSTM_CNN_FFNN
+# from LSTM_FFNN_CNN_withText import acousticTextLSTM_CNN_FFNN
+# from LSTM_FFNN_CNN_withText_TUNED_speakerDep import acousticTextLSTM_CNN_FFNN
+from LSTM_FFNN_CNN_withText_TUNED_speakerInd import acousticTextLSTM_CNN_FFNN
 from FFNN_CNN_withText import acousticTextCNN_FFNN
 from LSTM_FFNN import acousticLSTM_FFNN
+
 
 sys.path.append("../../AcousticFeatureExtraction")
 from speaker import Speaker
@@ -54,7 +57,7 @@ class ModelTrainer:
             else:
                 self.glob_file = pd.read_csv("{}/{}/all_inputs.csv".format(self.dataPath, self.glob_acoustic))
 
-        self.prefix = "speaker-{}_".format(self.speakerSplit)
+        self.prefix = "TUNED_speaker-{}_".format(self.speakerSplit)
         if self.glob_acoustic:
             self.prefix = self.prefix + "{}_".format(inputType[0])
         if self.seq_acoustic:
@@ -78,13 +81,6 @@ class ModelTrainer:
         self.train_list, self.dev_list, self.test_list = self.trainTestSplit()
         self.glob_scaler, self.seq_scaler, self.glob_imputer, self.seq_imputer = self.createScalers()
         
-        #For preparing supplemental test data
-        # with open("/home/hmgent2/Data/ModelInputs/{}/{}/scaler.pkl".format(self.seq_acoustic, self.subDir), "rb") as f:
-        #             self.seq_scaler = pickle.load(f)
-        # with open("/home/hmgent2/Data/ModelInputs/{}/{}/imputer.pkl".format(self.seq_acoustic, self.subDir), "rb") as f:
-        #             self.seq_imputer = pickle.load(f)
-        # self.glob_scaler = None
-        # self.glob_imputer = None
         self.tokenizer = self.makeTokenizer()
 
         self.prepareData()
@@ -112,12 +108,6 @@ class ModelTrainer:
         else:
             #Do 5-fold cross validation
             lab_list = np.array([item[-1] for item in self.fileList])
-
-            # For preparing test-only data
-            # t = np.array(self.fileList)
-            # t_labs = lab_list
-            # test_list.append((t, t_labs, 0))
-
 
             skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=6)
             count = 0
@@ -592,7 +582,8 @@ class ModelTrainer:
                     train_meta.to_csv("{}/speaker-{}_train_{}.meta".format(self.dataPath, self.speakerSplit, counter))
                     
                     if "PCs" not in self.glob_acoustic:
-                        X_train = self.glob_imputer.transform(X_train)
+                        if X_train.isnull().values.any():
+                            X_train = self.glob_imputer.transform(X_train)
                         X_train = self.glob_scaler.transform(X_train)
                     X_train = np.array(X_train)
                     with open("{}/{}/speaker-{}_train-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
@@ -616,7 +607,8 @@ class ModelTrainer:
                     dev_meta.to_csv("{}/speaker-{}_dev_{}.meta".format(self.dataPath, self.speakerSplit, counter))
 
                     if "PCs" not in self.glob_acoustic:
-                        X_dev = self.glob_imputer.transform(X_dev)
+                        if X_dev.isnull().values.any():
+                            X_dev = self.glob_imputer.transform(X_dev)
                         X_dev = self.glob_scaler.transform(X_dev)
                     X_dev = np.array(X_dev)
                     with open("{}/{}/speaker-{}_dev-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
@@ -640,7 +632,8 @@ class ModelTrainer:
                     test_meta.to_csv("{}/speaker-{}_test_{}.meta".format(self.dataPath, self.speakerSplit, counter))
 
                     if "PCs" not in self.glob_acoustic:
-                        X_test = self.glob_imputer.transform(X_test)
+                        if X_test.isnull().values.any():
+                            X_test = self.glob_imputer.transform(X_test)
                         X_test = self.glob_scaler.transform(X_test)
                     X_test = np.array(X_test)
                     with open("{}/{}/speaker-{}_test-{}_acoustic.npy".format(self.dataPath, self.glob_acoustic, self.speakerSplit, counter), "wb") as f:
@@ -846,6 +839,8 @@ if __name__=="__main__":
     dataPath = "/home/hmgent2/Data/ModelInputs"
     # dataPath = "/home/hmgent2/Data/newTest_ModelInputs"
     speakerSplits = ["dependent", "independent", "independent_2"]
+    # speakerSplits = ['independent_2']
+
     train_status = True
 
     #Make list of tuples with combinations of input types
@@ -853,30 +848,33 @@ if __name__=="__main__":
     # seq_acoustic = [False, "percentChunks", "rawSequential"]
     # text = [False, True]
 
-    inputTypes = [(False, False, True), (False, "percentChunks", False), (False, "rawSequential", False), 
-                    ("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False), ("rawGlobal", False, False),
-                    (False, "percentChunks", True), (False, "rawSequential", True), 
-                    ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True), ("rawGlobal", False, True), 
-                    ("ComParE", "percentChunks", False), ("PCs", "percentChunks", False), ("PCs_feats", "percentChunks", False),("rawGlobal", "percentChunks", False), 
-                    ("ComParE", "rawSequential", False), ("PCs", "rawSequential", False), ("PCs_feats", "rawSequential", False),("rawGlobal", "rawSequential", False), 
-                    ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),("rawGlobal", "percentChunks", True),
-                    ("ComParE", "rawSequential", False), ("PCs", "rawSequential", True), ("PCs_feats", "rawSequential", True),("rawGlobal", "rawSequential", True), 
-                    ("2PCs", False, False), ("2PCs_feats", False, False), 
-                    ("6PCs", False, False), ("6PCs_feats", False, False), 
-                    ("30PCs", False, False), ("30PCs_feats", False, False), 
-                    ("2PCs", "percentChunks", True), ("2PCs_feats", "percentChunks", True), 
-                    ("6PCs", "percentChunks", True), ("6PCs_feats", "percentChunks", True), 
-                    ("30PCs", "percentChunks", True), ("30PCs_feats", "percentChunks", True)]
+    # inputTypes = [(False, False, True), (False, "percentChunks", False), (False, "rawSequential", False), 
+    #                 ("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False), ("rawGlobal", False, False),
+    #                 (False, "percentChunks", True), (False, "rawSequential", True), 
+    #                 ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True), ("rawGlobal", False, True), 
+    #                 ("ComParE", "percentChunks", False), ("PCs", "percentChunks", False), ("PCs_feats", "percentChunks", False),("rawGlobal", "percentChunks", False), 
+    #                 ("ComParE", "rawSequential", False), ("PCs", "rawSequential", False), ("PCs_feats", "rawSequential", False),("rawGlobal", "rawSequential", False), 
+    #                 ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),("rawGlobal", "percentChunks", True),
+    #                 ("ComParE", "rawSequential", False), ("PCs", "rawSequential", True), ("PCs_feats", "rawSequential", True),("rawGlobal", "rawSequential", True), 
+    #                 ("2PCs", False, False), ("2PCs_feats", False, False), 
+    #                 ("6PCs", False, False), ("6PCs_feats", False, False), 
+    #                 ("30PCs", False, False), ("30PCs_feats", False, False), 
+    #                 ("2PCs", "percentChunks", True), ("2PCs_feats", "percentChunks", True), 
+    #                 ("6PCs", "percentChunks", True), ("6PCs_feats", "percentChunks", True), 
+    #                 ("30PCs", "percentChunks", True), ("30PCs_feats", "percentChunks", True)]
 
 
     #Time-series acoustic feature combinationsd
-    measureLists = [["f0", "hnr", "mfcc", "plp"], 
-                    ["f0", "hnr", "mfcc"], ["f0", "hnr", "plp"], 
-                    ["f0", "mfcc", "plp"], ["hnr", "mfcc", "plp"],
-                    ["f0", "hnr"], ["f0", "mfcc"], ["f0", "plp"],
-                    ["hnr", "mfcc"], ["hnr", "plp"], ["mfcc", "plp"],
-                    ["f0"], ["hnr"], ["mfcc"], ["plp"]
-                    ]  
+    # measureLists = [["f0", "hnr", "mfcc", "plp"], 
+    #                 ["f0", "hnr", "mfcc"], ["f0", "hnr", "plp"], 
+    #                 ["f0", "mfcc", "plp"], ["hnr", "mfcc", "plp"],
+    #                 ["f0", "hnr"], ["f0", "mfcc"], ["f0", "plp"],
+    #                 ["hnr", "mfcc"], ["hnr", "plp"], ["mfcc", "plp"],
+    #                 ["f0"], ["hnr"], ["mfcc"], ["plp"]
+    #                 ]  
+
+    inputTypes = [("2PCs_feats", "percentChunks", True)]
+    measureLists = [["f0", "mfcc", "plp"]]
 
 
     f0Normed=False
@@ -885,6 +883,9 @@ if __name__=="__main__":
     for i, measureList in enumerate(measureLists):
             
         for inputType in inputTypes:
+
+            print(inputType)
+
             for speakerSplit in speakerSplits:
 
                 if speakerSplit == "dependent":

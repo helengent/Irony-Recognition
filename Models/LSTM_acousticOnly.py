@@ -39,22 +39,8 @@ class acousticOnlyLSTM():
         lstm = layers.LSTM(24, activation='relu', dropout=0.05, recurrent_dropout=0.2)(acoustic)
         lstm = layers.Dense(2, activation='sigmoid')(lstm)
 
-        # dropout = layers.Dropout(0.5)(lstm)
-        # x = keras.Model(inputs=[acoustic], outputs=dropout)
-            
-        # z = layers.Dense(16, activation='relu')(x.output)
-        # z = layers.Dense(2, activation='sigmoid')(z)
-
-        # self.model = keras.Model(inputs=x.input, outputs=z)
         self.model = keras.Model(inputs=[acoustic], outputs = lstm)
         self.model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-
-        # self.model = models.Sequential()
-
-        # self.model.add(layers.LSTM(24, activation="relu", dropout=0.05, recurrent_dropout=0.2))
-        # self.model.add(layers.Dense(2, activation='sigmoid'))
-
-        # self.model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 
     def plotHist(self):
