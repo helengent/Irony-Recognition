@@ -18,7 +18,7 @@ The subdirectories are as follows
     
     iii) Scripts/PCA.py - this script performs an n-factor PCA on a provided input dataframe and outputs information about the amount of variance explained by each PC and what each PC's top five corresponding features are, as well as dataframes with PC values for each sample for use in a Logisitic Mixed Effects Regression Model (see the Rcode directory).
     
-3)  modelOptimization - the ModelOptimization subdirectory contains only the script modelOptimization.py, which performs cross-validated hyper-parameter tuning. Due to the priority in my dissertation research being placed on the comparison of different input feature combinations, hyper-parameter tuning was not prioritized and this script was not used.
+3)  modelOptimization - the ModelOptimization subdirectory contains the script modelOptimization.py, which performs cross-validated hyper-parameter tuning. The outputs of this script in the form of the best sets of hyper-parameters for the best models in the speaker dependent and speaker independent condition are housed in speakerDep.out and speakerInd.out, but the trials themselves could not be uploaded to Github due to size constraints.
 
 4)  nnets - the nnets subdirectory contains scripts for training and evaluating neural networks, as well as subdirectories containing evaluation metric results for each model run during experimentation. Some scripts are primarily the result of tinkering during the research process, but the primary scripts are below:
 
