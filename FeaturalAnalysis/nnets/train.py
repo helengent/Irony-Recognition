@@ -24,8 +24,8 @@ from FeedForward import FeedForwardNN
 from textOnly import textOnlyNN
 from LSTM_CNN_withText import acousticTextLSTM_CNN
 # from LSTM_FFNN_CNN_withText import acousticTextLSTM_CNN_FFNN
-# from LSTM_FFNN_CNN_withText_TUNED_speakerDep import acousticTextLSTM_CNN_FFNN
-from LSTM_FFNN_CNN_withText_TUNED_speakerInd import acousticTextLSTM_CNN_FFNN
+from LSTM_FFNN_CNN_withText_TUNED_speakerDep import acousticTextLSTM_CNN_FFNN
+# from LSTM_FFNN_CNN_withText_TUNED_speakerInd import acousticTextLSTM_CNN_FFNN
 from FFNN_CNN_withText import acousticTextCNN_FFNN
 from LSTM_FFNN import acousticLSTM_FFNN
 
@@ -844,18 +844,16 @@ if __name__=="__main__":
     train_status = True
 
     #Make list of tuples with combinations of input types
-    # glob_acoustic = [False, "PCs", "rawGlobal"]
-    # seq_acoustic = [False, "percentChunks", "rawSequential"]
+    # glob_acoustic = [False, "PCs", "CompParE", "PCs_feats"]
+    # seq_acoustic = [False, "percentChunks"]
     # text = [False, True]
 
-    # inputTypes = [(False, False, True), (False, "percentChunks", False), (False, "rawSequential", False), 
-    #                 ("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False), ("rawGlobal", False, False),
-    #                 (False, "percentChunks", True), (False, "rawSequential", True), 
-    #                 ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True), ("rawGlobal", False, True), 
-    #                 ("ComParE", "percentChunks", False), ("PCs", "percentChunks", False), ("PCs_feats", "percentChunks", False),("rawGlobal", "percentChunks", False), 
-    #                 ("ComParE", "rawSequential", False), ("PCs", "rawSequential", False), ("PCs_feats", "rawSequential", False),("rawGlobal", "rawSequential", False), 
-    #                 ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),("rawGlobal", "percentChunks", True),
-    #                 ("ComParE", "rawSequential", False), ("PCs", "rawSequential", True), ("PCs_feats", "rawSequential", True),("rawGlobal", "rawSequential", True), 
+    # inputTypes = [(False, False, True), (False, "percentChunks", False), 
+    #                 ("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False),
+    #                 (False, "percentChunks", True),
+    #                 ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True),
+    #                 ("ComParE", "percentChunks", False), ("PCs", "percentChunks", False), ("PCs_feats", "percentChunks", False),
+    #                 ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),
     #                 ("2PCs", False, False), ("2PCs_feats", False, False), 
     #                 ("6PCs", False, False), ("6PCs_feats", False, False), 
     #                 ("30PCs", False, False), ("30PCs_feats", False, False), 
@@ -873,8 +871,8 @@ if __name__=="__main__":
     #                 ["f0"], ["hnr"], ["mfcc"], ["plp"]
     #                 ]  
 
-    inputTypes = [("2PCs_feats", "percentChunks", True)]
-    measureLists = [["f0", "mfcc", "plp"]]
+    inputTypes = [("PCs", "percentChunks", True)]
+    measureLists = [["f0", "hnr", "mfcc"]]
 
 
     f0Normed=False

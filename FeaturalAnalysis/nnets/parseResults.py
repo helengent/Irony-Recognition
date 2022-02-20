@@ -184,20 +184,19 @@ threeResults = {"inputID": [],
                 "speakerDependentEERstd": [], "oldSplitEERstd": [], "newSplitEERstd": []}
 
 
-inputTypes = [(False, False, True), (False, "percentChunks", False), (False, "rawSequential", False), 
-                ("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False), ("rawGlobal", False, False),
-                (False, "percentChunks", True), (False, "rawSequential", True), 
-                ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True), ("rawGlobal", False, True), 
-                ("ComParE", "percentChunks", False), ("PCs", "percentChunks", False), ("PCs_feats", "percentChunks", False),("rawGlobal", "percentChunks", False), 
-                ("ComParE", "rawSequential", False), ("PCs", "rawSequential", False), ("PCs_feats", "rawSequential", False),("rawGlobal", "rawSequential", False), 
-                ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),("rawGlobal", "percentChunks", True),
-                ("ComParE", "rawSequential", False), ("PCs", "rawSequential", True), ("PCs_feats", "rawSequential", True),("rawGlobal", "rawSequential", True), 
+inputTypes = [(False, False, True), (False, "percentChunks", False), 
+                ("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False),
+                (False, "percentChunks", True),
+                ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True),
+                ("ComParE", "percentChunks", False), ("PCs", "percentChunks", False), ("PCs_feats", "percentChunks", False),
+                ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),
                 ("2PCs", False, False), ("2PCs_feats", False, False), 
                 ("6PCs", False, False), ("6PCs_feats", False, False), 
                 ("30PCs", False, False), ("30PCs_feats", False, False), 
                 ("2PCs", "percentChunks", True), ("2PCs_feats", "percentChunks", True), 
                 ("6PCs", "percentChunks", True), ("6PCs_feats", "percentChunks", True), 
                 ("30PCs", "percentChunks", True), ("30PCs_feats", "percentChunks", True)]
+
 
 measureLists = [["f0", "hnr", "mfcc", "plp"], 
                 ["f0", "hnr", "mfcc"], ["f0", "hnr", "plp"], 
@@ -210,10 +209,9 @@ measureLists = [["f0", "hnr", "mfcc", "plp"],
 
 speakerSplits = ["speakerDependent", "oldSplit", "newSplit"]
 
-for inputType in inputTypes:
-
-    for i, measureList in enumerate(measureLists):
-
+for i, measureList in enumerate(measureLists):
+    
+    for inputType in inputTypes:
 
         globAcoustic, seqAcoustic, text = inputType
 
@@ -265,14 +263,9 @@ for inputType in inputTypes:
         if text:
             t = "Text"
         if seqAcoustic:
-            if seqAcoustic == "percentChunks":
-                s = "10% Chunks"
-            else:
-                s = "Raw features"
+            s = "10% Chunks"
         if globAcoustic:
-            if globAcoustic == "rawGlobal":
-                g = "Raw features"
-            elif globAcoustic == "PCs_feats":
+            if globAcoustic == "PCs_feats":
                 g = "PCs and top feats"
             else:
                 g = globAcoustic
@@ -313,8 +306,8 @@ for inputType in inputTypes:
             else:
                 print("OH NO")
             
-            resultsDict["-".join([str(item) for item in inputType])] = [t, s, g, arch]
-            resultsDict["-".join([str(item) for item in inputType])].extend(orderedMetrics)
+            resultsDict["{}-{}".format("-".join([str(item) for item in inputType]), "-".join([str(item) for item in measureList]))] = [t, s, g, arch]
+            resultsDict["{}-{}".format("-".join([str(item) for item in inputType]), "-".join([str(item) for item in measureList]))].extend(orderedMetrics)
 
             fiveResults["inputID"].append("-".join([str(item) for item in inputType]))
             for m, key in zip(orderedMetrics, list(fiveResults.keys())[1:]):
@@ -372,18 +365,18 @@ for inputType in inputTypes:
 outResults = pd.DataFrame(resultsDict)
 outResults.to_csv("ResultsTables/modalityCompare.csv", index=False)
 
-# #seqResultsDict
-# seqResults = pd.DataFrame(seqResultsDict)
-# seqResults.to_csv("ResultsTables/seqResults.csv", index=False)
+#seqResultsDict
+seqResults = pd.DataFrame(seqResultsDict)
+seqResults.to_csv("ResultsTables/seqResults.csv", index=False)
 
-# #seqDiffsDict
-# seqDiffs = pd.DataFrame(seqDiffsDict)
-# seqDiffs.to_csv("ResultsTables/seqDiffs.csv", index=False)
+#seqDiffsDict
+seqDiffs = pd.DataFrame(seqDiffsDict)
+seqDiffs.to_csv("ResultsTables/seqDiffs.csv", index=False)
 
-# #PCResultsDict
-# PCResults = pd.DataFrame(PCResultsDict)
-# PCResults.to_csv("ResultsTables/PCResults.csv", index=False)
+#PCResultsDict
+PCResults = pd.DataFrame(PCResultsDict)
+PCResults.to_csv("ResultsTables/PCResults.csv", index=False)
 
-# #PCDiffsDict
-# PCDiffs = pd.DataFrame(PCDiffsDict)
-# PCDiffs.to_csv("ResultsTables/PCDiffs.csv", index=False)
+#PCDiffsDict
+PCDiffs = pd.DataFrame(PCDiffsDict)
+PCDiffs.to_csv("ResultsTables/PCDiffs.csv", index=False)
