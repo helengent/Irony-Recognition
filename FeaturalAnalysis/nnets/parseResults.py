@@ -184,26 +184,29 @@ threeResults = {"inputID": [],
                 "speakerDependentEERstd": [], "oldSplitEERstd": [], "newSplitEERstd": []}
 
 
-inputTypes = [(False, False, True), (False, "percentChunks", False), 
-                ("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False),
-                (False, "percentChunks", True),
-                ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True),
-                ("ComParE", "percentChunks", False), ("PCs", "percentChunks", False), ("PCs_feats", "percentChunks", False),
-                ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),
-                ("2PCs", False, False), ("2PCs_feats", False, False), 
-                ("6PCs", False, False), ("6PCs_feats", False, False), 
-                ("30PCs", False, False), ("30PCs_feats", False, False), 
-                ("2PCs", "percentChunks", True), ("2PCs_feats", "percentChunks", True), 
-                ("6PCs", "percentChunks", True), ("6PCs_feats", "percentChunks", True), 
-                ("30PCs", "percentChunks", True), ("30PCs_feats", "percentChunks", True)]
+# inputTypes = [(False, False, True), (False, "percentChunks", False), 
+#                 ("ComParE", False, False), ("PCs", False, False), ("PCs_feats", False, False),
+#                 (False, "percentChunks", True),
+#                 ("ComParE", False, True), ("PCs", False, True), ("PCs_feats", False, True),
+#                 ("ComParE", "percentChunks", False), ("PCs", "percentChunks", False), ("PCs_feats", "percentChunks", False),
+#                 ("ComParE", "percentChunks", True), ("PCs", "percentChunks", True), ("PCs_feats", "percentChunks", True),
+#                 ("2PCs", False, False), ("2PCs_feats", False, False), 
+#                 ("6PCs", False, False), ("6PCs_feats", False, False), 
+#                 ("30PCs", False, False), ("30PCs_feats", False, False), 
+#                 ("2PCs", "percentChunks", True), ("2PCs_feats", "percentChunks", True), 
+#                 ("6PCs", "percentChunks", True), ("6PCs_feats", "percentChunks", True), 
+#                 ("30PCs", "percentChunks", True), ("30PCs_feats", "percentChunks", True)]
 
+inputTypes = [("rawGlobal", False, False), 
+                    ("rawGlobal", False, True), ("rawGlobal", "percentChunks", False), 
+                    ("rawGlobal", "percentChunks", True)]
 
 measureLists = [["f0", "hnr", "mfcc", "plp"], 
-                ["f0", "hnr", "mfcc"], ["f0", "hnr", "plp"], 
-                ["f0", "mfcc", "plp"], ["hnr", "mfcc", "plp"],
-                ["f0", "hnr"], ["f0", "mfcc"], ["f0", "plp"],
-                ["hnr", "mfcc"], ["hnr", "plp"], ["mfcc", "plp"],
-                ["f0"], ["hnr"], ["mfcc"], ["plp"]
+                # ["f0", "hnr", "mfcc"], ["f0", "hnr", "plp"], 
+                # ["f0", "mfcc", "plp"], ["hnr", "mfcc", "plp"],
+                # ["f0", "hnr"], ["f0", "mfcc"], ["f0", "plp"],
+                # ["hnr", "mfcc"], ["hnr", "plp"], ["mfcc", "plp"],
+                # ["f0"], ["hnr"], ["mfcc"], ["plp"]
                 ]  
 
 

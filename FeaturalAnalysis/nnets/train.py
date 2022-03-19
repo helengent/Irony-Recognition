@@ -23,8 +23,8 @@ from LSTM_acousticOnly import acousticOnlyLSTM
 from FeedForward import FeedForwardNN
 from textOnly import textOnlyNN
 from LSTM_CNN_withText import acousticTextLSTM_CNN
-# from LSTM_FFNN_CNN_withText import acousticTextLSTM_CNN_FFNN
-from LSTM_FFNN_CNN_withText_TUNED_speakerDep import acousticTextLSTM_CNN_FFNN
+from LSTM_FFNN_CNN_withText import acousticTextLSTM_CNN_FFNN
+# from LSTM_FFNN_CNN_withText_TUNED_speakerDep import acousticTextLSTM_CNN_FFNN
 # from LSTM_FFNN_CNN_withText_TUNED_speakerInd import acousticTextLSTM_CNN_FFNN
 from FFNN_CNN_withText import acousticTextCNN_FFNN
 from LSTM_FFNN import acousticLSTM_FFNN
@@ -57,7 +57,7 @@ class ModelTrainer:
             else:
                 self.glob_file = pd.read_csv("{}/{}/all_inputs.csv".format(self.dataPath, self.glob_acoustic))
 
-        self.prefix = "TUNED_speaker-{}_".format(self.speakerSplit)
+        self.prefix = "speaker-{}_".format(self.speakerSplit)
         if self.glob_acoustic:
             self.prefix = self.prefix + "{}_".format(inputType[0])
         if self.seq_acoustic:
@@ -839,7 +839,7 @@ if __name__=="__main__":
     dataPath = "/home/hmgent2/Data/ModelInputs"
     # dataPath = "/home/hmgent2/Data/newTest_ModelInputs"
     speakerSplits = ["dependent", "independent", "independent_2"]
-    # speakerSplits = ['independent_2']
+    # speakerSplits = ['dependent']
 
     train_status = True
 
@@ -871,8 +871,10 @@ if __name__=="__main__":
     #                 ["f0"], ["hnr"], ["mfcc"], ["plp"]
     #                 ]  
 
-    inputTypes = [("PCs", "percentChunks", True)]
-    measureLists = [["f0", "hnr", "mfcc"]]
+    inputTypes = [("rawGlobal", False, False), 
+                    ("rawGlobal", False, True), ("rawGlobal", "percentChunks", False), 
+                    ("rawGlobal", "percentChunks", True)]
+    measureLists = [["f0", "hnr", "mfcc", "plp"]]
 
 
     f0Normed=False
