@@ -77,7 +77,7 @@ class acousticTextLSTM_CNN_FFNN():
         z = layers.Dense(2, activation='sigmoid')(z)
 
         self.model = keras.Model(inputs=x.input, outputs=z)
-        self.model.compile(loss='sparse_categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
+        self.model.compile(loss='sparse_categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 
     def plotHist(self):

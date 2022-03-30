@@ -63,7 +63,7 @@ class acousticTextLSTM_CNN_FFNN():
         embedded = layers.Concatenate()(embeddingConvs)
         embedded = layers.Dense(352, activation='relu')(embedded)
 
-        lstm = layers.LSTM(189, activation='relu', dropout=0.1, recurrent_dropout=0.2)(seq_acoustic)
+        lstm = layers.LSTM(180, activation='relu', dropout=0.1, recurrent_dropout=0.2)(seq_acoustic)
         lstm = layers.Dense(352, activation='relu')(lstm)
 
         ffnn = layers.Dense(352)(glob_acoustic)

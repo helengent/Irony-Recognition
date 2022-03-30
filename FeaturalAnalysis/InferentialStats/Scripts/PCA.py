@@ -324,7 +324,7 @@ def main(df, newdf, numComps, subDir):
 if __name__=="__main__":
 
     df = pd.read_csv("../Data/all_narrowed.csv")
-    new_df = pd.read_csv("../Data/all_narrowed.csv")
+    new_df = pd.read_csv("../Data/newTest_all_narrowed.csv")
 
     numComps = [3]
     subDir = "narrowed"

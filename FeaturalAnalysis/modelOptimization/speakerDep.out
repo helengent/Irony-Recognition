@@ -17,7 +17,7 @@ conv1_size: 168
 conv2_size: 184
 conv3_size: 176
 conv4_size: 104
-Score: 0.7389247417449951
+Score: 0.738924741744995
 
 Trial summary
 Hyperparameters:

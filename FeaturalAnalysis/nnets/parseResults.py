@@ -197,9 +197,7 @@ threeResults = {"inputID": [],
 #                 ("6PCs", "percentChunks", True), ("6PCs_feats", "percentChunks", True), 
 #                 ("30PCs", "percentChunks", True), ("30PCs_feats", "percentChunks", True)]
 
-inputTypes = [("rawGlobal", False, False), 
-                    ("rawGlobal", False, True), ("rawGlobal", "percentChunks", False), 
-                    ("rawGlobal", "percentChunks", True)]
+inputTypes = [("30PCs", False, True), ("30PCs", "percentChunks", False)]
 
 measureLists = [["f0", "hnr", "mfcc", "plp"], 
                 # ["f0", "hnr", "mfcc"], ["f0", "hnr", "plp"], 
@@ -288,8 +286,8 @@ for i, measureList in enumerate(measureLists):
             intermediateResults["speakerDependentEER"], intermediateResults["oldSplitEER"], intermediateResults["newSplitEER"],
             intermediateResults["speakerDependentEERstd"], intermediateResults["oldSplitEERstd"], intermediateResults["newSplitEERstd"]]
 
-        if len(measureList) == 4 and globAcoustic not in ["2PCs", "2PCs_feats", "6PCs", "6PCs_feats", "30PCs", "30PCs_feats"]:
-            # Results for models with all 5 time-series acoustic features will finish first
+        if len(measureList) == 4:# and globAcoustic not in ["2PCs", "2PCs_feats", "6PCs", "6PCs_feats", "30PCs", "30PCs_feats"]:
+            # Results for models with all 4 time-series acoustic features will finish first
             # Only these results will go in resultsDict, fiveResults, and threeResults
 
             if text and not seqAcoustic and not globAcoustic:

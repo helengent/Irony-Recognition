@@ -23,9 +23,11 @@ from LSTM_acousticOnly import acousticOnlyLSTM
 from FeedForward import FeedForwardNN
 from textOnly import textOnlyNN
 from LSTM_CNN_withText import acousticTextLSTM_CNN
+# from LSTM_CNN_withText_TUNED import acousticTextLSTM_CNN
 from LSTM_FFNN_CNN_withText import acousticTextLSTM_CNN_FFNN
+# from LSTM_FFNN_CNN_withText_TUNED_sepData import acousticTextLSTM_CNN_FFNN
 # from LSTM_FFNN_CNN_withText_TUNED_speakerDep import acousticTextLSTM_CNN_FFNN
-# from LSTM_FFNN_CNN_withText_TUNED_speakerInd import acousticTextLSTM_CNN_FFNN
+from LSTM_FFNN_CNN_withText_TUNED_speakerInd import acousticTextLSTM_CNN_FFNN
 from FFNN_CNN_withText import acousticTextCNN_FFNN
 from LSTM_FFNN import acousticLSTM_FFNN
 
@@ -57,7 +59,9 @@ class ModelTrainer:
             else:
                 self.glob_file = pd.read_csv("{}/{}/all_inputs.csv".format(self.dataPath, self.glob_acoustic))
 
-        self.prefix = "speaker-{}_".format(self.speakerSplit)
+#NEW-TUNED_
+
+        self.prefix = "NEW-TUNED_speaker-{}_".format(self.speakerSplit)
         if self.glob_acoustic:
             self.prefix = self.prefix + "{}_".format(inputType[0])
         if self.seq_acoustic:
@@ -838,8 +842,8 @@ if __name__=="__main__":
 
     dataPath = "/home/hmgent2/Data/ModelInputs"
     # dataPath = "/home/hmgent2/Data/newTest_ModelInputs"
-    speakerSplits = ["dependent", "independent", "independent_2"]
-    # speakerSplits = ['dependent']
+    # speakerSplits = ["dependent", "independent", "independent_2"]
+    speakerSplits = ['independent_2']
 
     train_status = True
 
@@ -871,10 +875,9 @@ if __name__=="__main__":
     #                 ["f0"], ["hnr"], ["mfcc"], ["plp"]
     #                 ]  
 
-    inputTypes = [("rawGlobal", False, False), 
-                    ("rawGlobal", False, True), ("rawGlobal", "percentChunks", False), 
-                    ("rawGlobal", "percentChunks", True)]
-    measureLists = [["f0", "hnr", "mfcc", "plp"]]
+    # inputTypes = [("30PCs", "percentChunks", True)]
+    inputTypes = [("2PCs_feats", "percentChunks", True)]
+    measureLists = [["f0", "mfcc", "plp"]]
 
 
     f0Normed=False
