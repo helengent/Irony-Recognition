@@ -12,3 +12,6 @@ My dissertation research regarding acoustic cues for irony in spontaneous speech
 5)  Pre-annotation audio preparation scripts can be found in the preAnnotation directory.
 
 6)  R code for inferential statistics can be found in the Rcode directory. 
+
+
+This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License.
